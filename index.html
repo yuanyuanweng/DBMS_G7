@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ワンちゃんの縁 — 流浪狗認養平台</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ======== HEADER ======== -->
+  <header class="site-header">
+    <nav class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-paw">🐾</span>
+        <span>ワンちゃんの縁</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#dogs">尋找夥伴</a></li>
+        <li><a href="#how">認養流程</a></li>
+        <li><a href="#ai-feature">AI 故事</a></li>
+        <li><a href="#" id="openAdminPanel">管理後台</a></li>
+        <li><a href="#" class="nav-btn" id="openLoginModal">登入 / 註冊</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ======== HERO ======== -->
+  <section class="hero">
+    <!-- floating petals -->
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="hero-bg-pattern"></div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="hero-eyebrow">🌸 AI 驅動的認養體驗</span>
+        <h1 class="hero-title">
+          每隻狗狗都有<br>
+          <span class="accent">屬於它的故事</span><br>
+          等待你來譜寫
+        </h1>
+        <p class="hero-subtitle">
+          透過 AI 智能媒合，我們不只是讓你看到狗狗的外表，
+          更讓你感受牠的個性與生命故事——找到真正屬於彼此的緣分。
+        </p>
+        <div class="hero-actions">
+          <a href="#dogs" class="btn-primary">🐕 開始尋找夥伴</a>
+          <a href="#how" class="btn-secondary">了解認養流程 →</a>
+        </div>
+      </div>
+
+      <div class="hero-illustration">
+        <div class="hero-dog-card">
+          <!-- floating tags -->
+          <div class="floating-tag">✨ AI 生成故事</div>
+          <div class="floating-tag">🏡 等待好家庭</div>
+
+          <!-- Dog SVG Illustration -->
+          <svg class="hero-dog-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background wash -->
+            <rect width="320" height="240" fill="#F0E6D3" rx="16"/>
+            <!-- Ground -->
+            <ellipse cx="160" cy="215" rx="90" ry="14" fill="#D9C4A8" opacity="0.5"/>
+            <!-- Tail -->
+            <path d="M230 170 Q260 140 252 118 Q248 108 240 112 Q244 126 220 150Z" fill="#C4714A"/>
+            <!-- Body -->
+            <ellipse cx="175" cy="175" rx="65" ry="45" fill="#D9A57A"/>
+            <!-- Head -->
+            <circle cx="115" cy="148" r="42" fill="#D9A57A"/>
+            <!-- Left Ear -->
+            <ellipse cx="90" cy="118" rx="18" ry="26" fill="#C4714A" transform="rotate(-15 90 118)"/>
+            <!-- Right Ear -->
+            <ellipse cx="140" cy="115" rx="14" ry="22" fill="#C4714A" transform="rotate(10 140 115)"/>
+            <!-- Snout -->
+            <ellipse cx="102" cy="162" rx="22" ry="16" fill="#E8B98A"/>
+            <!-- Nose -->
+            <ellipse cx="102" cy="155" rx="9" ry="6" fill="#4A3728"/>
+            <!-- Nose shine -->
+            <ellipse cx="99" cy="153" rx="3" ry="2" fill="white" opacity="0.6"/>
+            <!-- Left Eye -->
+            <circle cx="97" cy="138" r="8" fill="white"/>
+            <circle cx="98" cy="139" r="5" fill="#2C2416"/>
+            <circle cx="100" cy="137" r="2" fill="white"/>
+            <!-- Right Eye -->
+            <circle cx="127" cy="135" r="8" fill="white"/>
+            <circle cx="128" cy="136" r="5" fill="#2C2416"/>
+            <circle cx="130" cy="134" r="2" fill="white"/>
+            <!-- Mouth -->
+            <path d="M95 166 Q102 172 109 166" stroke="#8B6F52" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- Tongue -->
+            <ellipse cx="102" cy="172" rx="7" ry="6" fill="#E07070"/>
+            <!-- Front Legs -->
+            <rect x="128" y="205" width="18" height="30" rx="9" fill="#D9A57A"/>
+            <rect x="155" y="205" width="18" height="30" rx="9" fill="#D9A57A"/>
+            <!-- Paw toes -->
+            <ellipse cx="132" cy="234" rx="4" ry="3" fill="#C4714A"/>
+            <ellipse cx="140" cy="234" rx="4" ry="3" fill="#C4714A"/>
+            <ellipse cx="159" cy="234" rx="4" ry="3" fill="#C4714A"/>
+            <ellipse cx="167" cy="234" rx="4" ry="3" fill="#C4714A"/>
+            <!-- Spots -->
+            <circle cx="185" cy="165" r="8" fill="#C4714A" opacity="0.4"/>
+            <circle cx="200" cy="180" r="5" fill="#C4714A" opacity="0.3"/>
+            <!-- Bandana -->
+            <path d="M85 172 Q102 182 119 172 L115 188 Q102 196 89 188Z" fill="#C4714A" opacity="0.8"/>
+            <!-- Hearts floating -->
+            <text x="230" y="135" font-size="16" fill="#C4714A" opacity="0.6">♥</text>
+            <text x="72" y="110" font-size="12" fill="#8A9E8C" opacity="0.5">♥</text>
+            <text x="250" y="100" font-size="10" fill="#C4714A" opacity="0.4">♥</text>
+            <!-- Flower decorations -->
+            <text x="38" y="195" font-size="14" opacity="0.5">🌸</text>
+            <text x="268" y="200" font-size="14" opacity="0.5">🌿</text>
+          </svg>
+
+          <p style="font-family:var(--font-serif);font-size:1rem;font-weight:700;color:var(--dark-brown);margin-bottom:4px;">小豆 Komame</p>
+          <p style="font-size:0.78rem;color:var(--gray);">柴犬混種 · 2歲 · 台北市</p>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="num">128</span>
+              <span class="lbl">待認養</span>
+            </div>
+            <div class="hero-stat">
+              <span class="num">94%</span>
+              <span class="lbl">配對成功</span>
+            </div>
+            <div class="hero-stat">
+              <span class="num">342</span>
+              <span class="lbl">已出養</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== SEARCH ======== -->
+  <section class="search-section" id="search">
+    <div class="search-box">
+      <p class="search-title">🔍 篩選條件</p>
+      <div class="search-row">
+        <div class="form-group">
+          <label class="form-label">搜尋名字 / 品種</label>
+          <input class="form-input" type="text" placeholder="例：柴犬、黃金獵犬…" id="searchName"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">體型</label>
+          <select class="form-select" id="filterSize">
+            <option value="">全部體型</option>
+            <option value="小型">小型犬</option>
+            <option value="中型">中型犬</option>
+            <option value="大型">大型犬</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">地區</label>
+          <select class="form-select" id="filterCity">
+            <option value="">全台灣</option>
+            <option value="台北市">台北市</option>
+            <option value="新北市">新北市</option>
+            <option value="台中市">台中市</option>
+            <option value="台南市">台南市</option>
+            <option value="高雄市">高雄市</option>
+          </select>
+        </div>
+        <button class="search-btn" id="doSearch">
+          🔎 搜尋
+        </button>
+      </div>
+
+      <hr class="divider"/>
+
+      <div>
+        <div class="ai-label">✨ AI 智能媒合（描述你的生活，我幫你找最適合的狗狗）</div>
+        <div class="ai-search-wrapper">
+          <input class="ai-input" type="text" id="aiSearchInput"
+            placeholder="例：我住小公寓、每天能散步30分鐘、喜歡安靜的狗狗…"/>
+          <button class="ai-btn" id="aiSearchBtn">
+            🤖 AI 媒合
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== DOGS GRID ======== -->
+  <section class="section" id="dogs">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-tag">🐕 等待好家庭</span>
+        <h2 class="section-title">遇見你的毛茸茸命定夥伴</h2>
+        <p class="section-subtitle">每個生命都值得被愛，每段故事都等待續寫。</p>
+      </div>
+
+      <div class="dogs-grid" id="dogsGrid">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="text-center mt-2">
+        <button class="btn-secondary" id="loadMoreBtn">載入更多 →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== HOW IT WORKS ======== -->
+  <section class="section how-section" id="how">
+    <div class="section-inner">
+      <div class="section-header">
+        <span class="section-tag">🗺 認養流程</span>
+        <h2 class="section-title">四個步驟，帶牠回家</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon-wrap">
+            🔍
+            <span class="step-num">1</span>
+          </div>
+          <p class="step-title">瀏覽 & 媒合</p>
+          <p class="step-desc">用 AI 描述你的生活方式，系統推薦最適合的狗狗，或直接篩選瀏覽。</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-wrap">
+            📝
+            <span class="step-num">2</span>
+          </div>
+          <p class="step-title">填寫認養申請</p>
+          <p class="step-desc">填寫基本資料與居住環境，讓收容所了解你的狀況，一切從透明開始。</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-wrap">
+            📞
+            <span class="step-num">3</span>
+          </div>
+          <p class="step-title">審核 & 聯絡</p>
+          <p class="step-desc">收容所管理員審核申請，確認後主動聯絡安排見面時間。</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon-wrap">
+            🏠
+            <span class="step-num">4</span>
+          </div>
+          <p class="step-title">帶牠回家 🎉</p>
+          <p class="step-desc">完成手續，帶你的新夥伴踏上新生活。這是一個嶄新的開始。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== AI FEATURE ======== -->
+  <section class="section ai-section" id="ai-feature">
+    <div class="section-inner">
+      <div class="ai-feature-grid">
+        <!-- AI Story Demo -->
+        <div class="ai-story-demo">
+          <div class="ai-story-header">
+            <div class="ai-avatar">🐶</div>
+            <div>
+              <p class="ai-story-name">小豆的故事</p>
+              <p class="ai-story-sub">✨ 由 AI 生成的個性故事</p>
+            </div>
+          </div>
+          <p class="ai-story-content" id="demoStoryText">
+            「我叫小豆，是一隻喜歡在陽光下打盹的小傢伙。我不需要太大的空間，
+            只需要每天一小段散步和一個讓我靠著的溫暖膝蓋。
+            我最愛雨後泥土的氣味，和主人一起看窗外的麻雀……
+            如果你也喜歡慢慢的生活，也許我們就是彼此的命定。」
+          </p>
+          <div class="ai-tags-row" id="demoTags">
+            <span class="ai-tag">🏠 適合公寓</span>
+            <span class="ai-tag">🧘 性格溫和</span>
+            <span class="ai-tag">🚶 低度運動</span>
+            <span class="ai-tag">👶 親近孩童</span>
+            <span class="ai-tag">🐱 與貓共存</span>
+          </div>
+        </div>
+
+        <!-- Feature Points -->
+        <div class="ai-feature-text">
+          <span class="section-tag">🤖 AI 功能亮點</span>
+          <h2 class="section-title" style="text-align:left;margin-top:0.5rem;">
+            不只是資料，<br>更是一段故事
+          </h2>
+          <p class="section-subtitle" style="text-align:left;margin:0;">
+            傳統認養資料冰冷、缺乏情感連結。我們讓 AI 為每隻狗狗撰寫獨特的個性故事，
+            幫助你找到真正「合得來」的夥伴。
+          </p>
+          <ul class="feature-points">
+            <li class="feature-point">
+              <div class="fp-icon">📖</div>
+              <div class="fp-text">
+                <strong>AI 個性故事生成</strong>
+                <span>根據狗狗基本資訊，自動生成溫情的第一人稱故事敘述</span>
+              </div>
+            </li>
+            <li class="feature-point">
+              <div class="fp-icon">🏷️</div>
+              <div class="fp-text">
+                <strong>智能標籤分析</strong>
+                <span>AI 分析適合的居住環境、運動需求、家庭組成等生活標籤</span>
+              </div>
+            </li>
+            <li class="feature-point">
+              <div class="fp-icon">💬</div>
+              <div class="fp-text">
+                <strong>自然語言媒合搜尋</strong>
+                <span>用日常語言描述你的生活，系統找出最適合你的狗狗</span>
+              </div>
+            </li>
+            <li class="feature-point">
+              <div class="fp-icon">📊</div>
+              <div class="fp-text">
+                <strong>認養數據分析</strong>
+                <span>後台即時統計認養趨勢，幫助收容所優化管理效率</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FOOTER ======== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-logo">🐾Pickpet</p>
+      <p class="footer-tagline">每一個相遇，都是緣分的開始</p>
+      <ul class="footer-links">
+        <li><a href="#">關於我們</a></li>
+        <li><a href="#">認養須知</a></li>
+        <li><a href="#">收容所合作</a></li>
+        <li><a href="#">隱私政策</a></li>
+        <li><a href="#">聯絡我們</a></li>
+      </ul>
+      <p class="footer-copy">
+        © 2025 ワンちゃんの縁 · Group 7 · AI-Powered Stray Dog Adoption Platform
+        <br/>Made with ♥ by 王信淳、陳泰銘、顏紹育、魏璋珣、翁圓舒、王信安
+      </p>
+    </div>
+  </footer>
+
+  <!-- ======== DOG DETAIL MODAL ======== -->
+  <div class="modal-overlay" id="dogModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalDogName">狗狗詳情</h2>
+        <button class="modal-close" id="closeDogModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-dog-hero" id="modalDogHero">
+          <!-- SVG or img -->
+        </div>
+        <div class="modal-info-grid" id="modalInfoGrid">
+          <!-- filled by JS -->
+        </div>
+        <div class="modal-story" id="modalStoryBlock" style="display:none;">
+          <div class="modal-story-label">✨ AI 生成的個性故事</div>
+          <p class="modal-story-text" id="modalStoryText"></p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="openApplyForm">📝 提交認養申請</button>
+          <button class="btn-secondary" id="generateAIStoryBtn">✨ 生成 AI 故事</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== ADOPTION FORM MODAL ======== -->
+  <div class="modal-overlay" id="applyModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">📝 認養申請表</h2>
+        <button class="modal-close" id="closeApplyModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.85rem;color:var(--brown);margin-bottom:1rem;">
+          正在申請認養：<strong id="applyDogName" style="color:var(--terracotta)">—</strong>
+        </p>
+        <p class="form-section-title">👤 個人基本資料</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">姓名</label>
+            <input class="form-input" type="text" id="applyFullName" placeholder="王小明"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">聯絡電話</label>
+            <input class="form-input" type="tel" id="applyPhone" placeholder="0912-345-678"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="applyEmail" placeholder="example@mail.com"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">居住縣市</label>
+            <select class="form-select" id="applyCity">
+              <option value="">請選擇</option>
+              <option>台北市</option><option>新北市</option><option>台中市</option>
+              <option>台南市</option><option>高雄市</option><option>其他</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="form-section-title">🏠 居住環境</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">住宅類型</label>
+            <select class="form-select" id="applyHouseType">
+              <option value="">請選擇</option>
+              <option>公寓（無電梯）</option>
+              <option>公寓（有電梯）</option>
+              <option>透天厝</option>
+              <option>別墅/有院子</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">家中有無其他寵物</label>
+            <select class="form-select" id="applyPets">
+              <option value="">請選擇</option>
+              <option>沒有</option>
+              <option>有其他狗狗</option>
+              <option>有貓</option>
+              <option>有其他動物</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="form-section-title">💬 認養動機</p>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">請描述你認養這隻狗狗的原因與期待</label>
+            <textarea class="form-textarea" id="applyReason"
+              placeholder="例如：我一直很喜歡這個品種，平時工作規律，每天可以帶牠散步…"></textarea>
+          </div>
+        </div>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">你的日常作息（幫助我們更了解你的生活型態）</label>
+            <textarea class="form-textarea" id="applyLifestyle"
+              placeholder="例如：朝九晚六上班族，假日喜歡爬山，家裡有小孩…"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem;display:flex;gap:1rem;">
+          <button class="btn-primary" id="submitApply" style="flex:1;justify-content:center;">🐾 送出申請</button>
+          <button class="btn-secondary" id="cancelApply" style="flex:1;justify-content:center;">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== LOGIN MODAL ======== -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🐾 登入 / 註冊</h2>
+        <button class="modal-close" id="closeLoginModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;">
+          <button class="btn-primary" id="tabLogin" style="flex:1;justify-content:center;font-size:0.85rem;">登入</button>
+          <button class="btn-secondary" id="tabRegister" style="flex:1;justify-content:center;font-size:0.85rem;">註冊</button>
+        </div>
+        <div id="loginForm">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" placeholder="your@email.com"/>
+          </div>
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label class="form-label">密碼</label>
+            <input class="form-input" type="password" placeholder="••••••••"/>
+          </div>
+          <button class="btn-primary" style="width:100%;justify-content:center;" id="doLogin">登入帳號</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== AI SEARCH RESULT MODAL ======== -->
+  <div class="modal-overlay" id="aiResultModal">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🤖 AI 媒合結果</h2>
+        <button class="modal-close" id="closeAiModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="aiResultContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== TOAST ======== -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">操作成功</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
