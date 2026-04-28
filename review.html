@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Applications — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section">
+  <div class="section-inner">
+
+    <div class="section-header">
+      <span class="section-tag">🔎 Admin</span>
+      <h2 class="section-title">Review Adoption Applications</h2>
+      <p class="section-subtitle">Approve or reject incoming applications for your shelter's dogs.</p>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:0.6rem;justify-content:center;margin-bottom:2.5rem;flex-wrap:wrap;">
+      {% for status in ['All', 'Pending', 'Approved', 'Rejected'] %}
+        <a href="{{ url_for('applications.review', status=status if status != 'All' else '') }}"
+           class="{% if (request.args.get('status','') == status) or (status == 'All' and not request.args.get('status')) %}btn-primary{% else %}btn-secondary{% endif %}"
+           style="padding:8px 20px;font-size:0.85rem;">
+          {{ status }}
+          {% if status == 'Pending' and pending_count %}
+            <span style="background:var(--terracotta);color:#fff;border-radius:100px;
+                         padding:1px 7px;font-size:0.7rem;margin-left:6px;">{{ pending_count }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if applications %}
+      <div style="display:flex;flex-direction:column;gap:1.2rem;max-width:900px;margin:0 auto;">
+        {% for app in applications %}
+        <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:1.8rem 2rem;
+                    box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
+
+          <div style="display:flex;align-items:flex-start;gap:1.5rem;">
+            <!-- Dog thumbnail -->
+            <div style="width:72px;height:72px;background:var(--sand);border-radius:var(--radius-md);
+                        flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">
+              {% if app.dog.image_url %}
+                <img src="{{ app.dog.image_url }}" style="width:100%;height:100%;object-fit:cover;"/>
+              {% else %}🐶{% endif %}
+            </div>
+
+            <div style="flex:1;">
+              <!-- Header row -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem;">
+                <div>
+                  <p style="font-family:var(--font-serif);font-weight:700;font-size:1.05rem;color:var(--dark-brown);">
+                    {{ app.user.name }} → <span style="color:var(--terracotta);">{{ app.dog.name }}</span>
+                  </p>
+                  <p style="font-size:0.78rem;color:var(--gray);">
+                    {{ app.dog.breed }} · Submitted {{ app.created_at.strftime('%b %d, %Y') }}
+                  </p>
+                </div>
+                <!-- Status badge -->
+                {% set status_styles = {
+                  'Pending':  'background:#FFF7ED;color:#C4714A;border:1px solid #C4714A;',
+                  'Approved': 'background:#F0F7F1;color:#4A8A5A;border:1px solid #4A8A5A;',
+                  'Rejected': 'background:#FEF0EC;color:#C4714A;border:1px solid #C4714A;'
+                } %}
+                <span style="padding:5px 14px;border-radius:100px;font-size:0.76rem;font-weight:600;
+                             {{ status_styles.get(app.status, '') }}">
+                  {{ app.status }}
+                </span>
+              </div>
+
+              <!-- Applicant details (collapsible) -->
+              <div style="background:var(--cream);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:0.8rem;">
+                  <p style="font-size:0.8rem;color:var(--brown);"><strong>Email:</strong> {{ app.user.email }}</p>
+                  <p style="font-size:0.8rem;color:var(--brown);"><strong>Phone:</strong> {{ app.phone or '—' }}</p>
+                  <p style="font-size:0.8rem;color:var(--brown);"><strong>City:</strong> {{ app.city or '—' }}</p>
+                  <p style="font-size:0.8rem;color:var(--brown);"><strong>Housing:</strong> {{ app.house_type or '—' }}</p>
+                  <p style="font-size:0.8rem;color:var(--brown);"><strong>Other Pets:</strong> {{ app.other_pets or 'None' }}</p>
+                </div>
+                {% if app.reason %}
+                <p style="font-size:0.82rem;color:var(--brown);border-top:1px dashed var(--tan);padding-top:0.7rem;">
+                  <strong>Motivation:</strong> {{ app.reason }}
+                </p>
+                {% endif %}
+                {% if app.lifestyle %}
+                <p style="font-size:0.82rem;color:var(--brown);margin-top:0.4rem;">
+                  <strong>Lifestyle:</strong> {{ app.lifestyle }}
+                </p>
+                {% endif %}
+              </div>
+
+              <!-- Action buttons (only if Pending) -->
+              {% if app.status == 'Pending' %}
+              <div style="display:flex;gap:0.8rem;">
+                <form method="POST" action="{{ url_for('applications.approve', app_id=app.id) }}" style="flex:1;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn-primary"
+                          style="width:100%;justify-content:center;font-size:0.85rem;
+                                 background:var(--sage);box-shadow:none;">
+                    ✅ Approve
+                  </button>
+                </form>
+                <form method="POST" action="{{ url_for('applications.reject', app_id=app.id) }}" style="flex:1;"
+                      onsubmit="return confirm('Reject this application?')">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn-secondary"
+                          style="width:100%;justify-content:center;font-size:0.85rem;
+                                 color:var(--terracotta);border-color:var(--terracotta);">
+                    ❌ Reject
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div style="text-align:center;padding:4rem 0;">
+        <div style="font-size:3rem;margin-bottom:1rem;">📋</div>
+        <p style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);">No applications found</p>
+        <p style="font-size:0.85rem;color:var(--gray);margin-top:0.5rem;">
+          {% if request.args.get('status') %}Try switching to a different status tab.{% else %}No applications have been submitted yet.{% endif %}
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

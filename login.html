@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section" style="min-height:70vh;display:flex;align-items:center;">
+  <div class="section-inner" style="max-width:440px;width:100%;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div style="font-size:3rem;margin-bottom:0.5rem;">🐾</div>
+      <h1 style="font-family:var(--font-serif);font-size:1.8rem;color:var(--dark-brown);">Welcome Back</h1>
+      <p style="color:var(--gray);font-size:0.88rem;">Log in to continue your adoption journey.</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:0.6rem;margin-bottom:2rem;">
+      <a href="{{ url_for('auth.login') }}"
+         class="btn-primary" style="flex:1;justify-content:center;font-size:0.88rem;">Log In</a>
+      <a href="{{ url_for('auth.register') }}"
+         class="btn-secondary" style="flex:1;justify-content:center;font-size:0.88rem;">Sign Up</a>
+    </div>
+
+    <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2.5rem;
+                box-shadow:var(--shadow-md);border:1px solid var(--light-gray);">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div style="background:{% if category == 'error' %}#FEF0EC{% else %}#F0F7F1{% endif %};
+                      border:1px solid {% if category == 'error' %}var(--terracotta){% else %}var(--sage){% endif %};
+                      border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1.2rem;
+                      font-size:0.85rem;color:{% if category == 'error' %}var(--terracotta){% else %}var(--sage){% endif %};">
+            {{ message }}
+          </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% if next %}<input type="hidden" name="next" value="{{ next }}"/>{% endif %}
+
+        <div class="form-group" style="margin-bottom:1.2rem;">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" name="email" required
+                 value="{{ form.email.data or '' }}"
+                 placeholder="your@email.com" autofocus/>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.8rem;">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" name="password" required placeholder="••••••••"/>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:0.95rem;padding:14px;">
+          Log In to My Account
+        </button>
+      </form>
+
+      <p style="text-align:center;margin-top:1.2rem;font-size:0.82rem;color:var(--gray);">
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}" style="color:var(--terracotta);text-decoration:none;">Sign up here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

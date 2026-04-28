@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ dog.name }} — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section">
+  <div class="section-inner" style="max-width:860px;">
+
+    <!-- Back link -->
+    <a href="{{ url_for('dogs.list') }}" class="btn-secondary"
+       style="display:inline-flex;margin-bottom:2rem;font-size:0.85rem;">
+      ← Back to All Dogs
+    </a>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;">
+
+      <!-- Left: Image + Tags -->
+      <div>
+        <div class="modal-dog-hero" style="height:320px;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.5rem;">
+          {% if dog.image_url %}
+            <img src="{{ dog.image_url }}" alt="{{ dog.name }}"
+                 style="width:100%;height:100%;object-fit:cover;"/>
+          {% else %}
+            <div id="detailDogSVG"
+                 data-color="{{ dog.color or '#D9A57A' }}"
+                 data-spot="{{ dog.spot_color or '#C4714A' }}"
+                 data-urgent="{{ 'true' if dog.is_urgent else 'false' }}"
+                 style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--sand);">
+              <!-- SVG injected by app.js -->
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Status badge -->
+        <div style="margin-bottom:1.2rem;">
+          <span class="dog-status-badge {% if dog.is_urgent %}urgent{% endif %}"
+                style="font-size:0.8rem;padding:6px 16px;">
+            {{ 'Urgent Adoption Needed' if dog.is_urgent else 'Available for Adoption' }}
+          </span>
+        </div>
+
+        <!-- Tags -->
+        <div class="dog-tags" style="margin-bottom:1.5rem;">
+          {% for tag in dog.tags %}
+            <span class="dog-tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+
+        <!-- AI Story -->
+        <div class="modal-story" id="storyBlock"
+             style="{{ 'display:none;' if not dog.ai_story else '' }}">
+          <div class="modal-story-label">✨ AI-Generated Personality Story</div>
+          <p class="modal-story-text" id="storyText">{{ dog.ai_story or '' }}</p>
+        </div>
+
+        {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user.role == 'shelter_admin') %}
+          <!-- Admin: Generate / Regenerate Story -->
+          <form method="POST" action="{{ url_for('dogs.generate_story', id=dog.id) }}" style="margin-top:1rem;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="btn-secondary" style="width:100%;justify-content:center;">
+              ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
+            </button>
+          </form>
+        {% else %}
+          <button class="btn-secondary" id="generateAIStoryBtn"
+                  data-dog-id="{{ dog.id }}"
+                  style="width:100%;justify-content:center;margin-top:1rem;">
+            ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
+          </button>
+        {% endif %}
+      </div>
+
+      <!-- Right: Info + Apply -->
+      <div>
+        <h1 style="font-family:var(--font-serif);font-size:2rem;font-weight:700;color:var(--dark-brown);margin-bottom:4px;">
+          {{ dog.name }}
+        </h1>
+        <p style="color:var(--gray);font-size:0.9rem;margin-bottom:1.8rem;">
+          {{ dog.breed }} · {{ dog.shelter.name if dog.shelter else 'Unknown Shelter' }}
+        </p>
+
+        <!-- Info Grid -->
+        <div class="modal-info-grid" style="margin-bottom:2rem;">
+          <div class="info-item">
+            <div class="info-label">Breed</div>
+            <div class="info-value">{{ dog.breed }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Age</div>
+            <div class="info-value">{{ dog.age }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Gender</div>
+            <div class="info-value">{{ dog.gender }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Size</div>
+            <div class="info-value">{{ dog.size }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">City</div>
+            <div class="info-value">{{ dog.city }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Health Status</div>
+            <div class="info-value">{{ dog.health_status or 'See shelter for details' }}</div>
+          </div>
+          <div class="info-item" style="grid-column:1/-1;">
+            <div class="info-label">Shelter</div>
+            <div class="info-value">{{ dog.shelter.name if dog.shelter else '—' }}</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        {% if dog.description %}
+        <div style="margin-bottom:2rem;">
+          <p style="font-size:0.78rem;font-weight:600;color:var(--gray);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.5rem;">
+            About {{ dog.name }}
+          </p>
+          <p style="font-size:0.9rem;color:var(--brown);line-height:1.8;">{{ dog.description }}</p>
+        </div>
+        {% endif %}
+
+        <!-- CTA -->
+        {% if current_user.is_authenticated %}
+          {% if already_applied %}
+            <div style="background:var(--pale-yellow);border-radius:var(--radius-md);padding:1.2rem;text-align:center;">
+              <p style="font-size:0.88rem;color:var(--brown);">
+                ✅ You have already submitted an application for <strong>{{ dog.name }}</strong>.
+              </p>
+              <a href="{{ url_for('applications.my_applications') }}" class="btn-secondary"
+                 style="margin-top:0.8rem;display:inline-flex;font-size:0.85rem;">
+                View My Applications →
+              </a>
+            </div>
+          {% else %}
+            <a href="{{ url_for('applications.apply', dog_id=dog.id) }}" class="btn-primary"
+               style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
+              📝 Submit Adoption Application
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('auth.login') }}?next={{ request.url }}" class="btn-primary"
+             style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
+            Log In to Apply 🐾
+          </a>
+        {% endif %}
+
+        <!-- Admin Controls -->
+        {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user.role == 'shelter_admin') %}
+        <div style="margin-top:1.5rem;display:flex;gap:0.8rem;padding-top:1.5rem;border-top:1px dashed var(--tan);">
+          <a href="{{ url_for('dogs.edit', id=dog.id) }}" class="btn-secondary"
+             style="flex:1;justify-content:center;font-size:0.85rem;">
+            ✏️ Edit Dog Profile
+          </a>
+          <form method="POST" action="{{ url_for('dogs.delete', id=dog.id) }}" style="flex:1;"
+                onsubmit="return confirm('Are you sure you want to remove {{ dog.name }}?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" class="btn-secondary"
+                    style="width:100%;justify-content:center;font-size:0.85rem;color:var(--terracotta);border-color:var(--terracotta);">
+              🗑 Remove
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Inject SVG illustration if no image
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('detailDogSVG');
+    if (el) {
+      const dog = {
+        color: el.dataset.color,
+        spotColor: el.dataset.spot,
+        urgent: el.dataset.urgent === 'true'
+      };
+      el.innerHTML = generateDogSVG(dog, 320);
+    }
+
+    // AI Story generation (client-side via /ai/story endpoint)
+    const storyBtn = document.getElementById('generateAIStoryBtn');
+    if (storyBtn) {
+      storyBtn.addEventListener('click', async () => {
+        const dogId = storyBtn.dataset.dogId;
+        storyBtn.textContent = '⏳ Generating…';
+        storyBtn.disabled = true;
+
+        const storyBlock = document.getElementById('storyBlock');
+        const storyText = document.getElementById('storyText');
+        storyBlock.style.display = 'block';
+        storyText.textContent = '';
+
+        try {
+          const res = await fetch(`/ai/story/${dogId}`, { method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}' } });
+          const data = await res.json();
+          if (data.story) {
+            await typewriterEffect(storyText, data.story);
+            storyBtn.textContent = '✨ Regenerate AI Story';
+          } else {
+            storyText.textContent = 'Story generation failed. Please try again.';
+          }
+        } catch (e) {
+          storyText.textContent = 'Network error. Please try again.';
+        } finally {
+          storyBtn.disabled = false;
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

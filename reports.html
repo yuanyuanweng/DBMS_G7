@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section">
+  <div class="section-inner">
+
+    <div class="section-header">
+      <span class="section-tag">📊 Analytics</span>
+      <h2 class="section-title">Reports & Adoption Trends</h2>
+      <p class="section-subtitle">Insights powered by SQL GROUP BY queries across the platform.</p>
+    </div>
+
+    <!-- Summary Row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:3rem;">
+      {% for label, value, icon in [
+        ('Total Adoptions This Year', stats.adopted_this_year or 0, '🎉'),
+        ('Most Adopted Breed',         stats.top_breed or 'N/A',     '🏆'),
+        ('Avg. Days to Adoption',      (stats.avg_days|round(1)|string + ' days') if stats.avg_days else 'N/A', '📅')
+      ] %}
+      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:1.5rem 2rem;
+                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">{{ icon }}</div>
+        <div style="font-family:var(--font-serif);font-size:1.8rem;font-weight:700;
+                    color:var(--terracotta);">{{ value }}</div>
+        <div style="font-size:0.78rem;color:var(--gray);letter-spacing:0.06em;margin-top:4px;">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;">
+
+      <!-- Adoptions by Breed Table -->
+      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
+                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
+        <h3 style="font-family:var(--font-serif);font-size:1.05rem;color:var(--dark-brown);margin-bottom:1.2rem;">
+          🐾 Adoptions by Breed
+        </h3>
+        {% if breed_stats %}
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="color:var(--gray);font-size:0.75rem;letter-spacing:0.06em;text-transform:uppercase;">
+                <th style="text-align:left;padding:0.4rem 0;border-bottom:1px solid var(--light-gray);">Breed</th>
+                <th style="text-align:right;padding:0.4rem 0;border-bottom:1px solid var(--light-gray);">Available</th>
+                <th style="text-align:right;padding:0.4rem 0;border-bottom:1px solid var(--light-gray);">Adopted</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in breed_stats %}
+              <tr>
+                <td style="padding:0.5rem 0;border-bottom:1px dashed var(--light-gray);color:var(--dark-brown);">{{ row.breed }}</td>
+                <td style="text-align:right;padding:0.5rem 0;border-bottom:1px dashed var(--light-gray);color:var(--brown);">{{ row.available }}</td>
+                <td style="text-align:right;padding:0.5rem 0;border-bottom:1px dashed var(--light-gray);
+                           font-weight:600;color:var(--sage);">{{ row.adopted }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p style="font-size:0.85rem;color:var(--gray);">No data available.</p>
+        {% endif %}
+      </div>
+
+      <!-- Adoptions by City Table -->
+      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
+                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
+        <h3 style="font-family:var(--font-serif);font-size:1.05rem;color:var(--dark-brown);margin-bottom:1.2rem;">
+          📍 Adoptions by City
+        </h3>
+        {% if city_stats %}
+          <div style="display:flex;flex-direction:column;gap:0.8rem;">
+            {% for row in city_stats %}
+            {% set pct = (row.adopted / (city_stats[0].adopted or 1) * 100)|round %}
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;">
+                <span style="color:var(--dark-brown);">{{ row.city }}</span>
+                <span style="color:var(--brown);font-weight:600;">{{ row.adopted }} adopted</span>
+              </div>
+              <div style="background:var(--light-gray);border-radius:100px;height:6px;overflow:hidden;">
+                <div style="background:var(--terracotta);height:100%;border-radius:100px;
+                            width:{{ pct }}%;transition:width 0.8s ease;"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="font-size:0.85rem;color:var(--gray);">No data available.</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Monthly Trend (bar chart via inline CSS) -->
+    <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
+                box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
+      <h3 style="font-family:var(--font-serif);font-size:1.05rem;color:var(--dark-brown);margin-bottom:1.5rem;">
+        📈 Monthly Adoption Trend (This Year)
+      </h3>
+      {% if monthly_stats %}
+        {% set max_val = monthly_stats | map(attribute='count') | max %}
+        <div style="display:flex;align-items:flex-end;gap:0.6rem;height:140px;padding-bottom:1.5rem;position:relative;">
+          {% for row in monthly_stats %}
+          {% set height = (row.count / (max_val or 1) * 120)|round %}
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <span style="font-size:0.72rem;color:var(--brown);font-weight:600;">{{ row.count }}</span>
+            <div style="width:100%;background:var(--terracotta);border-radius:4px 4px 0 0;
+                        height:{{ height }}px;opacity:0.85;transition:height 0.5s ease;
+                        min-height:4px;"></div>
+            <span style="font-size:0.65rem;color:var(--gray);white-space:nowrap;">{{ row.month }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="font-size:0.85rem;color:var(--gray);text-align:center;padding:2rem 0;">No monthly data available yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Export -->
+    <div style="text-align:center;margin-top:2rem;">
+      <a href="{{ url_for('admin.export_csv') }}" class="btn-secondary" style="display:inline-flex;">
+        📥 Export Report as CSV
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

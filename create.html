@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Dog — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section">
+  <div class="section-inner" style="max-width:700px;">
+
+    <a href="{{ url_for('dogs.list') }}" class="btn-secondary"
+       style="display:inline-flex;margin-bottom:2rem;font-size:0.85rem;">
+      ← Back to Dog List
+    </a>
+
+    <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2.5rem;
+                box-shadow:var(--shadow-md);border:1px solid var(--light-gray);">
+
+      <h1 style="font-family:var(--font-serif);font-size:1.8rem;color:var(--dark-brown);margin-bottom:0.3rem;">
+        🐕 Add New Dog
+      </h1>
+      <p style="color:var(--gray);font-size:0.85rem;margin-bottom:2rem;">
+        Fill in the dog's information. An AI story can be generated after saving.
+      </p>
+
+      <form method="POST" action="{{ url_for('dogs.create') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        {% if form.errors %}
+        <div style="background:#FEF0EC;border:1px solid var(--terracotta);border-radius:var(--radius-sm);
+                    padding:1rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--terracotta);">
+          Please fix the following errors:
+          <ul style="margin-top:0.5rem;padding-left:1.2rem;">
+            {% for field, errors in form.errors.items() %}
+              {% for error in errors %}<li>{{ field }}: {{ error }}</li>{% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- Basic Info -->
+        <p class="form-section-title">🐾 Basic Information</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Dog's Name *</label>
+            <input class="form-input" type="text" name="name" value="{{ form.name.data or '' }}"
+                   placeholder="e.g. Komame" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Breed *</label>
+            <input class="form-input" type="text" name="breed" value="{{ form.breed.data or '' }}"
+                   placeholder="e.g. Shiba Inu Mix" required/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Age *</label>
+            <input class="form-input" type="text" name="age" value="{{ form.age.data or '' }}"
+                   placeholder="e.g. 2 years, 6 months" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender *</label>
+            <select class="form-select" name="gender" required>
+              <option value="">Select gender</option>
+              <option value="Male"   {% if form.gender.data == 'Male'   %}selected{% endif %}>Male</option>
+              <option value="Female" {% if form.gender.data == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Size *</label>
+            <select class="form-select" name="size" required>
+              <option value="">Select size</option>
+              <option value="Small"  {% if form.size.data == 'Small'  %}selected{% endif %}>Small</option>
+              <option value="Medium" {% if form.size.data == 'Medium' %}selected{% endif %}>Medium</option>
+              <option value="Large"  {% if form.size.data == 'Large'  %}selected{% endif %}>Large</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <select class="form-select" name="city" required>
+              <option value="">Select city</option>
+              {% for city in ['Taipei','New Taipei','Taichung','Tainan','Kaohsiung','Other'] %}
+                <option value="{{ city }}" {% if form.city.data == city %}selected{% endif %}>{{ city }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Health -->
+        <p class="form-section-title">🏥 Health Status</p>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">Health Notes</label>
+            <input class="form-input" type="text" name="health_status"
+                   value="{{ form.health_status.data or '' }}"
+                   placeholder="e.g. Neutered, vaccinated, microchipped"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex-direction:row;align-items:center;gap:10px;">
+            <input type="checkbox" name="is_urgent" id="isUrgent"
+                   {% if form.is_urgent.data %}checked{% endif %}
+                   style="width:18px;height:18px;accent-color:var(--terracotta);"/>
+            <label for="isUrgent" class="form-label" style="margin:0;cursor:pointer;">
+              Mark as Urgent Adoption
+            </label>
+          </div>
+        </div>
+
+        <!-- Shelter -->
+        <p class="form-section-title">🏠 Shelter Assignment</p>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">Shelter *</label>
+            <select class="form-select" name="shelter_id" required>
+              <option value="">Select shelter</option>
+              {% for shelter in shelters %}
+                <option value="{{ shelter.id }}"
+                  {% if form.shelter_id.data == shelter.id %}selected{% endif %}>
+                  {{ shelter.name }} — {{ shelter.city }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="form-section-title">📝 Description</p>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">Short Description (optional — AI story can be generated later)</label>
+            <textarea class="form-textarea" name="description" style="min-height:100px;"
+              placeholder="Brief description of the dog's personality, background…">{{ form.description.data or '' }}</textarea>
+          </div>
+        </div>
+
+        <!-- Photo -->
+        <p class="form-section-title">📷 Photo</p>
+        <div class="form-full">
+          <div class="form-group">
+            <label class="form-label">Upload Image (optional)</label>
+            <input type="file" name="image" accept="image/*"
+                   style="font-size:0.85rem;color:var(--brown);"/>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div style="display:flex;gap:1rem;margin-top:0.5rem;">
+          <button type="submit" class="btn-primary" style="flex:1;justify-content:center;">
+            🐾 Save Dog Profile
+          </button>
+          <a href="{{ url_for('dogs.list') }}" class="btn-secondary"
+             style="flex:1;justify-content:center;">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up — PICKPET{% endblock %}
+
+{% block content %}
+<div class="section" style="min-height:70vh;display:flex;align-items:center;">
+  <div class="section-inner" style="max-width:440px;width:100%;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div style="font-size:3rem;margin-bottom:0.5rem;">🌸</div>
+      <h1 style="font-family:var(--font-serif);font-size:1.8rem;color:var(--dark-brown);">Create an Account</h1>
+      <p style="color:var(--gray);font-size:0.88rem;">Join us and help a dog find a forever home.</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:0.6rem;margin-bottom:2rem;">
+      <a href="{{ url_for('auth.login') }}"
+         class="btn-secondary" style="flex:1;justify-content:center;font-size:0.88rem;">Log In</a>
+      <a href="{{ url_for('auth.register') }}"
+         class="btn-primary" style="flex:1;justify-content:center;font-size:0.88rem;">Sign Up</a>
+    </div>
+
+    <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2.5rem;
+                box-shadow:var(--shadow-md);border:1px solid var(--light-gray);">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div style="background:#FEF0EC;border:1px solid var(--terracotta);
+                      border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1.2rem;
+                      font-size:0.85rem;color:var(--terracotta);">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <div class="form-row" style="margin-bottom:1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input class="form-input" type="text" name="name" required
+                   value="{{ form.name.data or '' }}" placeholder="John Smith"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" name="phone"
+                   value="{{ form.phone.data or '' }}" placeholder="+886 912 345 678"/>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.2rem;">
+          <label class="form-label">Email Address *</label>
+          <input class="form-input" type="email" name="email" required
+                 value="{{ form.email.data or '' }}" placeholder="your@email.com"/>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.2rem;">
+          <label class="form-label">Password * <span style="color:var(--gray);font-size:0.75em;">(min. 8 characters)</span></label>
+          <input class="form-input" type="password" name="password" required placeholder="••••••••" minlength="8"/>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.8rem;">
+          <label class="form-label">Confirm Password *</label>
+          <input class="form-input" type="password" name="confirm_password" required placeholder="••••••••"/>
+        </div>
+
+        <button type="submit" class="btn-primary"
+                style="width:100%;justify-content:center;font-size:0.95rem;padding:14px;">
+          🐾 Create My Account
+        </button>
+      </form>
+
+      <p style="text-align:center;margin-top:1.2rem;font-size:0.82rem;color:var(--gray);">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}" style="color:var(--terracotta);text-decoration:none;">Log in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

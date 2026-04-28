@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}PICKPET — Stray Dog Adoption{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  {% include 'navbar.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'footer.html' %}
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Done</span>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
