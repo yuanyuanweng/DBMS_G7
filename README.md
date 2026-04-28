@@ -1,4 +1,4 @@
-# ワンちゃんの縁 (PickPet)
+# PickPet
 
 ### Setup
 #### 1. Clone the Repository
