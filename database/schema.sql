@@ -9,7 +9,7 @@ CREATE TABLE Shelter (
 -- 2. 建立 Users (使用者)
 CREATE TABLE Users (
     User_ID INTEGER PRIMARY KEY,
-    Role INTEGER CHECK (Role IN (0, 1)), -- 0: User, 1: Admin (舉例)
+    Role INTEGER CHECK (Role IN (0, 1)), -- 0 : 領養人, 1 : 志工
     Email TEXT,
     Password_Hash TEXT
 );
