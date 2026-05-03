@@ -38,3 +38,7 @@ INSERT INTO Dog (Dog_ID,Shelter_ID,Name,Gender,Age,Breed,Image_URL,AI_Story) VAL
 	 (35,NULL,'Elhagyott','female',8.25,'Unknown Mix',NULL,NULL),
 	 (36,NULL,'Drive','female',9.5,'Unknown Mix',NULL,NULL),
 	 (37,NULL,'Gina','female',12.58,'Unknown Mix',NULL,NULL),
+	 (38,NULL,'Maci','male',7.83,'Unknown Mix',NULL,NULL),
+	 (39,NULL,'Roxi','female',7.92,'Rottweiler Mix',NULL,NULL),
+	 (40,NULL,'Bátor','male',8,'Unknown Mix',NULL,NULL),
+	 
