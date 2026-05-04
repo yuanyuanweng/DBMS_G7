@@ -8,6 +8,18 @@
 </head>
 <body>
 
+  <div id="loading-screen" role="status" aria-label="載入中">
+    <div class="loading-text-group">
+      <div class="loading-brand">PICKPET</div>
+      <div class="loading-tagline">A new beginning for every dog</div>
+    </div>
+    <div class="loading-track">
+      <div class="loading-dog-runner">
+        <span class="loading-dog-bouncer">🐕</span>
+      </div>
+    </div>
+  </div>
+
   <!-- ======== HEADER ======== -->
   <header class="site-header">
     <nav class="nav-inner">
@@ -501,5 +513,18 @@
   </div>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+  <script>
+    (function () {
+      var el = document.getElementById('loading-screen');
+      if (!el) return;
+      setTimeout(function () {
+        el.classList.add('loading-hide');
+        el.addEventListener('transitionend', function () {
+          el.style.display = 'none';
+        }, { once: true });
+      }, 2100);
+    }());
+  </script>
 </body>
 </html>
