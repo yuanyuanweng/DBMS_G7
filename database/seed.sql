@@ -1,5 +1,3 @@
-DELETE FROM Dog;
-
 INSERT INTO Dog (Dog_ID,Shelter_ID,Name,Gender,Age,Breed,Image_URL,AI_Story) VALUES
 	 (1,NULL,'Alex','male',11,'Boxer',NULL,NULL),
 	 (2,NULL,'Rachel','female',13.25,'Rhodesian Ridgeback Mix',NULL,NULL),
