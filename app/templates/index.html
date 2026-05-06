@@ -28,7 +28,7 @@
         <span>PICKPET</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#dogs">Find a Dog</a></li>
+        <li><a href="/dogs/">Find a Dog</a></li>
         <li><a href="#how">How It Works</a></li>
         <li><a href="#ai-feature">AI Stories</a></li>
         <li><a href="#" id="openAdminPanel">Admin</a></li>
@@ -61,7 +61,7 @@
           so you can find the one that truly belongs with you.
         </p>
         <div class="hero-actions">
-          <a href="#dogs" class="btn-primary">🐕 Find My Companion</a>
+          <a href="/dogs/" class="btn-primary">🐕 Find My Companion</a>
           <a href="#how" class="btn-secondary">How It Works →</a>
         </div>
       </div>
@@ -148,6 +148,16 @@
         </div>
       </div>
     </div>
+
+    <!-- House frame: drawn directly on top of hero content, no clip-path needed -->
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;overflow:visible;"
+         viewBox="0 0 100 100" preserveAspectRatio="none">
+      <polygon points="50,1 99,28 99,99 1,99 1,28"
+               fill="none"
+               stroke="#C4714A"
+               stroke-width="5"
+               vector-effect="non-scaling-stroke"/>
+    </svg>
   </section>
 
   <!-- ======== SEARCH ======== -->
@@ -199,24 +209,82 @@
     </div>
   </section>
 
-  <!-- ======== DOGS GRID ======== -->
-  <section class="section" id="dogs">
-    <div class="section-inner">
-      <div class="section-header">
-        <span class="section-tag">🐕 Waiting for a Home</span>
-        <h2 class="section-title">Meet Your Furry Soulmate</h2>
-        <p class="section-subtitle">Every life deserves to be loved. Every story deserves to continue.</p>
-      </div>
-
-      <div class="dogs-grid" id="dogsGrid">
-        <!-- Populated by JS -->
-      </div>
-
-      <div class="text-center mt-2">
-        <button class="btn-secondary" id="loadMoreBtn">Load More →</button>
-      </div>
+<!-- ======== DOGS PREVIEW ======== -->
+<section class="section" id="dogs">
+  <div class="section-inner" style="text-align:center;padding:4rem 0;">
+    <div class="section-header">
+      <span class="section-tag">🐕 Waiting for a Home</span>
+      <h2 class="section-title">Meet Your Furry Soulmate</h2>
+      <p class="section-subtitle">
+        Every life deserves to be loved. Every story deserves to continue.
+      </p>
     </div>
-  </section>
+
+    <!-- 
+      Homepage dog preview.
+
+      Current approach:
+      - Dogs are passed from main_routes.py.
+      - Only 6 dogs are shown on index.html.
+      - Full browsing is handled by /dogs/.
+
+      TODO:
+      - Replace mock data with real database data through app/models/dog.py later.
+      - Improve dog card styling if needed.
+    -->
+    <div class="dogs-grid">
+      {% for dog in dogs %}
+      <article class="dog-card">
+        <div class="dog-card-img" style="background: {{ dog.color }};">
+          {% if dog.is_urgent %}
+          <span class="dog-status-badge urgent">Urgent</span>
+          {% endif %}
+
+          {% if dog.image_url %}
+          <img src="{{ dog.image_url }}" alt="{{ dog.name }}">
+          {% else %}
+          <div class="dog-card-img-placeholder">
+            🐶
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="dog-card-body">
+          <h3 class="dog-card-name">{{ dog.name }}</h3>
+
+          <p class="dog-card-meta">
+            {{ dog.breed }} · {{ dog.age }} · {{ dog.city }}
+          </p>
+
+          <div class="dog-tags">
+            {% for tag in dog.tags %}
+            <span class="dog-tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+
+          <p class="dog-story">
+            {{ dog.ai_story }}
+          </p>
+
+          <div class="dog-card-footer">
+            <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="adopt-btn">
+              View Details
+            </a>
+
+            <button class="heart-btn" type="button" aria-label="Like dog">
+              ♡
+            </button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <a href="{{ url_for('dogs.list_dogs') }}" class="btn-primary" style="display:inline-flex;margin-top:2rem;font-size:1rem;padding:14px 32px;">
+      🐾 Browse All Dogs →
+    </a>
+  </div>
+</section>
 
   <!-- ======== HOW IT WORKS ======== -->
   <section class="section how-section" id="how">

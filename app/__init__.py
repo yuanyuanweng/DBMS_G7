@@ -9,10 +9,12 @@ TODO:
 
 from flask import Flask, render_template
 from .main_routes import main 
+from .dogs.routes import dogs_bp
 
 def create_app():
     '''Register all Blueprints and return the app instance.'''
     app = Flask(__name__)
     app.register_blueprint(main)
+    app.register_blueprint(dogs_bp)
     
     return app 

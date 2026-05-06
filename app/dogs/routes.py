@@ -1,30 +1,40 @@
 '''
 Dog-related routes.
 
-This file handles dog-related pages and API endpoints, such as:
-- viewing all dogs (Page rendering)
-- viewing one dog's detail page (Page rendering)
-- providing dog data for the frontend (API routes)
-
-=== Wikipedia? ===
-1)Page rendering
-Flask directly returns an HTML template.
-Example: /dogs → render_template("dogs/list.html", dogs=dogs)
-
-2)API routes
-Flask returns data, usually JSON, for JavaScript/frontend to use.
-Example: /api/dogs → jsonify(dogs)
-
+Current approach:
+- Use mock dog data from app/models/dog.py.
+- Keep routes simple until database schema is ready.
 
 TODO:
-Before the database schema is ready:
-- Define basic API routes.
-- Use mock dog data for testing.
-- Make sure frontend pages can receive and display dog data.
-
-After the database schema is ready:
-- Import the Dog model from app/models.
-- Replace mock data with real database queries.
-- Add filtering/search logic based on request parameters.
-- Add create/edit/delete routes if needed.
+- Add search/filter later.
+- Add pagination later if needed.
+- Replace mock data with SQL through models/dog.py after schema is ready.
 '''
+
+from flask import Blueprint, render_template, abort
+from app.models.dog import Dog
+
+dogs_bp = Blueprint('dogs', __name__, url_prefix='/dogs')
+
+# URL: xxx/dogs/
+@dogs_bp.route('/')
+def list_dogs():
+    '''
+    Render page showing all dogs.
+    '''
+    dogs = Dog.get_all()
+
+    return render_template('dogs/list.html', dogs=dogs)
+
+# URL: xxx/dogs/<dog_id>
+@dogs_bp.route('/<int:dog_id>')
+def dog_detail(dog_id):
+    '''
+    Render detail page for one dog.
+    '''
+    dog = Dog.get_by_id(dog_id)
+
+    if dog is None:
+        abort(404)
+        
+    return render_template('dogs/detail.html', dog=dog)

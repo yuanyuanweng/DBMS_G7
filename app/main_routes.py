@@ -1,21 +1,27 @@
-"""
-Landing page route
+'''
+Landing page route.
+
+Current approach:
+- Show only 6 dogs on index.html.
+- Use mock data from Dog model.
 
 TODO:
-- Import Dog model from app/models.
-- Query/filter dogs based on request parameters.
-- Pass the filtered dog list to index.html.
-"""
-from flask import Blueprint, render_template 
+- Replace mock data with SQL through models/dog.py after schema is ready.
+'''
 
+from flask import Blueprint, render_template 
+from app.models.dog import Dog
 
 main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    """Render the landing page with dog data."""
-    
-    return render_template('index.html', dogs=None)
+    '''
+    Render homepage with a small dog preview.
+    '''
+    dogs = Dog.get_featured(limit=4)
+
+    return render_template('index.html', dogs=dogs)
     
     
     
