@@ -20,7 +20,7 @@ CREATE TABLE Dog (
     Shelter_ID INTEGER NOT NULL,
     Name TEXT NOT NULL,
     Gender TEXT CHECK (Gender IN ('Male', 'Female', 'Unknown')),
-    Age INTEGER CHECK (AGE >= 0),
+    Age INTEGER CHECK (Age >= 0),
     Breed TEXT,
     Image_URL TEXT,
     AI_Story TEXT,
