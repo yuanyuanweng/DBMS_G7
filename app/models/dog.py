@@ -1,131 +1,246 @@
 '''
-Temporary Dog model using mock data.
-
-Current stage:
-- Database schema is not finalized yet.
-- Use mock data so frontend pages can be developed and tested.
+- Data Source (main_routes.py, dogs/routes.py depends on this file)
+- Provides Dog object with class attributes & methods for consistency
 
 TODO:
 - Replace mock data with SQL queries after the database schema is finalized.
-- Keep the method names the same if possible.
 '''
+COLORS = [
+    '#D9A57A', '#B5C4B1', '#A8C5DA', '#D4A5A5',
+    '#C4B5A5', '#E8C4A0', '#9DB5A0', '#C4A8C4'
+]
+
+SPOT_COLORS = [
+    '#C4714A', '#6B8C6B', '#5B8FA8', '#A07070',
+    '#8B7355', '#C4A050', '#5B7A6B', '#9A7A9A'
+]
 
 MOCK_DOGS = [
     {
-        'id': 1,
-        'name': 'Komame',
-        'breed': 'Shiba Inu Mix',
-        'age': '2 yrs',
-        'gender': 'Female',
-        'city': 'Taipei',
-        'is_urgent': True,
-        'tags': ['Apartment-Friendly', 'Gentle'],
-        'image_url': None,
-        'ai_story': 'I love napping in sunny spots.',
-        'color': '#D9A57A',
-        'spot_color': '#C4714A'
+        'Dog_ID': 1,
+        'Shelter_ID': 1,
+        'Name': 'Komame',
+        'Breed': 'Shiba Inu Mix',
+        'Age': 2,
+        'Gender': 'Female',
+        'City': 'Taipei',
+        'Size': 'Small',
+        'Image_URL': None,
+        'Availability': 'Available',
+        'Is_Urgent': 0,
+        'Is_Liked': 0,
+        'AI_Story': 'I love napping in sunny spots and taking slow walks with gentle people.',
+        'Tags': ['🏷 Small', '♀ Female']
     },
     {
-        'id': 2,
-        'name': 'Lucky',
-        'breed': 'Mixed',
-        'age': '4 yrs',
-        'gender': 'Male',
-        'city': 'Kaohsiung',
-        'is_urgent': False,
-        'tags': ['Friendly', 'Playful'],
-        'image_url': None,
-        'ai_story': 'I enjoy walks and meeting new friends.',
-        'color': '#A98467',
-        'spot_color': '#6F4E37'
+        'Dog_ID': 2,
+        'Shelter_ID': 1,
+        'Name': 'Kendy',
+        'Breed': 'Unknown Mix',
+        'Age': 7,
+        'Gender': 'Male',
+        'City': 'Taipei',
+        'Size': 'Medium',
+        'Image_URL': None,
+        'Availability': 'Available',
+        'Is_Urgent': 0,
+        'Is_Liked': 1,
+        'AI_Story': 'No story yet — click to generate one with AI!',
+        'Tags': ['🏷 Medium', '♂ Male']
     },
     {
-        'id': 3,
-        'name': 'Mochi',
-        'breed': 'Taiwan Dog',
-        'age': '1 yr',
-        'gender': 'Female',
-        'city': 'Tainan',
-        'is_urgent': False,
-        'tags': ['Smart', 'Energetic'],
-        'image_url': None,
-        'ai_story': 'I am curious, active, and ready for a loving home.',
-        'color': '#B5C4B1',
-        'spot_color': '#6B8C6B'
+        'Dog_ID': 3,
+        'Shelter_ID': 2,
+        'Name': 'Mochi',
+        'Breed': 'Golden Retriever Mix',
+        'Age': 4,
+        'Gender': 'Female',
+        'City': 'New Taipei',
+        'Size': 'Large',
+        'Image_URL': None,
+        'Availability': 'Pending',
+        'Is_Urgent': 1,
+        'Is_Liked': 0,
+        'AI_Story': 'I am friendly, energetic, and always ready for a walk or a game.',
+        'Tags': ['🏷 Large', '♀ Female']
     },
     {
-        'id': 4,
-        'name': 'Bobo',
-        'breed': 'Golden Retriever Mix',
-        'age': '5 yrs',
-        'gender': 'Male',
-        'city': 'Taichung',
-        'is_urgent': False,
-        'tags': ['Gentle', 'Loyal'],
-        'image_url': None,
-        'ai_story': 'I am calm, loyal, and happiest beside my person.',
-        'color': '#E8C4A0',
-        'spot_color': '#C4A050'
+        'Dog_ID': 4,
+        'Shelter_ID': 2,
+        'Name': 'Bobo',
+        'Breed': 'Taiwan Dog Mix',
+        'Age': 1,
+        'Gender': 'Male',
+        'City': 'Taichung',
+        'Size': 'Medium',
+        'Image_URL': None,
+        'Availability': 'Available',
+        'Is_Urgent': 0,
+        'Is_Liked': 0,
+        'AI_Story': 'I am still young and curious. I hope to grow up with a family who loves adventure.',
+        'Tags': ['🐶 Puppy', '♂ Male']
     },
     {
-        'id': 5,
-        'name': 'Nana',
-        'breed': 'Spitz Mix',
-        'age': '3 yrs',
-        'gender': 'Female',
-        'city': 'New Taipei',
-        'is_urgent': True,
-        'tags': ['Small', 'Sweet'],
-        'image_url': None,
-        'ai_story': 'I may be small, but I have a big heart.',
-        'color': '#D4A5A5',
-        'spot_color': '#A07070'
+        'Dog_ID': 5,
+        'Shelter_ID': 3,
+        'Name': 'Luna',
+        'Breed': 'Labrador Mix',
+        'Age': 5,
+        'Gender': 'Female',
+        'City': 'Tainan',
+        'Size': 'Large',
+        'Image_URL': None,
+        'Availability': 'Available',
+        'Is_Urgent': 0,
+        'Is_Liked': 1,
+        'AI_Story': 'I am calm, loyal, and happiest when I can stay close to someone I trust.',
+        'Tags': ['🏷 Large', '♀ Female']
     },
     {
-        'id': 6,
-        'name': 'Oreo',
-        'breed': 'Mixed',
-        'age': '7 yrs',
-        'gender': 'Male',
-        'city': 'Taipei',
-        'is_urgent': False,
-        'tags': ['Calm', 'Loyal'],
-        'image_url': None,
-        'ai_story': 'I enjoy quiet afternoons and would love a peaceful home.',
-        'color': '#A8C5DA',
-        'spot_color': '#5B8FA8'
+        'Dog_ID': 6,
+        'Shelter_ID': 3,
+        'Name': 'Lucky',
+        'Breed': 'Chihuahua Mix',
+        'Age': 10,
+        'Gender': 'Male',
+        'City': 'Kaohsiung',
+        'Size': 'Small',
+        'Image_URL': None,
+        'Availability': 'Adopted',
+        'Is_Urgent': 0,
+        'Is_Liked': 0,
+        'AI_Story': 'I may be small, but I have a brave heart and lots of love to give.',
+        'Tags': ['🏷 Small', '♂ Male']
+    },
+    {
+        'Dog_ID': 7,
+        'Shelter_ID': 4,
+        'Name': 'Nana',
+        'Breed': 'Mixed Breed',
+        'Age': 11,
+        'Gender': 'Female',
+        'City': 'Taipei',
+        'Size': 'Medium',
+        'Image_URL': None,
+        'Availability': 'Available',
+        'Is_Urgent': 0,
+        'Is_Liked': 0,
+        'AI_Story': 'I am a gentle senior dog who enjoys quiet days, soft blankets, and kind voices.',
+        'Tags': ['🧡 Senior', '♀ Female']
+    },
+    {
+        'Dog_ID': 8,
+        'Shelter_ID': 4,
+        'Name': 'Rocky',
+        'Breed': 'Husky Mix',
+        'Age': 3,
+        'Gender': 'Male',
+        'City': 'New Taipei',
+        'Size': 'Large',
+        'Image_URL': None,
+        'Availability': 'Pending',
+        'Is_Urgent': 1,
+        'Is_Liked': 1,
+        'AI_Story': 'I have lots of energy and would love a home that enjoys outdoor activities.',
+        'Tags': ['🏷 Large', '♂ Male']
     }
 ]
 
 class Dog:
     '''
-    Dog data provider.
-
-    This class currently returns mock data.
-    Later, these methods can be changed to use SQL.
+    Dog data object and data provider 
     '''
     
-    @staticmethod #Static method (Unrelated to class object)
-    def get_featured(limit=6):
+    # Constructor
+    def __init__(self, row):
+        '''
+        Convert one raw dog row into a frontend-friendly Dog object
+        '''
+        self.id = row['Dog_ID']
+        self.name = row['Name']
+        self.breed = row.get('Breed') or 'Unknown Mix'
+        self.age = f"{row['Age']} yrs"
+        self.gender = row.get('Gender') or 'Unknown'
+        self.city = row.get('City') or 'Unknown'
+        self.size = row.get('Size') or 'Medium'
+        self.image_url = row.get('Image_URL')
+        self.ai_story = row.get('AI_Story') or 'No story yet — click to generate one with AI!'
+        self.is_urgent = bool(row.get('Is_Urgent', 0))
+        self.availability = row.get('Availability') or 'Available'
+        self.color = COLORS[(self.id - 1) % len(COLORS)]
+        self.spot_color = SPOT_COLORS[(self.id - 1) % len(SPOT_COLORS)]
+        self.tags = row.get('Tags') or [f'🏷 {self.size}', f'{"♂" if self.gender == "Male" else "♀"} {self.gender}']
+        
+    
+    # Helper method in 'Dog' class (Not meant to be called directly from outside)
+    # mostly Used in constructor, but still it's a convention with normal behavior
+    def _derive_size(self):
+        '''
+        TODO
+        Estimate dog size based on breed if Size is not provided 
+        '''
+    
+    # Helper method in 'Dog' class (Not meant to be called directly from outside)
+    # mostly Used in constructor, but still it's a convention with normal behavior
+    def _derive_tags(self, row):
+        '''
+        TODO
+        Generate display tags for dog cards
+        '''
+        
+    def to_dict(self):
+        '''
+        Convert Dog object to dictionary 
+        Purpose: Dictionary (Python reference data type) -> JSON(Text/Data)
+        '''
+        return {
+        'id': self.id,
+        'name': self.name,
+        'breed': self.breed,
+        'age': self.age,
+        'gender': self.gender,
+        'city': self.city,
+        'size': self.size,
+        'image_url': self.image_url,
+        'ai_story': self.ai_story,
+        'is_urgent': self.is_urgent,
+        'color': self.color,
+        'tags': self.tags,
+    }
+    
+    
+    @staticmethod # Cannot directly access or modify object data = no self
+    def get_featured(limit=4):
         '''
         Return a limited number of dogs for the homepage.
         '''
-        return MOCK_DOGS[:limit]
+        return [Dog(row) for row in MOCK_DOGS[:limit]]
+        
     
-    @staticmethod #Static method (Unrelated to class object)
+    @staticmethod # Cannot directly access or modify object data = no self
     def get_all():
         '''
         Return all dogs for the dog listing page.
         '''
-        return MOCK_DOGS
+        return [Dog(row) for row in MOCK_DOGS]
+        
 
     @staticmethod
     def get_by_id(dog_id):
         '''
         Return one dog by ID.
         '''
-        for dog in MOCK_DOGS:
-            if dog['id'] == dog_id:
-                return dog
-
+        for row in MOCK_DOGS:
+            if row['Dog_ID'] == dog_id:
+                return Dog(row)
+            
         return None
+    
+    # Used in dogs/list.html
+    @staticmethod
+    def search(q='', city='', size='', page=1, per_page=16):
+        '''
+        Search and paginate dogs 
+        '''
+        
+        

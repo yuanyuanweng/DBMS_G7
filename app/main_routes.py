@@ -2,11 +2,8 @@
 Landing page route.
 
 Current approach:
-- Show only 6 dogs on index.html.
-- Use mock data from Dog model.
-
-TODO:
-- Replace mock data with SQL through models/dog.py after schema is ready.
+- Show only 4 dogs on index.html.
+- Use mock data from Dog model. (Dog.get_featured())
 '''
 
 from flask import Blueprint, render_template 

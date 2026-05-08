@@ -24,7 +24,17 @@ def list_dogs():
     '''
     dogs = Dog.get_all()
 
-    return render_template('dogs/list.html', dogs=dogs)
+    return render_template(
+        'dogs/list.html',
+        dogs=dogs,
+        dogs_json=[dog.to_dict() for dog in dogs],
+        stats={
+            'available': len(dogs),
+            'adopted': 342
+        },
+        liked_ids=set(),
+        pagination=None
+    )
 
 # URL: xxx/dogs/<dog_id>
 @dogs_bp.route('/<int:dog_id>')
