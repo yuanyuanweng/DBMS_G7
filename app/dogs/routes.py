@@ -1,50 +1,21 @@
-'''
+"""
 Dog-related routes.
 
-Current approach:
 - Use mock dog data from app/models/dog.py.
-- Keep routes simple until database schema is ready.
+- Keep routes simple until database schema and dogs/list.html are ready.
+- Dog details are displayed by frontend popup/modal, not a separate page.
+"""
 
-TODO:
-- Add search/filter later.
-- Add pagination later if needed.
-- Replace mock data with SQL through models/dog.py after schema is ready.
-'''
-
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template
 from app.models.dog import Dog
 
-dogs_bp = Blueprint('dogs', __name__, url_prefix='/dogs')
+dogs_bp = Blueprint("dogs", __name__, url_prefix="/dogs")
 
-# URL: xxx/dogs/
-@dogs_bp.route('/')
-def list_dogs():
-    '''
-    Render page showing all dogs.
-    '''
+#URL: http://127.0.0.1:5000/dogs
+@dogs_bp.route("/")
+def dog_list():
+    """
+    Render the dog listing page.
+    """
     dogs = Dog.get_all()
-
-    return render_template(
-        'dogs/list.html',
-        dogs=dogs,
-        dogs_json=[dog.to_dict() for dog in dogs],
-        stats={
-            'available': len(dogs),
-            'adopted': 342
-        },
-        liked_ids=set(),
-        pagination=None
-    )
-
-# URL: xxx/dogs/<dog_id>
-@dogs_bp.route('/<int:dog_id>')
-def dog_detail(dog_id):
-    '''
-    Render detail page for one dog.
-    '''
-    dog = Dog.get_by_id(dog_id)
-
-    if dog is None:
-        abort(404)
-        
-    return render_template('dogs/detail.html', dog=dog)
+    return render_template("dogs/list.html", dogs=dogs)
