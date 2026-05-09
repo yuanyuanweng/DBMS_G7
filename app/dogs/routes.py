@@ -1,84 +1,95 @@
-from flask import Blueprint, render_template, request, current_app, session, jsonify
-import sqlite3
+"""
+Dog-related routes.
 
-dogs_bp = Blueprint('dogs', __name__, url_prefix='/dogs')
+- Use mock dog data from app/models/dog.py.
+- Keep routes simple until database schema and dogs/list.html are ready.
+- Dog list is displayed in dogs/list.html.
+- Dog details are displayed in dogs/detail.html.
 
-PER_PAGE = 12
+TODO:
+1) already_applied未來會修改
+"""
 
+from flask import Blueprint, render_template, request, abort
+from app.models.dog import Dog
 
-def get_db():
-    conn = sqlite3.connect(current_app.config['DB_PATH'])
-    conn.row_factory = lambda c, r: {col[0]: r[i] for i, col in enumerate(c.description)}
-    return conn
+dogs_bp = Blueprint("dogs", __name__, url_prefix="/find-a-dog")
 
-
-class Pagination:
-    def __init__(self, page, pages):
-        self.page = page
-        self.pages = pages
-        self.has_prev = page > 1
-        self.has_next = page < pages
-        self.prev_num = page - 1
-        self.next_num = page + 1
-
-
-@dogs_bp.route('/')
-def list():
-    from app.models.dog import Dog
-
-    q    = request.args.get('q', '').strip()
-    page = max(1, int(request.args.get('page', 1) or 1))
-
-    db = get_db()
-    where, params = [], []
-    if q:
-        where.append("(Name LIKE ? OR Breed LIKE ?)")
-        params += [f'%{q}%', f'%{q}%']
-    clause = ('WHERE ' + ' AND '.join(where)) if where else ''
-
-    total = db.execute(f"SELECT COUNT(*) as c FROM Dog {clause}", params).fetchone()['c']
-    pages = max(1, (total + PER_PAGE - 1) // PER_PAGE)
-    page  = min(page, pages)
-    rows  = db.execute(
-        f"SELECT * FROM Dog {clause} ORDER BY Dog_ID LIMIT ? OFFSET ?",
-        params + [PER_PAGE, (page - 1) * PER_PAGE]
-    ).fetchall()
-    db.close()
-
-    dogs      = [Dog(r) for r in rows]
-    liked_ids = set(session.get('liked_ids', []))
-    stats     = {'available': total, 'adopted': 342}
-
-    return render_template(
-        'dogs/list.html',
-        dogs=dogs,
-        dogs_json=[d.to_dict() for d in dogs],
-        pagination=Pagination(page, pages),
-        stats=stats,
-        liked_ids=liked_ids,
+#URL: http://127.0.0.1:5000/find-a-dog
+@dogs_bp.route("/")
+def list_dogs():
+    """
+    Render the dog listing page.
+    
+    - Provide dog list data to templates/dogs/list.html
+    
+    Supported URL parameters: (暫定 可修改)
+    - q: search by dog name or breed
+    - gender: Male / Female 
+    - age_group: puppy / young / adult / senior 
+    - size: Small / Medium / Large 
+    - city: Taipei / New Taipei / Taichung / Tainan / Kaohsiung 
+    - sort: newest / oldest / age_asc / age_desc
+    """
+    
+    # Basic query parameters for frontend filters (前端目前可用的)
+    q = request.args.get("q", "").strip()
+    gender = request.args.get("gender", "")
+    age_group = request.args.get("age_group", "")
+    size = request.args.get("size", "")
+    city = request.args.get("city", "")
+    sort = request.args.get("sort", "newest")
+    
+    dogs = Dog.search(
+        q=q,
+        gender=gender,
+        age_group=age_group,
+        size=size,
+        city=city,
+        sort=sort
     )
-
-
-@dogs_bp.route('/<int:id>')
-def detail(id):
-    from app.models.dog import Dog
-
-    db  = get_db()
-    row = db.execute("SELECT * FROM Dog WHERE Dog_ID = ?", [id]).fetchone()
-    db.close()
-
-    if row is None:
-        return "Dog not found", 404
-
-    return render_template('dogs/detail.html', dog=Dog(row), already_applied=False)
-
-
-@dogs_bp.route('/<int:id>/like', methods=['POST'])
-def like(id):
-    liked = set(session.get('liked_ids', []))
-    if id in liked:
-        liked.discard(id)
-    else:
-        liked.add(id)
-    session['liked_ids'] = list(liked)
-    return jsonify({'status': 'ok', 'liked': id in liked})
+    
+    # Keep current filter values available during one request cycle 
+    filters = {
+        "q": q,
+        "gender": gender, 
+        "age_group": age_group,
+        "size": size, 
+        "city": city,
+        "sort": sort 
+    }
+    
+    # Shows the summary 統計數字
+    stats = {
+        "total": len(dogs),
+        "available": len([dog for dog in dogs if dog.availability == "Available"]),
+        "urgent": len([dog for dog in dogs if dog.is_urgent])
+    }
+    
+    return render_template(
+        "dogs/list.html", 
+        dogs=dogs, # list(dict()), for HTML/Jinja2
+        dogs_json=[dog.to_dict() for dog in dogs], # jsonify(), for Javascript
+        filters=filters,
+        stats=stats
+        # liked_ids 可加可不加 
+    )
+    
+# URL: http://127.0.0.1:5000/find-a-dog/<dog_id>
+@dogs_bp.route("/<int:dog_id>")
+def dog_detail(dog_id):
+    '''
+    Render detail page for one dog
+    '''
+    
+    dog = Dog.get_by_id(dog_id)
+    
+    if dog is None: 
+        abort(404)
+    
+    return render_template(
+        "dogs/detail.html",
+        dog=dog,
+        dog_json=dog.to_dict(), 
+        already_applied=False #Placeholder only for now, connect database後會修改
+    )
