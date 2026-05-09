@@ -159,7 +159,8 @@ class Dog:
         self.id = row['Dog_ID']
         self.name = row['Name']
         self.breed = row.get('Breed') or 'Unknown Mix'
-        self.age = f"{row['Age']} yrs"
+        self.raw_age = int(row['Age'])
+        self.age = f"{self.raw_age} yrs"
         self.gender = row.get('Gender') or 'Unknown'
         self.city = row.get('City') or 'Unknown'
         self.size = row.get('Size') or 'Medium'
@@ -225,7 +226,7 @@ class Dog:
         return [Dog(row) for row in MOCK_DOGS]
         
 
-    @staticmethod
+    @staticmethod # Cannot directly access or modify object data = no self
     def get_by_id(dog_id):
         '''
         Return one dog by ID.
@@ -236,11 +237,54 @@ class Dog:
             
         return None
     
-    # Used in dogs/list.html
-    @staticmethod
-    def search(q='', city='', size='', page=1, per_page=16):
+    @staticmethod # Cannot directly access or modify object data = no self
+    def search(q="", gender="", age_group="", size="", city="", sort="newest"):
         '''
-        Search and paginate dogs 
+        Used in dogs/list.html
+        Search dogs with URL parameters
         '''
+        dogs = [Dog(row) for row in MOCK_DOGS]
         
+        # 根據用戶輸入的搜尋欄
+        if q:
+            q = q.lower()
+            dogs = [
+                dog for dog in dogs
+                if q in dog.name.lower()
+                or q in dog.breed.lower()
+            ]
         
+        # 根據性別
+        if gender: 
+            dogs = [dog for dog in dogs if dog.gender == gender]
+        
+        # 根據4種年齡區間
+        if age_group:
+            if age_group == "puppy":
+                dogs = [dog for dog in dogs if dog.raw_age < 1]
+            elif age_group == "young":
+                dogs = [dog for dog in dogs if 1 <= dog.raw_age < 3]
+            elif age_group == "adult":
+                dogs = [dog for dog in dogs if 3 <= dog.raw_age < 8]
+            elif age_group == "senior":
+                dogs = [dog for dog in dogs if dog.raw_age >= 8]
+        
+        # 根據體型
+        if size:
+            dogs = [dog for dog in dogs if dog.size == size]
+        
+        # 根據城市
+        if city:
+            dogs = [dog for dog in dogs if dog.city == city]
+        
+        # 支持 狗狗新增時間 & 年齡大小
+        if sort == "newest": 
+            dogs = sorted(dogs, key=lambda dog: dog.id, reverse=True)
+        elif sort == "oldest":
+            dogs = sorted(dogs, key=lambda dog: dog.id)
+        elif sort == "age_asc":
+            dogs = sorted(dogs, key=lambda dog: dog.raw_age)
+        elif sort == "age_desc":
+            dogs = sorted(dogs, key=lambda dog: dog.raw_age, reverse=True)
+            
+        return dogs

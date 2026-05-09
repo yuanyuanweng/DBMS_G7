@@ -28,7 +28,7 @@
         <span>PICKPET</span>
       </a>
       <ul class="nav-links">
-        <li><a href="/dogs/">Find a Dog</a></li>
+        <li><a href="{{ url_for('dogs.list_dogs') }}">Find a Dog</a></li>
         <li><a href="#how">How It Works</a></li>
         <li><a href="#ai-feature">AI Stories</a></li>
         <li><a href="#" id="openAdminPanel">Admin</a></li>
@@ -61,7 +61,7 @@
           so you can find the one that truly belongs with you.
         </p>
         <div class="hero-actions">
-          <a href="/dogs/" class="btn-primary">🐕 Find My Companion</a>
+          <a href="{{ url_for('dogs.list_dogs') }}" class="btn-primary">🐕 Find My Companion</a>
           <a href="#how" class="btn-secondary">How It Works →</a>
         </div>
       </div>

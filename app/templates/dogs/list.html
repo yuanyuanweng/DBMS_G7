@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% comment %} {% extends 'base.html' %}
 
 {% block title %}Find a Dog — PICKPET{% endblock %}
 
@@ -157,7 +157,7 @@
     {% if dogs %}
       <div class="dogs-grid">
         {% for dog in dogs %}
-        <div class="dog-card" onclick="window.location='{{ url_for('dogs.dog_detail', dog_id=dog.id) }}'">
+        <div class="dog-card" onclick="window.location='{{ url_for('dog_list', dog_id=dog.id) }}'">
           <div class="dog-card-img">
             {% if dog.image_url %}
               <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
@@ -180,7 +180,7 @@
             </div>
             <p class="dog-story">{{ dog.ai_story or dog.description or 'No story yet — click to generate one with AI!' }}</p>
             <div class="dog-card-footer">
-              <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
+              <a href="{{ url_for('dog_list', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
               <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
                 data-heart="{{ dog.id }}" onclick="event.stopPropagation()">
                 {{ '❤️' if dog.id in liked_ids else '🤍' }}
@@ -343,4 +343,4 @@
   // Pass dog data from Flask to JS for AI match rendering
   const DOGS_FROM_SERVER = {{ dogs_json | tojson | safe }};
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}
