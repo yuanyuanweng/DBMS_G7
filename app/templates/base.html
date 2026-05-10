@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}PICKPET — Stray Dog Adoption{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div id="loading-screen" role="status" aria-label="載入中">
+    <div class="loading-text-group">
+      <div class="loading-brand">PICKPET</div>
+      <div class="loading-tagline">A new beginning for every dog</div>
+    </div>
+    <div class="loading-track">
+      <div class="loading-dog-runner">
+        <span class="loading-dog-bouncer">🐕</span>
+      </div>
+    </div>
+  </div>
+
+  {% include 'components/navbar.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'components/footer.html' %}
+
+  <div class="toast" id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Done</span>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+
+  <script>
+    (function () {
+      var el = document.getElementById('loading-screen');
+      if (!el) return;
+      setTimeout(function () {
+        el.classList.add('loading-hide');
+        el.addEventListener('transitionend', function () {
+          el.style.display = 'none';
+        }, { once: true });
+      }, 2100);
+    }());
+  </script>
+</body>
+</html>

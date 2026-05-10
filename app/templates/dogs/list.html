@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% comment %} {% extends 'base.html' %}
 
 {% block title %}Find a Dog — PICKPET{% endblock %}
 
@@ -100,7 +100,7 @@
     <p class="search-title">🔍 Filter Dogs</p>
 
     {# Flask form: GET request to dogs.list with query params #}
-    <form method="GET" action="{{ url_for('dogs.list') }}">
+    <form method="GET" action="{{ url_for('dogs.list_dogs') }}">
       <div class="search-row">
         <div class="form-group">
           <label class="form-label">Name / Breed</label>
@@ -157,7 +157,7 @@
     {% if dogs %}
       <div class="dogs-grid">
         {% for dog in dogs %}
-        <div class="dog-card" onclick="window.location='{{ url_for('dogs.detail', id=dog.id) }}'">
+        <div class="dog-card" onclick="window.location='{{ url_for('dog_list', dog_id=dog.id) }}'">
           <div class="dog-card-img">
             {% if dog.image_url %}
               <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
@@ -180,7 +180,7 @@
             </div>
             <p class="dog-story">{{ dog.ai_story or dog.description or 'No story yet — click to generate one with AI!' }}</p>
             <div class="dog-card-footer">
-              <a href="{{ url_for('dogs.detail', id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
+              <a href="{{ url_for('dog_list', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
               <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
                 data-heart="{{ dog.id }}" onclick="event.stopPropagation()">
                 {{ '❤️' if dog.id in liked_ids else '🤍' }}
@@ -195,14 +195,14 @@
       {% if pagination %}
       <div class="text-center mt-2" style="display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;">
         {% if pagination.has_prev %}
-          <a href="{{ url_for('dogs.list', page=pagination.prev_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
+          <a href="{{ url_for('dogs.list_dogs', page=pagination.prev_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
              class="btn-secondary" style="padding:8px 18px;font-size:0.85rem;">← Prev</a>
         {% endif %}
         <span style="padding:8px 14px;font-size:0.85rem;color:var(--gray);">
           Page {{ pagination.page }} of {{ pagination.pages }}
         </span>
         {% if pagination.has_next %}
-          <a href="{{ url_for('dogs.list', page=pagination.next_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
+          <a href="{{ url_for('dogs.list_dogs', page=pagination.next_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
              class="btn-secondary" style="padding:8px 18px;font-size:0.85rem;">Next →</a>
         {% endif %}
       </div>
@@ -213,7 +213,7 @@
         <div style="font-size:3rem;margin-bottom:1rem;">🐾</div>
         <p style="font-family:var(--font-serif);font-size:1.1rem;">No dogs found matching your criteria</p>
         <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--gray);">Try adjusting your filters or use AI Match</p>
-        <a href="{{ url_for('dogs.list') }}" class="btn-secondary" style="margin-top:1.5rem;display:inline-flex;">Clear Filters</a>
+        <a href="{{ url_for('dogs.list_dogs') }}" class="btn-secondary" style="margin-top:1.5rem;display:inline-flex;">Clear Filters</a>
       </div>
     {% endif %}
   </div>
@@ -343,4 +343,4 @@
   // Pass dog data from Flask to JS for AI match rendering
   const DOGS_FROM_SERVER = {{ dogs_json | tojson | safe }};
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}
