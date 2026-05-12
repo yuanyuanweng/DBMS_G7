@@ -1,45 +1,46 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, session
 from .utils import hash_password, verify_password
-# from app.models import User, db
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        # 支援前端 JSON 或是 Form 表單
-        data = request.get_json() if request.is_json else request.form
-        
-        username = data.get('username')
-        password = data.get('password')
-        
-        if not username or not password:
-            return jsonify({"error": "請輸入帳號密碼"}), 400
-
-        # 加密密碼
-        hashed_pw = hash_password(password)
-
-        #資料庫邏輯 (模擬) 
-        # new_user = User(username=username, password=hashed_pw, role='user')
-        # db.session.add(new_user)
-        # db.session.commit()
-        # ----------------------------
-
-        return jsonify({
-            "message": "註冊成功！",
-            "user": username,
-            "debug_hashed_password": hashed_pw
-        }), 201
-
-    return render_template('auth/register.html')
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # 登入邏輯可以在此擴充
+    if request.method == 'POST':
+        # 接收前端登入資料
+        data = request.get_json() if request.is_json else request.form
+        username = data.get('username')
+        password = data.get('password')
+
+        # 開發構想：智慧角色分流
+        # 模擬兩組帳號先測試不同的跳轉結果
+        users_db = {
+            "admin": {"password": "123", "role": "admin"},
+            "user": {"password": "123", "role": "user"}
+        }
+
+        if username in users_db and password == users_db[username]['password']:
+            # 登入成功將身份寫入 Session
+            session['user_id'] = 101
+            session['username'] = username
+            session['role'] = users_db[username]['role']
+
+            flash(f"登入成功！歡迎 {username}", "success")
+
+            # 智慧跳轉
+            if session['role'] == 'admin':
+                # 跳轉至寫好的 Dashboard
+                return redirect(url_for('admin.dashboard'))
+            else:
+                # 一般使用者跳轉至狗狗列表
+                return redirect(url_for('dogs.list'))
+
+        flash("帳號或密碼錯誤", "danger")
+    
     return render_template('auth/login.html')
 
 @auth_bp.route('/logout')
 def logout():
+    "徹底清理 Session，確保權限不殘留"
     session.clear()
-    flash("你已成功登出", "info")
+    flash("您已成功登出", "info")
     return redirect(url_for('auth.login'))
