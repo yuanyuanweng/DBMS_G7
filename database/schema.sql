@@ -59,22 +59,23 @@ CREATE TABLE User_Shelter (
 );
 
 -- Dog Status (狗狗的領養狀態)
--- CREATE VIEW Dog_With_Status AS
--- SELECT 
---     d.Dog_ID,
---     d.Shelter_ID,
---     d.Name,
---     d.Gender,
---     d.Age,
---     d.Breed,
---     d.Image_URL,
---     d.AI_Story,
---     CASE
---         WHEN SUM(CASE WHEN a.Status = 1 THEN 1 ELSE 0 END) > 0 THEN 'Adopted'
---         WHEN SUM(CASE WHEN a.Status = 0 THEN 1 ELSE 0 END) > 0 THEN 'Pending'
---         ELSE 'Available'
---     END AS Availability
--- FROM Dog d
--- LEFT JOIN Application a 
---     ON d.Dog_ID = a.Dog_ID
--- GROUP BY d.Dog_ID;
+DROP VIEW IF EXISTS Dog_With_Status;
+CREATE VIEW Dog_With_Status AS
+SELECT 
+    d.Dog_ID,
+    d.Shelter_ID,
+    d.Name,
+    d.Gender,
+    d.Age,
+    d.Breed,
+    d.Image_URL,
+    d.AI_Story,
+    CASE
+        WHEN COUNT(CASE WHEN a.Status = 1 THEN 1 END) > 0 THEN 'Adopted'
+        WHEN COUNT(CASE WHEN a.Status = 0 THEN 1 END) > 0 THEN 'Pending'
+        ELSE 'Available'
+    END AS Availability
+FROM Dog d
+LEFT JOIN Application a 
+    ON d.Dog_ID = a.Dog_ID
+GROUP BY d.Dog_ID;
