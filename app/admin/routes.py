@@ -1,21 +1,32 @@
 from flask import Blueprint, render_template, session
 from app.auth.utils import admin_required
-# 之後要對接資料庫模型
-# from app.models import User, Dog, db
+# 1. 成功引進璋珣寫好的 Dog 類別
+from app.models.dog import Dog  
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
-    "後台儀表板主頁"
+    "後台儀表板主頁：串接真實 Dog 物件資料"
     
-    # 開發構想：統計數據 (暫時使用 Mock Data) ---
-    # 未來會改為 User.query.count() 等資料庫查詢
+    # 2.取得目前系統中所有的狗狗物件列表
+    all_dogs_list = Dog.get_all()
+    
+    # 利用實體資料動態統計 
+    # 這裡的統計數據會隨 models/dog.py 裡的 MOCK_DOGS 內容自動更新
     stats = {
-        'total_users': 156,        # 總註冊人數
-        'pending_dogs': 12,        # 待審核/待領養狗狗
-        'success_adoptions': 45,   # 成功領養案例
+        'total_users': 156, # 這一行之後等璋珣把 user.py 寫好，我們再改成 User.query.count()
+        
+        # 動態計算：算算看清單裡有幾隻狗狗
+        'total_dogs': len(all_dogs_list), 
+        
+        # 動態計算：算算看狀態是 'Pending'（審核中）的狗狗有幾隻
+        'pending_dogs': len([dog for dog in all_dogs_list if dog.availability == 'Pending']),
+        
+        # 動態計算：算算看狀態是 'Adopted'（已領養）的狗狗有幾隻
+        'success_adoptions': len([dog for dog in all_dogs_list if dog.availability == 'Adopted']),
+        
         'admin_name': session.get('username', '管理員')
     }
     
