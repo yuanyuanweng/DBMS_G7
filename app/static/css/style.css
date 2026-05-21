@@ -5,19 +5,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;700&display=swap');
 
 :root {
-  --cream: #FDF6EE;
-  --warm-white: #FFFDF9;
-  --sand: #F0E6D3;
-  --tan: #D9C4A8;
-  --brown: #8B6F52;
-  --dark-brown: #4A3728;
-  --terracotta: #C4714A;
-  --sage: #8A9E8C;
-  --muted-sage: #C5D4C6;
-  --pale-yellow: #F5EDD6;
-  --ink: #2C2416;
-  --gray: #9A8E82;
-  --light-gray: #EAE3D9;
+  /* ① 米白底色 */
+  --cream: #FAFAF5;
+  --warm-white: #FFFFFF;
+  --sand: #F4F0D8;
+  --tan: #DEDA9C;
+
+  /* 文字色 */
+  --brown: #4A6040;
+  --dark-brown: #2D3E28;
+  --ink: #1E2A1A;
+  --gray: #6E826A;
+  --light-gray: #E2EAE0;
+
+  /* ② 向日葵黃 → 主色 */
+  --terracotta: #F5C842;
+
+  /* ③ 森林深綠 → 對比色 */
+  --sage: #3D7A5C;
+  --muted-sage: #A8CBB8;
+
+  /* ④ 天空藍 → 次要色 */
+  --sky-blue: #6AAFD6;
+  --pale-blue: #D6EDF8;
+
+  /* ⑤ 櫻花粉 → 點綴色 */
+  --sakura: #F2A8B8;
+  --pale-sakura: #FDE8EE;
+
+  --pale-yellow: #FBF5CC;
 
   --font-serif: 'Shippori Mincho', 'Noto Serif JP', serif;
   --font-sans: 'Noto Sans JP', sans-serif;
@@ -27,9 +43,9 @@
   --radius-lg: 24px;
   --radius-xl: 40px;
 
-  --shadow-sm: 0 2px 8px rgba(74,55,40,0.08);
-  --shadow-md: 0 4px 20px rgba(74,55,40,0.12);
-  --shadow-lg: 0 8px 40px rgba(74,55,40,0.16);
+  --shadow-sm: 0 2px 8px rgba(45,62,40,0.08);
+  --shadow-md: 0 4px 20px rgba(45,62,40,0.12);
+  --shadow-lg: 0 8px 40px rgba(45,62,40,0.16);
 }
 
 * {
@@ -214,7 +230,7 @@ body {
 .nav-links a:hover::after { width: 100%; }
 
 .nav-btn {
-  background: var(--terracotta);
+  background: var(--sage);
   color: #fff !important;
   padding: 8px 20px;
   border-radius: var(--radius-xl);
@@ -223,7 +239,7 @@ body {
 }
 
 .nav-btn:hover {
-  background: var(--dark-brown) !important;
+  background: #2D5E44 !important;
   transform: translateY(-1px);
 }
 
@@ -238,7 +254,7 @@ body {
   display: flex;
   align-items: center;
   overflow: hidden;
-  background: linear-gradient(160deg, var(--warm-white) 0%, var(--pale-yellow) 50%, var(--sand) 100%);
+  background: linear-gradient(160deg, #FAFAF5 0%, #F8F5E6 50%, #F4F0D8 100%);
 }
 
 .hero-bg-pattern {
@@ -293,10 +309,10 @@ body {
   font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.12em;
-  color: var(--terracotta);
+  color: var(--sage);
   text-transform: uppercase;
   margin-bottom: 1.2rem;
-  background: rgba(196,113,74,0.1);
+  background: rgba(61,122,92,0.1);
   padding: 6px 14px;
   border-radius: 100px;
 }
@@ -331,22 +347,22 @@ body {
   align-items: center;
   gap: 8px;
   background: var(--terracotta);
-  color: #fff;
+  color: var(--dark-brown);
   padding: 14px 28px;
   border-radius: var(--radius-xl);
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 700;
   text-decoration: none;
   border: none;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 4px 16px rgba(196,113,74,0.35);
+  box-shadow: 0 4px 16px rgba(245,200,66,0.4);
 }
 
 .btn-primary:hover {
-  background: var(--dark-brown);
+  background: #E8B820;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(74,55,40,0.25);
+  box-shadow: 0 8px 24px rgba(245,200,66,0.45);
 }
 
 .btn-secondary {
@@ -499,7 +515,7 @@ body {
    SEARCH BAR
    ======================================== */
 .search-section {
-  background: var(--sand);
+  background: #F6F3E4;
   padding: 3rem 2rem;
 }
 
@@ -565,7 +581,7 @@ body {
   background: var(--dark-brown);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 100px;
   padding: 10px 24px;
   font-family: var(--font-sans);
   font-size: 0.9rem;
@@ -609,7 +625,7 @@ body {
   background: linear-gradient(135deg, var(--terracotta), var(--brown));
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 100px;
   padding: 10px 20px;
   font-size: 0.85rem;
   cursor: pointer;
@@ -648,9 +664,8 @@ body {
 .dog-card {
   background: var(--warm-white);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--light-gray);
+  box-shadow: 4px 4px 0 var(--tan);
+  border: 1.5px solid var(--tan);
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
@@ -658,7 +673,7 @@ body {
 
 .dog-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 6px 6px 0 var(--tan);
 }
 
 .dog-card-img {
@@ -699,7 +714,7 @@ body {
   letter-spacing: 0.06em;
 }
 
-.dog-status-badge.urgent { background: var(--terracotta); }
+.dog-status-badge.urgent { background: var(--sakura); color: #7A1A30; }
 
 .dog-card-body {
   padding: 1.4rem;
@@ -727,8 +742,8 @@ body {
 }
 
 .dog-tag {
-  background: var(--pale-yellow);
-  color: var(--brown);
+  background: var(--pale-blue);
+  color: #2A6E96;
   font-size: 0.72rem;
   padding: 3px 10px;
   border-radius: 100px;
@@ -753,7 +768,7 @@ body {
 }
 
 .adopt-btn {
-  background: var(--terracotta);
+  background: var(--sage);
   color: #fff;
   border: none;
   border-radius: 100px;
@@ -763,10 +778,12 @@ body {
   cursor: pointer;
   font-family: var(--font-sans);
   transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .adopt-btn:hover {
-  background: var(--dark-brown);
+  background: #2D5E44;
   transform: scale(1.04);
 }
 
@@ -783,10 +800,80 @@ body {
 .heart-btn.liked { color: var(--terracotta); }
 
 /* ========================================
+   PAW DIVIDER
+   ======================================== */
+.paw-divider {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 2rem;
+  background: #FAFAF5;
+}
+
+.paw-divider::before,
+.paw-divider::after {
+  display: none;
+}
+
+.paw-divider-icons {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  opacity: 0.3;
+}
+
+/* ========================================
+   DOG CARD — CIRCULAR IMAGE
+   ======================================== */
+.dog-card-circle-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 1.6rem;
+  padding-bottom: 0.4rem;
+  position: relative;
+}
+
+.dog-card-img-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--sand);
+  background: var(--sand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dog-card-img-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dog-card-img-circle .dog-card-img-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.dog-card-img-circle .dog-card-img-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+.dog-card-circle-wrap .dog-status-badge {
+  position: absolute;
+  top: 0.6rem;
+  right: calc(50% - 76px);
+}
+
+/* ========================================
    HOW IT WORKS
    ======================================== */
 .how-section {
-  background: var(--pale-yellow);
+  background: #F7F5E8;
 }
 
 .steps-grid {
@@ -797,14 +884,7 @@ body {
 }
 
 .steps-grid::before {
-  content: '';
-  position: absolute;
-  top: 2.2rem;
-  left: 12%;
-  right: 12%;
-  height: 1.5px;
-  background: repeating-linear-gradient(90deg, var(--tan) 0, var(--tan) 8px, transparent 8px, transparent 16px);
-  z-index: 0;
+  display: none;
 }
 
 .step-card {
@@ -832,20 +912,17 @@ body {
   border: 2px solid var(--tan);
 }
 
-.step-num {
-  position: absolute;
-  top: -4px;
-  right: calc(50% - 46px);
-  background: var(--terracotta);
-  color: #fff;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  font-size: 0.7rem;
+.step-num { display: none; }
+
+.step-big-num {
+  font-family: var(--font-serif);
+  font-size: 4rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--sage);
+  opacity: 0.35;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.03em;
 }
 
 .step-title {
@@ -866,7 +943,7 @@ body {
    AI STORY FEATURE
    ======================================== */
 .ai-section {
-  background: var(--warm-white);
+  background: #F9F7EC;
 }
 
 .ai-feature-grid {
@@ -1175,8 +1252,8 @@ body {
    FOOTER
    ======================================== */
 .site-footer {
-  background: var(--dark-brown);
-  color: var(--tan);
+  background: #F5EEC8;
+  color: var(--dark-brown);
   padding: 3rem 2rem 2rem;
   text-align: center;
 }
@@ -1189,7 +1266,7 @@ body {
 .footer-logo {
   font-family: var(--font-serif);
   font-size: 1.4rem;
-  color: var(--cream);
+  color: var(--dark-brown);
   margin-bottom: 0.8rem;
 }
 
@@ -1209,17 +1286,17 @@ body {
 
 .footer-links a {
   font-size: 0.82rem;
-  color: var(--tan);
+  color: var(--brown);
   text-decoration: none;
   transition: color 0.2s;
 }
 
-.footer-links a:hover { color: var(--cream); }
+.footer-links a:hover { color: var(--dark-brown); }
 
 .footer-copy {
   font-size: 0.75rem;
-  color: var(--gray);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  color: var(--brown);
+  border-top: 1px solid rgba(61,122,92,0.15);
   padding-top: 1.5rem;
 }
 

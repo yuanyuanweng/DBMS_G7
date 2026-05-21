@@ -6,7 +6,7 @@
 <div class="section">
   <div class="section-inner" style="max-width:680px;">
 
-    <a href="{{ url_for('dogs.detail', id=dog.id) }}" class="btn-secondary"
+    <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="btn-secondary"
        style="display:inline-flex;margin-bottom:2rem;font-size:0.85rem;">
       ← Back to {{ dog.name }}'s Profile
     </a>
@@ -25,9 +25,7 @@
         <p style="font-family:var(--font-serif);font-weight:700;color:var(--dark-brown);font-size:1.05rem;">
           Applying to adopt: <span style="color:var(--terracotta);">{{ dog.name }}</span>
         </p>
-        <p style="font-size:0.8rem;color:var(--gray);">
-          {{ dog.breed }} · {{ dog.age }} · {{ dog.shelter.name if dog.shelter else '' }}
-        </p>
+        <p style="font-size:0.8rem;color:var(--gray);">{{ dog.breed }} · {{ dog.age }}</p>
       </div>
     </div>
 
@@ -38,77 +36,53 @@
         📝 Adoption Application
       </h1>
       <p style="color:var(--gray);font-size:0.85rem;margin-bottom:2rem;">
-        All fields marked * are required. The shelter will review and contact you.
+        The shelter will review your application and contact you.
       </p>
 
-      <form method="POST" action="{{ url_for('applications.apply', dog_id=dog.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <input type="hidden" name="dog_id" value="{{ dog.id }}"/>
-
-        {% if form.errors %}
-        <div style="background:#FEF0EC;border:1px solid var(--terracotta);border-radius:var(--radius-sm);
-                    padding:1rem;margin-bottom:1.5rem;font-size:0.85rem;color:var(--terracotta);">
-          Please fix the following errors:
-          <ul style="margin-top:0.5rem;padding-left:1.2rem;">
-            {% for field, errors in form.errors.items() %}
-              {% for error in errors %}<li>{{ field }}: {{ error }}</li>{% endfor %}
-            {% endfor %}
-          </ul>
-        </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div style="background:#FEF0EC;border:1px solid var(--terracotta);border-radius:var(--radius-sm);
+                      padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.85rem;color:var(--terracotta);">
+            {{ message }}
+          </div>
+          {% endfor %}
         {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('applications.apply', dog_id=dog.id) }}">
+        <input type="hidden" name="dog_id" value="{{ dog.id }}"/>
 
         <!-- Personal Info -->
         <p class="form-section-title">👤 Personal Information</p>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Full Name *</label>
-            <input class="form-input" type="text" name="full_name"
-                   value="{{ current_user.name or '' }}" placeholder="John Smith" required/>
+            <input class="form-input" type="text" name="full_name" placeholder="John Smith" required/>
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number *</label>
-            <input class="form-input" type="tel" name="phone"
-                   value="{{ current_user.phone or '' }}" placeholder="+886 912 345 678" required/>
+            <input class="form-input" type="tel" name="phone" placeholder="+886 912 345 678" required/>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Email *</label>
-            <input class="form-input" type="email" name="email"
-                   value="{{ current_user.email }}" readonly
-                   style="background:var(--light-gray);cursor:not-allowed;"/>
-          </div>
           <div class="form-group">
             <label class="form-label">City of Residence *</label>
             <select class="form-select" name="city" required>
               <option value="">Select city</option>
               {% for city in ['Taipei','New Taipei','Taichung','Tainan','Kaohsiung','Other'] %}
-                <option value="{{ city }}" {% if current_user.city == city %}selected{% endif %}>{{ city }}</option>
+                <option value="{{ city }}">{{ city }}</option>
               {% endfor %}
             </select>
           </div>
-        </div>
-
-        <!-- Living Environment -->
-        <p class="form-section-title">🏠 Living Environment</p>
-        <div class="form-row">
           <div class="form-group">
             <label class="form-label">Housing Type *</label>
             <select class="form-select" name="house_type" required>
               <option value="">Select type</option>
-              <option value="Apartment (no elevator)">Apartment (no elevator)</option>
-              <option value="Apartment (with elevator)">Apartment (with elevator)</option>
-              <option value="Townhouse">Townhouse</option>
-              <option value="House with yard">House with yard</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Other Pets at Home</label>
-            <select class="form-select" name="other_pets">
-              <option value="None">None</option>
-              <option value="Other dogs">Other dogs</option>
-              <option value="Cats">Cats</option>
-              <option value="Other animals">Other animals</option>
+              <option>Apartment (no elevator)</option>
+              <option>Apartment (with elevator)</option>
+              <option>Townhouse</option>
+              <option>House with yard</option>
             </select>
           </div>
         </div>
@@ -119,14 +93,14 @@
           <div class="form-group">
             <label class="form-label">Why do you want to adopt {{ dog.name }}? *</label>
             <textarea class="form-textarea" name="reason" required
-              placeholder="e.g. I've always loved this breed, I work regular hours, I can take them for walks every day…">{{ form.reason.data or '' }}</textarea>
+              placeholder="e.g. I've always loved this breed, I can take them for walks every day…"></textarea>
           </div>
         </div>
         <div class="form-full">
           <div class="form-group">
             <label class="form-label">Describe your daily routine</label>
             <textarea class="form-textarea" name="lifestyle"
-              placeholder="e.g. 9-to-5 office worker, love hiking on weekends, two children at home…">{{ form.lifestyle.data or '' }}</textarea>
+              placeholder="e.g. 9-to-5 office worker, love hiking on weekends…"></textarea>
           </div>
         </div>
 
@@ -136,7 +110,7 @@
           <button type="submit" class="btn-primary" style="flex:1;justify-content:center;">
             🐾 Submit Application
           </button>
-          <a href="{{ url_for('dogs.detail', id=dog.id) }}" class="btn-secondary"
+          <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="btn-secondary"
              style="flex:1;justify-content:center;">Cancel</a>
         </div>
       </form>

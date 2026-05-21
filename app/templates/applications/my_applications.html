@@ -12,6 +12,18 @@
       <p class="section-subtitle">Track the status of your submitted applications here.</p>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div style="background:#F0F7F1;border:1px solid var(--sage);border-radius:var(--radius-sm);
+                    padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.85rem;color:var(--sage);
+                    max-width:800px;margin:0 auto 1.2rem;">
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     {% if applications %}
       <div style="display:flex;flex-direction:column;gap:1.2rem;max-width:800px;margin:0 auto;">
         {% for app in applications %}
@@ -20,9 +32,9 @@
                     display:flex;align-items:center;gap:1.5rem;">
 
           <!-- Dog thumbnail -->
-          <div style="width:80px;height:80px;background:var(--sand);border-radius:var(--radius-md);
+          <div style="width:80px;height:80px;background:var(--sand);border-radius:50%;
                       flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:2rem;">
-            {% if app.dog.image_url %}
+            {% if app.dog and app.dog.image_url %}
               <img src="{{ app.dog.image_url }}" style="width:100%;height:100%;object-fit:cover;"/>
             {% else %}🐶{% endif %}
           </div>
@@ -30,35 +42,39 @@
           <!-- Info -->
           <div style="flex:1;">
             <p style="font-family:var(--font-serif);font-weight:700;font-size:1.1rem;color:var(--dark-brown);">
-              {{ app.dog.name }}
+              {{ app.dog.name if app.dog else 'Unknown Dog' }}
             </p>
             <p style="font-size:0.8rem;color:var(--gray);margin-bottom:0.5rem;">
-              {{ app.dog.breed }} · {{ app.dog.shelter.name if app.dog.shelter else '' }}
+              {{ app.dog.breed if app.dog else '' }}
             </p>
             <p style="font-size:0.78rem;color:var(--brown);">
-              Submitted: {{ app.created_at.strftime('%B %d, %Y') }}
+              Submitted: {{ app.created_at[:10] if app.created_at else '—' }}
             </p>
           </div>
 
           <!-- Status -->
           <div style="text-align:right;">
-            {% set status_styles = {
-              'Pending':  ('background:#FFF7ED;color:#C4714A;border:1px solid #C4714A;',  '⏳'),
-              'Approved': ('background:#F0F7F1;color:#4A8A5A;border:1px solid #4A8A5A;',  '✅'),
-              'Rejected': ('background:#FEF0EC;color:#C4714A;border:1px solid #C4714A;',  '❌'),
-              'Cancelled':('background:var(--light-gray);color:var(--gray);border:1px solid var(--tan);','—')
-            } %}
-            {% set style, icon = status_styles.get(app.status, ('','')) %}
-            <span style="display:inline-block;padding:6px 14px;border-radius:100px;
-                         font-size:0.78rem;font-weight:600;letter-spacing:0.04em;{{ style }}">
-              {{ icon }} {{ app.status }}
-            </span>
+            {% if app.status == 'Pending' %}
+              <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.78rem;
+                           font-weight:600;background:#FFF7ED;color:#C4714A;border:1px solid #C4714A;">
+                ⏳ Pending
+              </span>
+            {% elif app.status == 'Approved' %}
+              <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.78rem;
+                           font-weight:600;background:#F0F7F1;color:#4A8A5A;border:1px solid #4A8A5A;">
+                ✅ Approved
+              </span>
+            {% else %}
+              <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.78rem;
+                           font-weight:600;background:#FEF0EC;color:#C4714A;border:1px solid #C4714A;">
+                ❌ Rejected
+              </span>
+            {% endif %}
 
             {% if app.status == 'Pending' %}
               <form method="POST" action="{{ url_for('applications.cancel', app_id=app.id) }}"
                     style="margin-top:0.6rem;"
-                    onsubmit="return confirm('Cancel this application?')">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    onsubmit="return confirm('Withdraw this application?')">
                 <button type="submit" style="font-size:0.75rem;color:var(--gray);
                         background:none;border:none;cursor:pointer;text-decoration:underline;">
                   Withdraw Application
@@ -79,7 +95,7 @@
         <p style="font-size:0.88rem;color:var(--brown);line-height:1.7;margin-bottom:1.8rem;">
           You haven't submitted any adoption applications. Find your perfect companion and start the journey!
         </p>
-        <a href="{{ url_for('dogs.list') }}" class="btn-primary">🐕 Find a Dog</a>
+        <a href="{{ url_for('dogs.list_dogs') }}" class="btn-primary">🐕 Find a Dog</a>
       </div>
     {% endif %}
 

@@ -1,44 +1,58 @@
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, request, redirect, url_for, flash
 from app.auth.utils import admin_required
-# 1. 成功引進璋珣寫好的 Dog 類別
-from app.models.dog import Dog  
+from app.database import get_db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
-    "後台儀表板主頁：串接真實 Dog 物件資料"
-    
-    # 2.取得目前系統中所有的狗狗物件列表
-    all_dogs_list = Dog.get_all()
-    
-    # 利用實體資料動態統計 
-    # 這裡的統計數據會隨 models/dog.py 裡的 MOCK_DOGS 內容自動更新
-    stats = {
-        'total_users': 156, # 這一行之後等璋珣把 user.py 寫好，我們再改成 User.query.count()
-        
-        # 動態計算：算算看清單裡有幾隻狗狗
-        'total_dogs': len(all_dogs_list), 
-        
-        # 動態計算：算算看狀態是 'Pending'（審核中）的狗狗有幾隻
-        'pending_dogs': len([dog for dog in all_dogs_list if dog.availability == 'Pending']),
-        
-        # 動態計算：算算看狀態是 'Adopted'（已領養）的狗狗有幾隻
-        'success_adoptions': len([dog for dog in all_dogs_list if dog.availability == 'Adopted']),
-        
-        'admin_name': session.get('username', '管理員')
-    }
-    
-    # 模擬最近的活動紀錄
-    recent_activities = [
-        {'time': '10分鐘前', 'event': '新用戶註冊: Sophia'},
-        {'time': '1小時前', 'event': '狗狗資料更新: Kosomo'},
-        {'time': '2小時前', 'event': '系統權限變更'}
-    ]
+    db = get_db()
+
+    total_users = db.execute('SELECT COUNT(*) FROM Users').fetchone()[0]
+    pending_count = db.execute("SELECT COUNT(*) FROM Application WHERE Status = 0").fetchone()[0]
+    approved_count = db.execute("SELECT COUNT(*) FROM Application WHERE Status = 1").fetchone()[0]
+    rejected_count = db.execute("SELECT COUNT(*) FROM Application WHERE Status = 2").fetchone()[0]
+
+    applications = db.execute('''
+        SELECT a.App_ID, a.Status, a.Created_at,
+               u.Email, u.User_ID,
+               d.Name AS Dog_Name, d.Dog_ID
+        FROM Application a
+        JOIN Users u ON a.User_ID = u.User_ID
+        JOIN Dog d ON a.Dog_ID = d.Dog_ID
+        ORDER BY a.Created_at DESC
+        LIMIT 20
+    ''').fetchall()
+
+    users = db.execute(
+        'SELECT User_ID, Email, Role FROM Users ORDER BY User_ID DESC'
+    ).fetchall()
+
+    STATUS_MAP = {0: 'Pending', 1: 'Approved', 2: 'Rejected'}
 
     return render_template(
-        'admin/dashboard.html', 
-        stats=stats, 
-        activities=recent_activities
+        'admin/dashboard.html',
+        total_users=total_users,
+        pending_count=pending_count,
+        approved_count=approved_count,
+        rejected_count=rejected_count,
+        applications=applications,
+        users=users,
+        STATUS_MAP=STATUS_MAP,
+        admin_email=session.get('email', '')
     )
+
+@admin_bp.route('/applications/<int:app_id>/status', methods=['POST'])
+@admin_required
+def update_status(app_id):
+    new_status = request.form.get('status')
+    if new_status not in ('0', '1', '2'):
+        flash('Invalid status.', 'error')
+        return redirect(url_for('admin.dashboard'))
+
+    db = get_db()
+    db.execute('UPDATE Application SET Status = ? WHERE App_ID = ?', (int(new_status), app_id))
+    db.commit()
+    flash('Application status updated.', 'success')
+    return redirect(url_for('admin.dashboard'))

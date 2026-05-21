@@ -34,25 +34,10 @@
       {% endwith %}
 
       <form method="POST" action="{{ url_for('auth.register') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-
-        <div class="form-row" style="margin-bottom:1.2rem;">
-          <div class="form-group">
-            <label class="form-label">Full Name *</label>
-            <input class="form-input" type="text" name="name" required
-                   value="{{ form.name.data or '' }}" placeholder="John Smith"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Phone</label>
-            <input class="form-input" type="tel" name="phone"
-                   value="{{ form.phone.data or '' }}" placeholder="+886 912 345 678"/>
-          </div>
-        </div>
 
         <div class="form-group" style="margin-bottom:1.2rem;">
           <label class="form-label">Email Address *</label>
-          <input class="form-input" type="email" name="email" required
-                 value="{{ form.email.data or '' }}" placeholder="your@email.com"/>
+          <input class="form-input" type="email" name="email" required placeholder="your@email.com"/>
         </div>
 
         <div class="form-group" style="margin-bottom:1.2rem;">

@@ -1,4 +1,4 @@
-{% comment %} {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ dog.name }} — PICKPET{% endblock %}
 
@@ -7,7 +7,7 @@
   <div class="section-inner" style="max-width:860px;">
 
     <!-- Back link -->
-    <a href="{{ url_for('dogs.list') }}" class="btn-secondary"
+    <a href="{{ url_for('dogs.list_dogs') }}" class="btn-secondary"
        style="display:inline-flex;margin-bottom:2rem;font-size:0.85rem;">
       ← Back to All Dogs
     </a>
@@ -53,21 +53,11 @@
           <p class="modal-story-text" id="storyText">{{ dog.ai_story or '' }}</p>
         </div>
 
-        {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user.role == 'shelter_admin') %}
-          <!-- Admin: Generate / Regenerate Story -->
-          <form method="POST" action="{{ url_for('dogs.generate_story', id=dog.id) }}" style="margin-top:1rem;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type="submit" class="btn-secondary" style="width:100%;justify-content:center;">
-              ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
-            </button>
-          </form>
-        {% else %}
-          <button class="btn-secondary" id="generateAIStoryBtn"
-                  data-dog-id="{{ dog.id }}"
-                  style="width:100%;justify-content:center;margin-top:1rem;">
-            ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
-          </button>
-        {% endif %}
+        <button class="btn-secondary" id="generateAIStoryBtn"
+                data-dog-id="{{ dog.id }}"
+                style="width:100%;justify-content:center;margin-top:1rem;">
+          ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
+        </button>
       </div>
 
       <!-- Right: Info + Apply -->
@@ -122,7 +112,7 @@
         {% endif %}
 
         <!-- CTA -->
-        {% if current_user.is_authenticated %}
+        {% if session.get('user_id') %}
           {% if already_applied %}
             <div style="background:var(--pale-yellow);border-radius:var(--radius-md);padding:1.2rem;text-align:center;">
               <p style="font-size:0.88rem;color:var(--brown);">
@@ -144,24 +134,6 @@
              style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
             Log In to Apply 🐾
           </a>
-        {% endif %}
-
-        <!-- Admin Controls -->
-        {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user.role == 'shelter_admin') %}
-        <div style="margin-top:1.5rem;display:flex;gap:0.8rem;padding-top:1.5rem;border-top:1px dashed var(--tan);">
-          <a href="{{ url_for('dogs.edit', id=dog.id) }}" class="btn-secondary"
-             style="flex:1;justify-content:center;font-size:0.85rem;">
-            ✏️ Edit Dog Profile
-          </a>
-          <form method="POST" action="{{ url_for('dogs.delete', id=dog.id) }}" style="flex:1;"
-                onsubmit="return confirm('Are you sure you want to remove {{ dog.name }}?')">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <button type="submit" class="btn-secondary"
-                    style="width:100%;justify-content:center;font-size:0.85rem;color:var(--terracotta);border-color:var(--terracotta);">
-              🗑 Remove
-            </button>
-          </form>
-        </div>
         {% endif %}
       </div>
     </div>
@@ -199,8 +171,7 @@
 
         try {
           const res = await fetch(`/ai/story/${dogId}`, { method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token() }}' } });
+            headers: { 'Content-Type': 'application/json' } });
           const data = await res.json();
           if (data.story) {
             await typewriterEffect(storyText, data.story);
@@ -217,3 +188,4 @@
     }
   });
 </script>
+{% endblock %}
