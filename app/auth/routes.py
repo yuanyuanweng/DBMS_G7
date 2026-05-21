@@ -1,46 +1,54 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, session
-from .utils import hash_password, verify_password
+from flask import Blueprint, request, render_template, redirect, url_for, flash, session
+from app.models.user import User
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # 接收前端登入資料
-        data = request.get_json() if request.is_json else request.form
-        username = data.get('username')
-        password = data.get('password')
-
-        # 開發構想：智慧角色分流
-        # 模擬兩組帳號先測試不同的跳轉結果
-        users_db = {
-            "admin": {"password": "123", "role": "admin"},
-            "user": {"password": "123", "role": "user"}
-        }
-
-        if username in users_db and password == users_db[username]['password']:
-            # 登入成功將身份寫入 Session
-            session['user_id'] = 101
-            session['username'] = username
-            session['role'] = users_db[username]['role']
-
-            flash(f"登入成功！歡迎 {username}", "success")
-
-            # 智慧跳轉
-            if session['role'] == 'admin':
-                # 跳轉至寫好的 Dashboard
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        user = User.verify_password(email, password)
+        if user:
+            session['user_id'] = user.id
+            session['email'] = user.email
+            session['role'] = user.role
+            login_type = request.form.get('login_type', 'user')
+            if login_type == 'admin' and user.role == 'admin':
                 return redirect(url_for('admin.dashboard'))
-            else:
-                # 一般使用者跳轉至狗狗列表
-                return redirect(url_for('dogs.list'))
+            elif login_type == 'admin' and user.role != 'admin':
+                flash('This account does not have admin access.', 'error')
+                session.clear()
+                return render_template('auth/login.html', form=None, next=request.args.get('next', ''))
+            next_url = request.form.get('next') or url_for('dogs.list_dogs')
+            return redirect(next_url)
+        flash('Invalid email or password.', 'error')
 
-        flash("帳號或密碼錯誤", "danger")
-    
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', form=None, next=request.args.get('next', ''))
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm = request.form.get('confirm_password', '')
+
+        if password != confirm:
+            flash('Passwords do not match.', 'error')
+            return render_template('auth/register.html', form=None)
+        if len(password) < 8:
+            flash('Password must be at least 8 characters.', 'error')
+            return render_template('auth/register.html', form=None)
+
+        success, _ = User.create(email, password)
+        if success:
+            flash('Account created! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
+        flash('Email already registered.', 'error')
+
+    return render_template('auth/register.html', form=None)
 
 @auth_bp.route('/logout')
 def logout():
-    "徹底清理 Session，確保權限不殘留"
     session.clear()
-    flash("您已成功登出", "info")
     return redirect(url_for('auth.login'))

@@ -5,10 +5,22 @@
       <span>PICKPET</span>
     </a>
     <ul class="nav-links">
-      <li><a href="/">Find a Dog</a></li>
+      <li><a href="{{ url_for('dogs.list_dogs') }}">Find a Dog</a></li>
       <li><a href="/#how">How It Works</a></li>
       <li><a href="/#ai-feature">AI Stories</a></li>
-      <li><a href="/login" class="nav-btn">Log In / Sign Up</a></li>
+      {% if session.get('user_id') %}
+        <li><a href="{{ url_for('applications.my_applications') }}">My Applications</a></li>
+        {% if session.get('role') == 'admin' %}
+          <li><a href="{{ url_for('admin.dashboard') }}" class="nav-btn" style="background:var(--dark-brown);">Admin</a></li>
+        {% endif %}
+        <li>
+          <a href="{{ url_for('auth.logout') }}" class="nav-btn">
+            Log Out ({{ session.get('email', '').split('@')[0] }})
+          </a>
+        </li>
+      {% else %}
+        <li><a href="{{ url_for('auth.login') }}" class="nav-btn">Log In / Sign Up</a></li>
+      {% endif %}
     </ul>
   </nav>
 </header>

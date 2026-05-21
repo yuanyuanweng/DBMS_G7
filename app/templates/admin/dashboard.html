@@ -2,151 +2,313 @@
 
 {% block title %}Admin Dashboard — PICKPET{% endblock %}
 
+{% block extra_css %}
+<style>
+  .admin-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .admin-title {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+  }
+
+  .admin-sub {
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--warm-white);
+    border-radius: var(--radius-md);
+    padding: 1.5rem 1.8rem;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid transparent;
+  }
+
+  .stat-card.yellow { border-left-color: var(--terracotta); }
+  .stat-card.green  { border-left-color: var(--sage); }
+  .stat-card.blue   { border-left-color: var(--sky-blue); }
+  .stat-card.pink   { border-left-color: var(--sakura); }
+
+  .stat-num {
+    font-family: var(--font-serif);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .admin-section-title {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+    margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--sand);
+  }
+
+  .admin-table-wrap {
+    background: var(--warm-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .admin-table thead { background: var(--sand); }
+
+  .admin-table th {
+    text-align: left;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .admin-table td {
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid var(--light-gray);
+    color: var(--dark-brown);
+  }
+
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover td { background: var(--cream); }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-pending  { background: var(--pale-yellow); color: #7A6000; }
+  .badge-approved { background: #D6F0E0; color: #1E5C35; }
+  .badge-rejected { background: var(--pale-sakura); color: #8C2A3E; }
+  .badge-admin    { background: var(--pale-blue); color: #1A4F6E; }
+  .badge-user     { background: var(--sand); color: var(--gray); }
+
+  .action-form { display: inline-flex; gap: 6px; }
+
+  .btn-approve {
+    padding: 5px 14px;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #D6F0E0;
+    color: #1E5C35;
+    transition: background 0.18s;
+  }
+  .btn-approve:hover { background: #b5e2c8; }
+
+  .btn-reject {
+    padding: 5px 14px;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--pale-sakura);
+    color: #8C2A3E;
+    transition: background 0.18s;
+  }
+  .btn-reject:hover { background: #f5c4d0; }
+
+  .flash-success {
+    background: #D6F0E0;
+    color: #1E5C35;
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+  }
+
+  .flash-error {
+    background: var(--pale-sakura);
+    color: #8C2A3E;
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="section">
-  <div class="section-inner">
+<div class="admin-wrap">
 
-    <div class="section-header">
-      <span class="section-tag">⚙️ Admin</span>
-      <h2 class="section-title">Admin Dashboard</h2>
-      <p class="section-subtitle">Overview of platform activity and quick actions.</p>
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">Admin Dashboard</div>
+      <div class="admin-sub">{{ admin_email }}</div>
     </div>
+    <a href="{{ url_for('dogs.list_dogs') }}" class="btn-secondary" style="font-size:0.85rem;">
+      Back to Site
+    </a>
+  </div>
 
-    <!-- KPI Cards -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:3rem;">
-      {% set kpis = [
-        ('🐕', stats.total_dogs or 0,        'Total Dogs',         'var(--terracotta)'),
-        ('✅', stats.adopted or 0,            'Successfully Adopted','var(--sage)'),
-        ('⏳', stats.pending_apps or 0,       'Pending Applications','#C4714A'),
-        ('👥', stats.total_users or 0,        'Registered Users',   'var(--brown)')
-      ] %}
-      {% for icon, num, label, color in kpis %}
-      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:1.5rem;
-                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);text-align:center;">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">{{ icon }}</div>
-        <div style="font-family:var(--font-serif);font-size:2.2rem;font-weight:700;color:{{ color }};">{{ num }}</div>
-        <div style="font-size:0.78rem;color:var(--gray);letter-spacing:0.06em;text-transform:uppercase;margin-top:4px;">{{ label }}</div>
-      </div>
-      {% endfor %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="stats-grid">
+    <div class="stat-card yellow">
+      <div class="stat-num">{{ total_users }}</div>
+      <div class="stat-label">Total Users</div>
     </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
-
-      <!-- Quick Actions -->
-      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
-                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
-        <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);margin-bottom:1.2rem;">
-          ⚡ Quick Actions
-        </h3>
-        <div style="display:flex;flex-direction:column;gap:0.8rem;">
-          <a href="{{ url_for('dogs.create') }}" class="btn-primary" style="justify-content:center;">
-            ➕ Add New Dog
-          </a>
-          <a href="{{ url_for('applications.review') }}" class="btn-secondary" style="justify-content:center;">
-            📋 Review Applications
-            {% if stats.pending_apps %}
-              <span style="background:var(--terracotta);color:#fff;border-radius:100px;
-                           padding:1px 8px;font-size:0.72rem;margin-left:6px;">{{ stats.pending_apps }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('admin.reports') }}" class="btn-secondary" style="justify-content:center;">
-            📊 View Reports
-          </a>
-        </div>
-      </div>
-
-      <!-- Recent Applications -->
-      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
-                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
-        <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);margin-bottom:1.2rem;">
-          🆕 Recent Applications
-        </h3>
-        {% if recent_applications %}
-          <div style="display:flex;flex-direction:column;gap:0.8rem;">
-            {% for app in recent_applications[:5] %}
-            <div style="display:flex;align-items:center;justify-content:space-between;
-                        padding:0.6rem 0;border-bottom:1px dashed var(--light-gray);">
-              <div>
-                <p style="font-size:0.85rem;font-weight:600;color:var(--dark-brown);">
-                  {{ app.user.name }} → {{ app.dog.name }}
-                </p>
-                <p style="font-size:0.75rem;color:var(--gray);">
-                  {{ app.created_at.strftime('%b %d') }}
-                </p>
-              </div>
-              {% set colors = {'Pending':'#C4714A','Approved':'#4A8A5A','Rejected':'var(--gray)'} %}
-              <span style="font-size:0.72rem;font-weight:600;color:{{ colors.get(app.status,'var(--gray)') }};">
-                {{ app.status }}
-              </span>
-            </div>
-            {% endfor %}
-          </div>
-          <a href="{{ url_for('applications.review') }}" style="font-size:0.8rem;color:var(--terracotta);
-             text-decoration:none;display:block;margin-top:1rem;">View all →</a>
-        {% else %}
-          <p style="font-size:0.85rem;color:var(--gray);">No recent applications.</p>
-        {% endif %}
-      </div>
-
-      <!-- Recently Added Dogs -->
-      <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2rem;
-                  box-shadow:var(--shadow-sm);border:1px solid var(--light-gray);">
-        <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);margin-bottom:1.2rem;">
-          🐕 Recently Added Dogs
-        </h3>
-        {% if recent_dogs %}
-          <div style="display:flex;flex-direction:column;gap:0.8rem;">
-            {% for dog in recent_dogs[:5] %}
-            <div style="display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0;
-                        border-bottom:1px dashed var(--light-gray);">
-              <div style="width:40px;height:40px;background:var(--sand);border-radius:var(--radius-sm);
-                          overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">
-                {% if dog.image_url %}<img src="{{ dog.image_url }}" style="width:100%;height:100%;object-fit:cover;"/>
-                {% else %}🐶{% endif %}
-              </div>
-              <div style="flex:1;">
-                <a href="{{ url_for('dogs.detail', id=dog.id) }}"
-                   style="font-size:0.85rem;font-weight:600;color:var(--dark-brown);text-decoration:none;">
-                  {{ dog.name }}
-                </a>
-                <p style="font-size:0.75rem;color:var(--gray);">{{ dog.breed }} · {{ dog.city }}</p>
-              </div>
-              <a href="{{ url_for('dogs.edit', id=dog.id) }}"
-                 style="font-size:0.75rem;color:var(--terracotta);text-decoration:none;">Edit</a>
-            </div>
-            {% endfor %}
-          </div>
-          <a href="{{ url_for('dogs.list') }}" style="font-size:0.8rem;color:var(--terracotta);
-             text-decoration:none;display:block;margin-top:1rem;">View all dogs →</a>
-        {% else %}
-          <p style="font-size:0.85rem;color:var(--gray);">No dogs added yet.</p>
-        {% endif %}
-      </div>
-
-      <!-- Summary Snapshot -->
-      <div style="background:var(--pale-yellow);border-radius:var(--radius-lg);padding:2rem;
-                  box-shadow:var(--shadow-sm);border:1px solid var(--tan);">
-        <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);margin-bottom:1.2rem;">
-          🌸 Platform Health
-        </h3>
-        <div style="display:flex;flex-direction:column;gap:0.8rem;">
-          {% set health_items = [
-            ('Adoption success rate', (stats.adopted / stats.total_dogs * 100)|round(1)|string + '%' if stats.total_dogs else 'N/A'),
-            ('Dogs with AI stories', stats.dogs_with_stories or 0),
-            ('Dogs marked urgent', stats.urgent_dogs or 0),
-            ('Active shelters', stats.active_shelters or 0)
-          ] %}
-          {% for label, value in health_items %}
-          <div style="display:flex;justify-content:space-between;padding:0.5rem 0;
-                      border-bottom:1px dashed var(--tan);">
-            <span style="font-size:0.85rem;color:var(--brown);">{{ label }}</span>
-            <span style="font-size:0.85rem;font-weight:600;color:var(--dark-brown);">{{ value }}</span>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-
+    <div class="stat-card blue">
+      <div class="stat-num">{{ pending_count }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-num">{{ approved_count }}</div>
+      <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card pink">
+      <div class="stat-num">{{ rejected_count }}</div>
+      <div class="stat-label">Rejected</div>
     </div>
   </div>
+
+  <div class="admin-section-title">Applications (last 20)</div>
+  <div class="admin-table-wrap">
+    {% if applications %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Dog</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td style="color:var(--gray);font-size:0.8rem;">#{{ app['App_ID'] }}</td>
+          <td>{{ app['Email'] }}</td>
+          <td>{{ app['Dog_Name'] }}</td>
+          <td style="color:var(--gray);">{{ (app['Created_at'] or '')[:10] }}</td>
+          <td>
+            {% if app['Status'] == 0 %}
+              <span class="badge badge-pending">Pending</span>
+            {% elif app['Status'] == 1 %}
+              <span class="badge badge-approved">Approved</span>
+            {% else %}
+              <span class="badge badge-rejected">Rejected</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="action-form">
+              {% if app['Status'] != 1 %}
+              <form method="POST" action="{{ url_for('admin.update_status', app_id=app['App_ID']) }}">
+                <input type="hidden" name="status" value="1">
+                <button type="submit" class="btn-approve">Approve</button>
+              </form>
+              {% endif %}
+              {% if app['Status'] != 2 %}
+              <form method="POST" action="{{ url_for('admin.update_status', app_id=app['App_ID']) }}">
+                <input type="hidden" name="status" value="2">
+                <button type="submit" class="btn-reject">Reject</button>
+              </form>
+              {% endif %}
+              {% if app['Status'] != 0 %}
+              <form method="POST" action="{{ url_for('admin.update_status', app_id=app['App_ID']) }}">
+                <input type="hidden" name="status" value="0">
+                <button type="submit" class="btn-approve" style="background:var(--pale-yellow);color:#7A6000;">Reset</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:2rem;text-align:center;color:var(--gray);font-size:0.9rem;">
+      No applications yet.
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="admin-section-title">All Users</div>
+  <div class="admin-table-wrap">
+    {% if users %}
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td style="color:var(--gray);font-size:0.8rem;">{{ user['User_ID'] }}</td>
+          <td>{{ user['Email'] }}</td>
+          <td>
+            {% if user['Role'] == 1 %}
+              <span class="badge badge-admin">Admin</span>
+            {% else %}
+              <span class="badge badge-user">User</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:2rem;text-align:center;color:var(--gray);font-size:0.9rem;">
+      No users found.
+    </div>
+    {% endif %}
+  </div>
+
 </div>
 {% endblock %}

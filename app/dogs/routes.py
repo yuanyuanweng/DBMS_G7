@@ -11,8 +11,9 @@ TODO:
 2) redirect(url_for("blueprint.function")): 提交Form後, 把user送回要去的網址
 """
 
-from flask import Blueprint, render_template, request, abort, redirect
+from flask import Blueprint, render_template, request, abort, redirect, session
 from app.models.dog import Dog
+from app.models.application import Application
 
 dogs_bp = Blueprint("dogs", __name__)
 
@@ -88,11 +89,14 @@ def dog_detail(dog_id):
     if dog is None: 
         abort(404)
     
+    user_id = session.get('user_id')
+    already_applied = Application.already_applied(user_id, dog_id) if user_id else False
+
     return render_template(
         "dogs/detail.html",
         dog=dog,
-        dog_json=dog.to_dict(), 
-        already_applied=False #Placeholder only for now, connect database後會修改
+        dog_json=dog.to_dict(),
+        already_applied=already_applied
     )
 
 # http://127.0.0.1:5000/shelter/create_dog

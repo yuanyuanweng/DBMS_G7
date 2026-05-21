@@ -1,4 +1,4 @@
-{% comment %} {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Find a Dog — PICKPET{% endblock %}
 
@@ -157,18 +157,20 @@
     {% if dogs %}
       <div class="dogs-grid">
         {% for dog in dogs %}
-        <div class="dog-card" onclick="window.location='{{ url_for('dog_list', dog_id=dog.id) }}'">
-          <div class="dog-card-img">
-            {% if dog.image_url %}
-              <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
-            {% else %}
-              <div class="dog-card-img-placeholder" data-color="{{ dog.color or '#D9A57A' }}" data-spot="{{ dog.spot_color or '#C4714A' }}" data-id="{{ dog.id }}">
-                <!-- SVG injected by app.js -->
-              </div>
-            {% endif %}
+        <div class="dog-card" onclick="window.location='{{ url_for('dogs.dog_detail', dog_id=dog.id) }}'">
+          <div class="dog-card-circle-wrap">
             <span class="dog-status-badge {% if dog.is_urgent %}urgent{% endif %}">
               {{ 'Urgent' if dog.is_urgent else 'Available' }}
             </span>
+            <div class="dog-card-img-circle">
+              {% if dog.image_url %}
+                <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
+              {% else %}
+                <div class="dog-card-img-placeholder" data-color="{{ dog.color or '#D9A57A' }}" data-spot="{{ dog.spot_color or '#C4714A' }}" data-id="{{ dog.id }}">
+                  <!-- SVG injected by app.js -->
+                </div>
+              {% endif %}
+            </div>
           </div>
           <div class="dog-card-body">
             <p class="dog-card-name">{{ dog.name }}</p>
@@ -180,7 +182,7 @@
             </div>
             <p class="dog-story">{{ dog.ai_story or dog.description or 'No story yet — click to generate one with AI!' }}</p>
             <div class="dog-card-footer">
-              <a href="{{ url_for('dog_list', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
+              <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
               <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
                 data-heart="{{ dog.id }}" onclick="event.stopPropagation()">
                 {{ '❤️' if dog.id in liked_ids else '🤍' }}
@@ -343,4 +345,4 @@
   // Pass dog data from Flask to JS for AI match rendering
   const DOGS_FROM_SERVER = {{ dogs_json | tojson | safe }};
 </script>
-{% endblock %} {% endcomment %}
+{% endblock %}
