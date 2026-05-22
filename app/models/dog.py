@@ -167,6 +167,7 @@ class Dog:
         self.image_url = row.get('Image_URL')
         self.ai_story = row.get('AI_Story') or 'No story yet — click to generate one with AI!'
         self.is_urgent = bool(row.get('Is_Urgent', 0))
+        self.is_liked = bool(row.get('Is_Liked', 0))
         self.availability = row.get('Availability') or 'Available'
         self.color = COLORS[(self.id - 1) % len(COLORS)]
         self.spot_color = SPOT_COLORS[(self.id - 1) % len(SPOT_COLORS)]
@@ -205,6 +206,7 @@ class Dog:
         'image_url': self.image_url,
         'ai_story': self.ai_story,
         'is_urgent': self.is_urgent,
+        'is_liked': self.is_liked,
         'color': self.color,
         'tags': self.tags,
     }
