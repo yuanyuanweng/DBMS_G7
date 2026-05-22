@@ -11,7 +11,7 @@ def login():
         username = data.get('username')
         password = data.get('password')
 
-        # 開發構想：智慧角色分流
+        # 智慧角色分流
         # 模擬兩組帳號先測試不同的跳轉結果
         users_db = {
             "admin": {"password": "123", "role": "admin"},
@@ -31,8 +31,8 @@ def login():
                 # 跳轉至寫好的 Dashboard
                 return redirect(url_for('admin.dashboard'))
             else:
-                # 一般使用者跳轉至狗狗列表
-                return redirect(url_for('dogs.list'))
+                # 配合會議結論：一般使用者跳轉至「我的申請」頁面
+                return redirect(url_for('applications.my_applications'))
 
         flash("帳號或密碼錯誤", "danger")
     
@@ -40,7 +40,7 @@ def login():
 
 @auth_bp.route('/logout')
 def logout():
-    "徹底清理 Session，確保權限不殘留"
+    "徹底清理 Session"
     session.clear()
     flash("您已成功登出", "info")
     return redirect(url_for('auth.login'))
