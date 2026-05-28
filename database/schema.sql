@@ -23,7 +23,6 @@ CREATE TABLE Dog (
     Age INTEGER CHECK (Age >= 0),
     Breed TEXT,
     Image_URL TEXT,
-    AI_Story TEXT,
     FOREIGN KEY (Shelter_ID) REFERENCES Shelter(Shelter_ID)
 );
 
