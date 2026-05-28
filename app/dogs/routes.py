@@ -14,6 +14,7 @@ TODO:
 from flask import Blueprint, render_template, request, abort, redirect, session
 from app.models.dog import Dog
 from app.models.application import Application
+from app.models.shelter import Shelter
 
 dogs_bp = Blueprint("dogs", __name__)
 
@@ -117,11 +118,7 @@ def create():
         # redirect after success
         pass
 
-    # Temporary
-    shelters = [
-        {"id": 1, "name": "Kaohsiung Shelter", "city": "Kaohsiung"},
-        {"id": 2, "name": "Taipei Shelter", "city": "Taipei"},
-    ]
+    shelters = Shelter.get_all()
 
     # GET req: shows empty form
     return render_template(
@@ -153,11 +150,7 @@ def edit(dog_id):
         # redirect after success
         pass
 
-    # Temporary
-    shelters = [
-        {"id": 1, "name": "Kaohsiung Shelter", "city": "Kaohsiung"},
-        {"id": 2, "name": "Taipei Shelter", "city": "Taipei"},
-    ]
+    shelters = Shelter.get_all()
 
     # GET req: shows filled form with that specific id
     return render_template(

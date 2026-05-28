@@ -111,7 +111,7 @@
               {% for shelter in shelters %}
                 <option value="{{ shelter.id }}"
                   {% if dog.shelter_id == shelter.id %}selected{% endif %}>
-                  {{ shelter.name }} — {{ shelter.city }}
+                  {{ shelter.name }} — {{ shelter.location }}
                 </option>
               {% endfor %}
             </select>
