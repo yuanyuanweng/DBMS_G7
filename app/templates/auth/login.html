@@ -12,12 +12,9 @@
       <p style="color:var(--gray);font-size:0.88rem;">Log in to continue your adoption journey.</p>
     </div>
 
-    <!-- Tab switcher -->
     <div style="display:flex;gap:0.6rem;margin-bottom:2rem;">
-      <a href="{{ url_for('auth.login') }}"
-         class="btn-primary" style="flex:1;justify-content:center;font-size:0.88rem;">Log In</a>
-      <a href="{{ url_for('auth.register') }}"
-         class="btn-secondary" style="flex:1;justify-content:center;font-size:0.88rem;">Sign Up</a>
+      <a href="{{ url_for('auth.login') }}" class="btn-primary" style="flex:1;justify-content:center;font-size:0.88rem;">Log In</a>
+      <a href="#" class="btn-secondary" style="flex:1;justify-content:center;font-size:0.88rem;">Sign Up</a>
     </div>
 
     <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2.5rem;
@@ -26,12 +23,15 @@
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-          <div style="background:{% if category == 'error' %}#FEF0EC{% else %}#F0F7F1{% endif %};
-                      border:1px solid {% if category == 'error' %}var(--terracotta){% else %}var(--sage){% endif %};
-                      border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1.2rem;
-                      font-size:0.85rem;color:{% if category == 'error' %}var(--terracotta){% else %}var(--sage){% endif %};">
-            {{ message }}
-          </div>
+            {% if category == 'error' %}
+              <div style="background:#FEF0EC; border:1px solid var(--terracotta); border-radius:var(--radius-sm); padding:0.8rem 1rem; margin-bottom:1.2rem; font-size:0.85rem; color:var(--terracotta);">
+                {{ message }}
+              </div>
+            {% else %}
+              <div style="background:#F0F7F1; border:1px solid var(--sage); border-radius:var(--radius-sm); padding:0.8rem 1rem; margin-bottom:1.2rem; font-size:0.85rem; color:var(--sage);">
+                {{ message }}
+              </div>
+            {% endif %}
           {% endfor %}
         {% endif %}
       {% endwith %}
@@ -59,7 +59,7 @@
 
       <p style="text-align:center;margin-top:1.2rem;font-size:0.82rem;color:var(--gray);">
         Don't have an account?
-        <a href="{{ url_for('auth.register') }}" style="color:var(--terracotta);text-decoration:none;">Sign up here</a>
+        <a href="#" style="color:var(--terracotta);text-decoration:none;">Sign up here</a>
       </p>
     </div>
   </div>

@@ -1,4 +1,4 @@
-{% comment %} {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ dog.name }} — PICKPET{% endblock %}
 
@@ -24,7 +24,7 @@
             <div id="detailDogSVG"
                  data-color="{{ dog.color or '#D9A57A' }}"
                  data-spot="{{ dog.spot_color or '#C4714A' }}"
-                 data-urgent="{{ 'true' if dog.is_urgent else 'false' }}"
+                 data-urgent="{% if dog.is_urgent %}true{% else %}false{% endif %}"
                  style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--sand);">
               <!-- SVG injected by app.js -->
             </div>
@@ -47,16 +47,15 @@
         </div>
 
         <!-- AI Story -->
-        <div class="modal-story" id="storyBlock"
-             style="{{ 'display:none;' if not dog.ai_story else '' }}">
-          <div class="modal-story-label">✨ AI-Generated Personality Story</div>
+        <div class="modal-story" id="storyBlock" {% if not dog.ai_story %}style="display:none;"{% endif %}>
+        <div class="modal-story-label">✨ AI-Generated Personality Story</div>
           <p class="modal-story-text" id="storyText">{{ dog.ai_story or '' }}</p>
         </div>
 
         {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user.role == 'shelter_admin') %}
           <!-- Admin: Generate / Regenerate Story -->
           <form method="POST" action="{{ url_for('dogs.generate_story', id=dog.id) }}" style="margin-top:1rem;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+           <input type="hidden" name="csrf_token" value=""/>
             <button type="submit" class="btn-secondary" style="width:100%;justify-content:center;">
               ✨ {{ 'Regenerate AI Story' if dog.ai_story else 'Generate AI Story' }}
             </button>
@@ -198,9 +197,13 @@
         storyText.textContent = '';
 
         try {
-          const res = await fetch(`/ai/story/${dogId}`, { method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token() }}' } });
+          const res = await fetch(`/ai/story/${dogId}`, { 
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'X-CSRFToken': ''
+            } 
+          });
           const data = await res.json();
           if (data.story) {
             await typewriterEffect(storyText, data.story);

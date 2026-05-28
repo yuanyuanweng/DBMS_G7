@@ -90,3 +90,16 @@ def toggle_favorite(dog_id):
         'action': action,
         'dog_id': dog_id
     }), 200
+
+@auth_bp.app_template_global('dog_list')
+def rescue_dog_list(dog_id):
+    return url_for('dogs.list_dogs', dog_id=dog_id)
+
+
+@auth_bp.app_template_global('rescue_dogs_list_url')
+def rescue_dogs_list_url():
+    return url_for('dogs.list_dogs')
+
+@auth_bp.app_template_global('rescue_dogs_edit_url')
+def rescue_dogs_edit_url(dog_id):
+    return url_for('dogs.edit', dog_id=dog_id)

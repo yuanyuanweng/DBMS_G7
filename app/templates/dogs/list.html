@@ -1,12 +1,10 @@
-{% comment %} {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Find a Dog — PICKPET{% endblock %}
 
 {% block content %}
 
-<!-- ======== HERO ======== -->
 <section class="hero">
-  <!-- Floating petals -->
   <div class="petal"></div>
   <div class="petal"></div>
   <div class="petal"></div>
@@ -38,7 +36,6 @@
         <div class="floating-tag">✨ AI-Generated Stories</div>
         <div class="floating-tag">🏡 Waiting for a Home</div>
 
-        <!-- Hero Dog SVG Illustration -->
         <svg class="hero-dog-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
           <rect width="320" height="240" fill="#F0E6D3" rx="16"/>
           <ellipse cx="160" cy="215" rx="90" ry="14" fill="#D9C4A8" opacity="0.5"/>
@@ -94,12 +91,10 @@
   </div>
 </section>
 
-<!-- ======== SEARCH ======== -->
 <section class="search-section" id="search">
   <div class="search-box">
     <p class="search-title">🔍 Filter Dogs</p>
 
-    {# Flask form: GET request to dogs.list with query params #}
     <form method="GET" action="{{ url_for('dogs.list_dogs') }}">
       <div class="search-row">
         <div class="form-group">
@@ -133,7 +128,6 @@
 
     <hr class="divider"/>
 
-    <!-- AI Smart Match (JS-driven, calls backend /ai/match) -->
     <div>
       <div class="ai-label">✨ AI Smart Match — describe your lifestyle and we'll find the perfect dog</div>
       <div class="ai-search-wrapper">
@@ -145,7 +139,6 @@
   </div>
 </section>
 
-<!-- ======== DOGS GRID ======== -->
 <section class="section" id="dogs">
   <div class="section-inner">
     <div class="section-header">
@@ -157,14 +150,12 @@
     {% if dogs %}
       <div class="dogs-grid">
         {% for dog in dogs %}
-        <div class="dog-card" onclick="window.location='{{ url_for('dog_list', dog_id=dog.id) }}'">
+        <div class="dog-card" data-url="{{ url_for('dogs.edit', id=dog.id) }}" onclick="window.location=this.dataset.url">
           <div class="dog-card-img">
             {% if dog.image_url %}
               <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
             {% else %}
-              <div class="dog-card-img-placeholder" data-color="{{ dog.color or '#D9A57A' }}" data-spot="{{ dog.spot_color or '#C4714A' }}" data-id="{{ dog.id }}">
-                <!-- SVG injected by app.js -->
-              </div>
+              <div class="dog-card-img-placeholder" data-color="{{ dog.color or '#D9A57A' }}" data-spot="{{ dog.spot_color or '#C4714A' }}" data-id="{{ dog.id }}"></div>
             {% endif %}
             <span class="dog-status-badge {% if dog.is_urgent %}urgent{% endif %}">
               {{ 'Urgent' if dog.is_urgent else 'Available' }}
@@ -179,10 +170,11 @@
               {% endfor %}
             </div>
             <p class="dog-story">{{ dog.ai_story or dog.description or 'No story yet — click to generate one with AI!' }}</p>
+            
             <div class="dog-card-footer">
-              <a href="{{ url_for('dog_list', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
+              <a href="{{ url_for('dogs.edit', id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
               <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
-                data-heart="{{ dog.id }}" onclick="event.stopPropagation()">
+                data-heart="{{ dog.id }}" onclick="toggleFavorite(event, this)">
                 {{ '❤️' if dog.id in liked_ids else '🤍' }}
               </button>
             </div>
@@ -191,7 +183,6 @@
         {% endfor %}
       </div>
 
-      <!-- Pagination -->
       {% if pagination %}
       <div class="text-center mt-2" style="display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;">
         {% if pagination.has_prev %}
@@ -219,7 +210,6 @@
   </div>
 </section>
 
-<!-- ======== HOW IT WORKS ======== -->
 <section class="section how-section" id="how">
   <div class="section-inner">
     <div class="section-header">
@@ -251,7 +241,6 @@
   </div>
 </section>
 
-<!-- ======== AI FEATURE ======== -->
 <section class="section ai-section" id="ai-feature">
   <div class="section-inner">
     <div class="ai-feature-grid">
@@ -323,7 +312,6 @@
   </div>
 </section>
 
-<!-- ======== AI MATCH RESULT MODAL ======== -->
 <div class="modal-overlay" id="aiResultModal">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
@@ -336,11 +324,40 @@
   </div>
 </div>
 
+<div id="server-data" data-dogs="{{ dogs_json }}" style="display:none;"></div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // Pass dog data from Flask to JS for AI match rendering
-  const DOGS_FROM_SERVER = {{ dogs_json | tojson | safe }};
+  // 從 HTML 標籤安全地讀取資料，徹底解決 IDE 紅字問題
+  const dataElement = document.getElementById('server-data');
+  const rawData = dataElement.getAttribute('data-dogs');
+  let DOGS_FROM_SERVER = [];
+  try {
+    DOGS_FROM_SERVER = rawData ? JSON.parse(rawData) : [];
+  } catch(e) {
+    console.error("JSON 解析失敗:", e);
+  }
+
+  async function toggleFavorite(event, btn) {
+    event.stopPropagation();
+    const dogId = btn.getAttribute('data-heart');
+    
+    try {
+      const response = await fetch(`/auth/favorite/${dogId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        btn.innerHTML = data.liked ? '❤️' : '🤍';
+        btn.classList.toggle('liked', data.liked);
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  }
 </script>
-{% endblock %} {% endcomment %}
+{% endblock %}
