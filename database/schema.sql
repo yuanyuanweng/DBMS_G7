@@ -68,7 +68,6 @@ SELECT
     d.Age,
     d.Breed,
     d.Image_URL,
-    d.AI_Story,
     CASE
         WHEN COUNT(CASE WHEN a.Status = 1 THEN 1 END) > 0 THEN 'Adopted'
         WHEN COUNT(CASE WHEN a.Status = 0 THEN 1 END) > 0 THEN 'Pending'
