@@ -2,7 +2,33 @@
 
 {% block title %}Sign Up — PICKPET{% endblock %}
 
+{% block extra_css %}
+<style>
+  .register-flash {
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .register-flash-error,
+  .register-flash-danger {
+    background: #FEF0EC;
+    border: 1px solid var(--terracotta);
+    color: var(--terracotta);
+  }
+
+  .register-flash-success,
+  .register-flash-info {
+    background: #F0F7F1;
+    border: 1px solid var(--sage);
+    color: var(--sage);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+
 <div class="section" style="min-height:70vh;display:flex;align-items:center;">
   <div class="section-inner" style="max-width:440px;width:100%;">
 
@@ -23,12 +49,12 @@
     <div style="background:var(--warm-white);border-radius:var(--radius-lg);padding:2.5rem;
                 box-shadow:var(--shadow-md);border:1px solid var(--light-gray);">
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-          <div style="background:#FEF0EC;border:1px solid var(--terracotta);
-                      border-radius:var(--radius-sm);padding:0.8rem 1rem;margin-bottom:1.2rem;
-                      font-size:0.85rem;color:var(--terracotta);">{{ message }}</div>
+            <div class="register-flash register-flash-{{ category }}">
+              {{ message }}
+            </div>
           {% endfor %}
         {% endif %}
       {% endwith %}

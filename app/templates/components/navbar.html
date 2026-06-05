@@ -14,9 +14,9 @@
           <li><a href="{{ url_for('admin.dashboard') }}" class="nav-btn" style="background:var(--dark-brown);">Admin</a></li>
         {% endif %}
         <li>
-          <a href="{{ url_for('auth.logout') }}" class="nav-btn">
-            Log Out ({{ session.get('email', '').split('@')[0] }})
-          </a>
+        <a href="{{ url_for('auth.logout') }}" class="nav-btn">
+        Log Out
+        </a>
         </li>
       {% else %}
         <li><a href="{{ url_for('auth.login') }}" class="nav-btn">Log In / Sign Up</a></li>

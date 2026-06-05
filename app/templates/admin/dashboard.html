@@ -263,6 +263,11 @@
                 <button type="submit" class="btn-approve" style="background:var(--pale-yellow);color:#7A6000;">Reset</button>
               </form>
               {% endif %}
+              <form method="POST"
+                action="{{ url_for('admin.delete_application', app_id=app['App_ID']) }}"
+                onsubmit="return confirm('Are you sure you want to delete this application?');">
+                <button type="submit" class="btn-reject">Delete</button>
+              </form>
             </div>
           </td>
         </tr>
