@@ -20,8 +20,13 @@ def login():
                 flash('This account does not have admin access.', 'error')
                 session.clear()
                 return render_template('auth/login.html', form=None, next=request.args.get('next', ''))
-            next_url = request.form.get('next') or url_for('dogs.list_dogs')
+            next_url = request.form.get('next')
+
+            if not next_url or not next_url.startswith('/'):
+                next_url = url_for('dogs.list_dogs')
+
             return redirect(next_url)
+
         flash('Invalid email or password.', 'error')
 
     return render_template('auth/login.html', form=None, next=request.args.get('next', ''))

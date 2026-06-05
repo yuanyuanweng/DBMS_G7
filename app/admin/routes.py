@@ -47,12 +47,49 @@ def dashboard():
 @admin_required
 def update_status(app_id):
     new_status = request.form.get('status')
+
     if new_status not in ('0', '1', '2'):
         flash('Invalid status.', 'error')
         return redirect(url_for('admin.dashboard'))
 
     db = get_db()
-    db.execute('UPDATE Application SET Status = ? WHERE App_ID = ?', (int(new_status), app_id))
+
+    application = db.execute(
+        'SELECT App_ID FROM Application WHERE App_ID = ?',
+        (app_id,)
+    ).fetchone()
+
+    if application is None:
+        flash('Application not found.', 'error')
+        return redirect(url_for('admin.dashboard'))
+
+    db.execute(
+        'UPDATE Application SET Status = ? WHERE App_ID = ?',
+        (int(new_status), app_id)
+    )
     db.commit()
+
     flash('Application status updated.', 'success')
+    return redirect(url_for('admin.dashboard'))
+@admin_bp.route('/applications/<int:app_id>/delete', methods=['POST'])
+@admin_required
+def delete_application(app_id):
+    db = get_db()
+
+    application = db.execute(
+        'SELECT App_ID FROM Application WHERE App_ID = ?',
+        (app_id,)
+    ).fetchone()
+
+    if application is None:
+        flash('Application not found.', 'error')
+        return redirect(url_for('admin.dashboard'))
+
+    db.execute(
+        'DELETE FROM Application WHERE App_ID = ?',
+        (app_id,)
+    )
+    db.commit()
+
+    flash('Application deleted.', 'success')
     return redirect(url_for('admin.dashboard'))
