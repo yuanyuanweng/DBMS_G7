@@ -1,89 +1,182 @@
 """
 Dog-related routes.
 
-- Use mock dog data from app/models/dog.py.
-- Keep routes simple until database schema and dogs/list.html are ready.
-- Dog list is displayed in dogs/list.html.
-- Dog details are displayed in dogs/detail.html.
+- Public dog browsing pages use the Dog model, which reads from SQLite.
+- The list page passes stable filter state to dogs/list.html.
+- The detail page checks whether the logged-in user has already applied.
+- Shelter create/edit pages save only fields that exist in the current schema.
 
-TODO:
-1) already_applied未來會修改
-2) redirect(url_for("blueprint.function")): 提交Form後, 把user送回要去的網址
+Current schema limitation:
+- Frontend-only fields such as exact weight, "good with", city, urgent flag,
+  description, and health notes are accepted for template compatibility, but
+  they cannot be fully stored or filtered until the Dog schema adds columns.
 """
 
-from flask import Blueprint, render_template, request, abort, redirect, session
+from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash
+from app.database import get_db
 from app.models.dog import Dog
 from app.models.application import Application
 from app.models.shelter import Shelter
 
 dogs_bp = Blueprint("dogs", __name__)
 
-#URL: http://127.0.0.1:5000/find-a-dog
+
+GENDER_MAP = {
+    "male": "Male",
+    "female": "Female",
+    "brother": "Male",
+    "sister": "Female",
+    "boy": "Male",
+    "girl": "Female",
+    "弟弟": "Male",
+    "妹妹": "Female",
+}
+
+AGE_GROUP_MAP = {
+    "puppy": "puppy",
+    "young": "young",
+    "adult": "adult",
+    "senior": "senior",
+    "0-1": "puppy",
+    "1-3": "young",
+    "3-8": "adult",
+    "8+": "senior",
+}
+
+SIZE_MAP = {
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large",
+    "under_12": "Small",
+    "12_25": "Medium",
+    "25_plus": "Large",
+}
+
+SORT_MAP = {
+    "latest": "newest",
+    "newest": "newest",
+    "oldest": "oldest",
+    "age_asc": "age_asc",
+    "age_desc": "age_desc",
+}
+
+
+class FormField:
+    """Minimal helper so templates can read form.field.data."""
+
+    def __init__(self, data=""):
+        self.data = data
+
+
+class DogFormView:
+    """Minimal form object used by current create/edit templates."""
+
+    FIELD_NAMES = (
+        "name", "breed", "age", "gender", "size", "city", "health_status",
+        "is_urgent", "shelter_id", "description",
+    )
+
+    def __init__(self, form_data=None, errors=None):
+        self.errors = errors or {}
+        form_data = form_data or {}
+
+        for field_name in self.FIELD_NAMES:
+            value = form_data.get(field_name, "")
+            if field_name == "is_urgent":
+                value = bool(value)
+            setattr(self, field_name, FormField(value))
+
+
+def _first_arg(*names, default=""):
+    """Return the first non-empty query parameter from supported aliases."""
+    for name in names:
+        value = request.args.get(name, "").strip()
+        if value:
+            return value
+    return default
+
+
+def _normalize(value, mapping, default=""):
+    """Map frontend filter values into the values used by the Dog model."""
+    if not value:
+        return default
+    return mapping.get(value.lower(), value)
+
+
+def _parse_age(value):
+    """Extract an integer age from text such as '2 years'."""
+    value = (value or "").strip()
+    digits = "".join(char for char in value if char.isdigit())
+    return int(digits) if digits else 0
+
+
+# Dog listing page.
 @dogs_bp.route("/find-a-dog/", methods=["GET"])
 def list_dogs():
-    '''
+    """
     Render the dog listing page.
-    
-    - Provide dog list data to templates/dogs/list.html
-    
-    Supported URL parameters: (暫定 可修改)
-    - q: search by dog name or breed
-    - gender: Male / Female 
-    - age_group: puppy / young / adult / senior 
-    - size: Small / Medium / Large 
-    - city: Taipei / New Taipei / Taichung / Tainan / Kaohsiung 
-    - sort: newest / oldest / age_asc / age_desc
-    '''
-    
-    # Basic query parameters for frontend filters (前端目前可用的)
-    q = request.args.get("q", "").strip()
-    gender = request.args.get("gender", "")
-    age_group = request.args.get("age_group", "")
-    size = request.args.get("size", "")
-    city = request.args.get("city", "")
-    sort = request.args.get("sort", "newest")
-    
+
+    Supported query parameters for frontend:
+    - q / search / keyword: search by dog name or breed
+    - gender / sex: Male, Female, brother, sister, boy, girl
+    - age_group / age: puppy, young, adult, senior
+    - size / weight_group: Small, Medium, Large
+    - city: city filter derived from shelter location/name
+    - good_with: kept in filter state, not applied until DB has this data
+    - sort: newest/latest, oldest, age_asc, age_desc
+    """
+
+    q = _first_arg("q", "search", "keyword")
+    gender = _normalize(_first_arg("gender", "sex"), GENDER_MAP)
+    age_group = _normalize(_first_arg("age_group", "age"), AGE_GROUP_MAP)
+    size = _normalize(_first_arg("size", "weight_group", "weight"), SIZE_MAP)
+    city = _first_arg("city")
+    good_with = _first_arg("good_with")
+    sort = _normalize(_first_arg("sort", default="newest"), SORT_MAP, "newest")
+
     dogs = Dog.search(
         q=q,
         gender=gender,
         age_group=age_group,
         size=size,
         city=city,
-        sort=sort
+        sort=sort,
     )
-    
-    # Keep current filter values available during one request cycle 
+
+    # Preserve active filter values for the template.
     filters = {
         "q": q,
-        "gender": gender, 
+        "gender": gender,
         "age_group": age_group,
-        "size": size, 
+        "size": size,
         "city": city,
-        "sort": sort 
+        "good_with": good_with,
+        "sort": sort,
     }
-    
-    # Shows the summary 統計數字
+
+    # Summary counts for the list page header/filter UI.
     stats = {
         "total": len(dogs),
         "available": len([dog for dog in dogs if dog.availability == "Available"]),
-        "urgent": len([dog for dog in dogs if dog.is_urgent])
+        "pending": len([dog for dog in dogs if dog.availability == "Pending"]),
+        "adopted": len([dog for dog in dogs if dog.availability == "Adopted"]),
+        "urgent": len([dog for dog in dogs if dog.is_urgent]),
     }
-    
+
     return render_template(
-        "dogs/list.html", 
-        dogs=dogs, # list(dict()), for HTML/Jinja2
-        dogs_json=[dog.to_dict() for dog in dogs], # jsonify(), for Javascript
+        "dogs/list.html",
+        dogs=dogs,
+        dogs_json=[dog.to_dict() for dog in dogs],
         filters=filters,
-        stats=stats
-        # liked_ids 可加可不加 
+        stats=stats,
+        liked_ids=[],
     )
-    
-# URL: http://127.0.0.1:5000/find-a-dog/<dog_id>
+
+
+# Dog detail page.
 @dogs_bp.route("/find-a-dog/<int:dog_id>", methods=["GET"])
 def dog_detail(dog_id):
-    '''
-    Render detail page for one dog
-    '''
+    """Render one dog profile and application status for the current user."""
     
     dog = Dog.get_by_id(dog_id)
     
@@ -100,61 +193,129 @@ def dog_detail(dog_id):
         already_applied=already_applied
     )
 
-# http://127.0.0.1:5000/shelter/create_dog
+
+def dog_detail_alias(id):
+    """Compatibility endpoint for templates that pass id=..."""
+    return dog_detail(id)
+
+
+# Compatibility endpoints for older templates.
+dogs_bp.add_url_rule("/find-a-dog/", endpoint="list", view_func=list_dogs)
+dogs_bp.add_url_rule("/find-a-dog/<int:id>", endpoint="detail", view_func=dog_detail_alias)
+
+# Shelter dog creation page.
 @dogs_bp.route("/shelter/create_dog", methods=["GET", "POST"])
 def create():
-    '''
-    Render the create dog page. (For Shelter Admins only)
-    
-    Temporary:
-    - Use mock shelter data.
-    - Real POST handling and database insert will be added when database & frontend is stable
-    '''
-    
-    # TODO
+    """
+    Render and handle the create dog form.
+
+    Current schema-backed fields:
+    - Shelter_ID, Name, Gender, Age, Breed, Image_URL
+
+    Frontend-only fields such as size, city, urgent, description, and health notes
+    are accepted by the form but not saved until the Dog schema supports them.
+    """
+
+    form = DogFormView(request.form if request.method == "POST" else None)
+
     if request.method == "POST":
-        # read form data
-        # INSERT INTO Dog ...
-        # redirect after success
-        pass
+        name = request.form.get("name", "").strip()
+        breed = request.form.get("breed", "").strip()
+        gender = request.form.get("gender", "").strip() or "Unknown"
+        shelter_id = request.form.get("shelter_id", "").strip()
+        age = _parse_age(request.form.get("age", ""))
+        image_url = request.form.get("image_url", "").strip() or None
+
+        errors = {}
+        if not name:
+            errors.setdefault("name", []).append("Name is required.")
+        if not breed:
+            errors.setdefault("breed", []).append("Breed is required.")
+        if not shelter_id:
+            errors.setdefault("shelter_id", []).append("Shelter is required.")
+
+        if not errors:
+            db = get_db()
+            cursor = db.execute(
+                """
+                INSERT INTO Dog (Shelter_ID, Name, Gender, Age, Breed, Image_URL)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (int(shelter_id), name, gender, age, breed, image_url),
+            )
+            db.commit()
+            flash("Dog profile created.", "success")
+            return redirect(url_for("dogs.dog_detail", dog_id=cursor.lastrowid))
+
+        form = DogFormView(request.form, errors)
 
     shelters = Shelter.get_all()
 
-    # GET req: shows empty form
+    # GET shows an empty form; POST with errors re-renders the submitted data.
     return render_template(
         "dogs/create.html",
-        shelters=shelters
+        shelters=shelters,
+        form=form,
+        csrf_token=lambda: "",
     )
 
-# http://127.0.0.1:5000/shelter/<int:dog_id>/edit_dog
-@dogs_bp.route("/shelter/<int:dog_id>/edit_dog", methods=["GET", "POST"])
-def edit(dog_id):
-    '''
-    Render and handle the edit dog page (For Shelter Admins only)
+# Shelter dog edit page.
+@dogs_bp.route("/shelter/<int:id>/edit_dog", methods=["GET", "POST"])
+def edit(id):
+    """
+    Render and handle the edit dog form.
+
+    Only current Dog table columns are updated. Template-only fields such as
+    size, city, urgent flag, description, and health notes are displayed for
+    frontend compatibility but are not persisted by this route yet.
+    """
     
-    Temporary:
-    - Uses mock dog data from Dog.get_by_id()
-    - Uses mock shelter data
-    - Real POST handling and database update will be added when database and frontend is stable
-    '''
-    
-    dog = Dog.get_by_id(dog_id)
+    dog = Dog.get_by_id(id)
 
     if dog is None:
         abort(404)
-    
-    # TODO
+
+    form = DogFormView()
+
     if request.method == "POST":
-        # read form data
-        # UPDATE Dog SET ... WHERE Dog_ID = ?
-        # redirect after success
-        pass
+        name = request.form.get("name", "").strip()
+        breed = request.form.get("breed", "").strip()
+        gender = request.form.get("gender", "").strip() or "Unknown"
+        shelter_id = request.form.get("shelter_id", "").strip()
+        age = _parse_age(request.form.get("age", ""))
+        image_url = request.form.get("image_url", "").strip() or dog.image_url
+
+        errors = {}
+        if not name:
+            errors.setdefault("name", []).append("Name is required.")
+        if not breed:
+            errors.setdefault("breed", []).append("Breed is required.")
+        if not shelter_id:
+            errors.setdefault("shelter_id", []).append("Shelter is required.")
+
+        if not errors:
+            db = get_db()
+            db.execute(
+                """
+                UPDATE Dog
+                SET Shelter_ID = ?, Name = ?, Gender = ?, Age = ?, Breed = ?, Image_URL = ?
+                WHERE Dog_ID = ?
+                """,
+                (int(shelter_id), name, gender, age, breed, image_url, id),
+            )
+            db.commit()
+            flash("Dog profile updated.", "success")
+            return redirect(url_for("dogs.dog_detail", dog_id=id))
+
+        form = DogFormView(request.form, errors)
 
     shelters = Shelter.get_all()
 
-    # GET req: shows filled form with that specific id
+    # GET shows the current dog values; POST with errors re-renders them.
     return render_template(
         "dogs/edit.html",
         dog=dog,
-        shelters=shelters
+        shelters=shelters,
+        form=form,
+        csrf_token=lambda: "",
     )
