@@ -1,264 +1,200 @@
-'''
-- Data Source (main_routes.py, dogs/routes.py depends on this file)
-- Provides Dog object with class attributes & methods for consistency
+from app.database import get_db
+from app.models.shelter import Shelter
 
-TODO:
-- Replace mock data with SQL queries after the database schema is finalized.
-'''
 COLORS = [
-    '#D9A57A', '#B5C4B1', '#A8C5DA', '#D4A5A5',
-    '#C4B5A5', '#E8C4A0', '#9DB5A0', '#C4A8C4'
+    "#D9A57A", "#B5C4B1", "#A8C5DA", "#D4A5A5",
+    "#C4B5A5", "#E8C4A0", "#9DB5A0", "#C4A8C4",
 ]
 
 SPOT_COLORS = [
-    '#C4714A', '#6B8C6B', '#5B8FA8', '#A07070',
-    '#8B7355', '#C4A050', '#5B7A6B', '#9A7A9A'
+    "#C4714A", "#6B8C6B", "#5B8FA8", "#A07070",
+    "#8B7355", "#C4A050", "#5B7A6B", "#9A7A9A",
 ]
 
-MOCK_DOGS = [
-    {
-        'Dog_ID': 1,
-        'Shelter_ID': 1,
-        'Name': 'Komame',
-        'Breed': 'Shiba Inu Mix',
-        'Age': 2,
-        'Gender': 'Female',
-        'City': 'Taipei',
-        'Size': 'Small',
-        'Image_URL': None,
-        'Availability': 'Available',
-        'Is_Urgent': 0,
-        'Is_Liked': 0,
-        'AI_Story': 'I love napping in sunny spots and taking slow walks with gentle people.',
-        'Tags': ['🏷 Small', '♀ Female']
-    },
-    {
-        'Dog_ID': 2,
-        'Shelter_ID': 1,
-        'Name': 'Kendy',
-        'Breed': 'Unknown Mix',
-        'Age': 7,
-        'Gender': 'Male',
-        'City': 'Taipei',
-        'Size': 'Medium',
-        'Image_URL': None,
-        'Availability': 'Available',
-        'Is_Urgent': 0,
-        'Is_Liked': 1,
-        'AI_Story': 'No story yet — click to generate one with AI!',
-        'Tags': ['🏷 Medium', '♂ Male']
-    },
-    {
-        'Dog_ID': 3,
-        'Shelter_ID': 2,
-        'Name': 'Mochi',
-        'Breed': 'Golden Retriever Mix',
-        'Age': 4,
-        'Gender': 'Female',
-        'City': 'New Taipei',
-        'Size': 'Large',
-        'Image_URL': None,
-        'Availability': 'Pending',
-        'Is_Urgent': 1,
-        'Is_Liked': 0,
-        'AI_Story': 'I am friendly, energetic, and always ready for a walk or a game.',
-        'Tags': ['🏷 Large', '♀ Female']
-    },
-    {
-        'Dog_ID': 4,
-        'Shelter_ID': 2,
-        'Name': 'Bobo',
-        'Breed': 'Taiwan Dog Mix',
-        'Age': 1,
-        'Gender': 'Male',
-        'City': 'Taichung',
-        'Size': 'Medium',
-        'Image_URL': None,
-        'Availability': 'Available',
-        'Is_Urgent': 0,
-        'Is_Liked': 0,
-        'AI_Story': 'I am still young and curious. I hope to grow up with a family who loves adventure.',
-        'Tags': ['🐶 Puppy', '♂ Male']
-    },
-    {
-        'Dog_ID': 5,
-        'Shelter_ID': 3,
-        'Name': 'Luna',
-        'Breed': 'Labrador Mix',
-        'Age': 5,
-        'Gender': 'Female',
-        'City': 'Tainan',
-        'Size': 'Large',
-        'Image_URL': None,
-        'Availability': 'Available',
-        'Is_Urgent': 0,
-        'Is_Liked': 1,
-        'AI_Story': 'I am calm, loyal, and happiest when I can stay close to someone I trust.',
-        'Tags': ['🏷 Large', '♀ Female']
-    },
-    {
-        'Dog_ID': 6,
-        'Shelter_ID': 3,
-        'Name': 'Lucky',
-        'Breed': 'Chihuahua Mix',
-        'Age': 10,
-        'Gender': 'Male',
-        'City': 'Kaohsiung',
-        'Size': 'Small',
-        'Image_URL': None,
-        'Availability': 'Adopted',
-        'Is_Urgent': 0,
-        'Is_Liked': 0,
-        'AI_Story': 'I may be small, but I have a brave heart and lots of love to give.',
-        'Tags': ['🏷 Small', '♂ Male']
-    },
-    {
-        'Dog_ID': 7,
-        'Shelter_ID': 4,
-        'Name': 'Nana',
-        'Breed': 'Mixed Breed',
-        'Age': 11,
-        'Gender': 'Female',
-        'City': 'Taipei',
-        'Size': 'Medium',
-        'Image_URL': None,
-        'Availability': 'Available',
-        'Is_Urgent': 0,
-        'Is_Liked': 0,
-        'AI_Story': 'I am a gentle senior dog who enjoys quiet days, soft blankets, and kind voices.',
-        'Tags': ['🧡 Senior', '♀ Female']
-    },
-    {
-        'Dog_ID': 8,
-        'Shelter_ID': 4,
-        'Name': 'Rocky',
-        'Breed': 'Husky Mix',
-        'Age': 3,
-        'Gender': 'Male',
-        'City': 'New Taipei',
-        'Size': 'Large',
-        'Image_URL': None,
-        'Availability': 'Pending',
-        'Is_Urgent': 1,
-        'Is_Liked': 1,
-        'AI_Story': 'I have lots of energy and would love a home that enjoys outdoor activities.',
-        'Tags': ['🏷 Large', '♂ Male']
-    }
-]
+SMALL_BREEDS = ("chihuahua", "dachshund", "terrier", "spitz")
+LARGE_BREEDS = (
+    "boxer", "retriever", "ridgeback", "bernese", "husky",
+    "rottweiler", "german pointer", "labrador",
+)
+
 
 class Dog:
-    '''
-    Dog data object and data provider 
-    '''
-    
-    # Constructor
+    """Dog data object backed by the SQLite database."""
+
     def __init__(self, row):
-        '''
-        Convert one raw dog row into a frontend-friendly Dog object
-        '''
-        self.id = row['Dog_ID']
-        self.name = row['Name']
-        self.breed = row.get('Breed') or 'Unknown Mix'
-        self.raw_age = int(row['Age'])
+        """Convert one database row into a frontend-friendly Dog object."""
+        data = dict(row)
+
+        self.id = data["Dog_ID"]
+        self.shelter_id = data["Shelter_ID"]
+        self.name = data["Name"]
+        self.breed = data.get("Breed") or "Unknown Mix"
+        self.raw_age = int(data.get("Age") or 0)
         self.age = f"{self.raw_age} yrs"
-        self.gender = row.get('Gender') or 'Unknown'
-        self.city = row.get('City') or 'Unknown'
-        self.size = row.get('Size') or 'Medium'
-        self.image_url = row.get('Image_URL')
-        self.ai_story = row.get('AI_Story') or 'No story yet — click to generate one with AI!'
-        self.is_urgent = bool(row.get('Is_Urgent', 0))
-        self.availability = row.get('Availability') or 'Available'
+        self.gender = data.get("Gender") or "Unknown"
+        self.image_url = data.get("Image_URL")
+        self.availability = data.get("Availability") or "Available"
+
+        self.shelter = Shelter.get_by_id(self.shelter_id)
+        self.city = self._derive_city()
+        self.size = self._derive_size()
+        self.health_status = self._latest_health_status()
+        self.description = self._derive_description()
+        self.ai_story = ""
+        self.is_urgent = False
+
         self.color = COLORS[(self.id - 1) % len(COLORS)]
         self.spot_color = SPOT_COLORS[(self.id - 1) % len(SPOT_COLORS)]
-        self.tags = row.get('Tags') or [f'🏷 {self.size}', f'{"♂" if self.gender == "Male" else "♀"} {self.gender}']
-        
-    
-    # Helper method in 'Dog' class (Not meant to be called directly from outside)
-    # mostly Used in constructor, but still it's a convention with normal behavior
-    def _derive_size(self):
-        '''
-        TODO
-        Estimate dog size based on breed if Size is not provided 
-        '''
-    
-    # Helper method in 'Dog' class (Not meant to be called directly from outside)
-    # mostly Used in constructor, but still it's a convention with normal behavior
-    def _derive_tags(self, row):
-        '''
-        TODO
-        Generate display tags for dog cards
-        '''
-        
-    def to_dict(self):
-        '''
-        Convert Dog object to dictionary 
-        Purpose: Dictionary (Python reference data type) -> JSON(Text/Data)
-        '''
-        return {
-        'id': self.id,
-        'name': self.name,
-        'breed': self.breed,
-        'age': self.age,
-        'gender': self.gender,
-        'city': self.city,
-        'size': self.size,
-        'image_url': self.image_url,
-        'ai_story': self.ai_story,
-        'is_urgent': self.is_urgent,
-        'color': self.color,
-        'tags': self.tags,
-    }
-    
-    
-    @staticmethod # Cannot directly access or modify object data = no self
-    def get_featured(limit=4):
-        '''
-        Return a limited number of dogs for the homepage.
-        '''
-        return [Dog(row) for row in MOCK_DOGS[:limit]]
-        
-    
-    @staticmethod # Cannot directly access or modify object data = no self
-    def get_all():
-        '''
-        Return all dogs for the dog listing page.
-        '''
-        return [Dog(row) for row in MOCK_DOGS]
-        
+        self.tags = self._derive_tags()
 
-    @staticmethod # Cannot directly access or modify object data = no self
+    def _derive_city(self):
+        """Infer city from shelter name/location until City is added to Dog."""
+        source = ""
+        if self.shelter:
+            source = f"{self.shelter.name} {self.shelter.location}".lower()
+
+        if "taipei" in source:
+            return "Taipei"
+        if "new taipei" in source:
+            return "New Taipei"
+        if "taichung" in source:
+            return "Taichung"
+        if "tainan" in source:
+            return "Tainan"
+        if "kaohsiung" in source:
+            return "Kaohsiung"
+        return "Unknown"
+
+    def _derive_size(self):
+        """Estimate dog size from breed until Size is added to Dog."""
+        breed = self.breed.lower()
+        if any(keyword in breed for keyword in SMALL_BREEDS):
+            return "Small"
+        if any(keyword in breed for keyword in LARGE_BREEDS):
+            return "Large"
+        return "Medium"
+
+    def _derive_tags(self):
+        """Generate display tags for dog cards and detail pages."""
+        tags = [self.size, self.gender]
+
+        if self.raw_age < 1:
+            tags.append("Puppy")
+        elif self.raw_age >= 8:
+            tags.append("Senior")
+
+        if self.availability != "Available":
+            tags.append(self.availability)
+
+        return tags
+
+    def _derive_description(self):
+        """Create a short fallback description from known database fields."""
+        shelter_name = self.shelter.name if self.shelter else "the shelter"
+        return (
+            f"{self.name} is a {self.age} {self.breed} currently cared for by "
+            f"{shelter_name}. Contact the shelter for more details."
+        )
+
+    def _latest_health_status(self):
+        """Return the latest recorded vaccine name for this dog, if present."""
+        db = get_db()
+        row = db.execute(
+            """
+            SELECT Vaccine_Name
+            FROM Health_record
+            WHERE Dog_ID = ?
+            ORDER BY Administered_Date DESC, Record_ID DESC
+            LIMIT 1
+            """,
+            (self.id,),
+        ).fetchone()
+        return row["Vaccine_Name"] if row else None
+
+    def to_dict(self):
+        """Convert Dog object to dictionary for JSON usage."""
+        return {
+            "id": self.id,
+            "shelter_id": self.shelter_id,
+            "name": self.name,
+            "breed": self.breed,
+            "age": self.age,
+            "raw_age": self.raw_age,
+            "gender": self.gender,
+            "city": self.city,
+            "size": self.size,
+            "image_url": self.image_url,
+            "availability": self.availability,
+            "ai_story": self.ai_story,
+            "description": self.description,
+            "health_status": self.health_status,
+            "is_urgent": self.is_urgent,
+            "color": self.color,
+            "spot_color": self.spot_color,
+            "tags": self.tags,
+        }
+
+    @staticmethod
+    def _base_query():
+        return """
+            SELECT Dog_ID, Shelter_ID, Name, Gender, Age, Breed, Image_URL, Availability
+            FROM Dog_With_Status
+        """
+
+    @staticmethod
+    def get_featured(limit=4):
+        """Return a limited number of dogs for the homepage."""
+        db = get_db()
+        rows = db.execute(
+            f"""
+            {Dog._base_query()}
+            ORDER BY Dog_ID DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+        return [Dog(row) for row in rows]
+
+    @staticmethod
+    def get_all():
+        """Return all dogs for the dog listing page."""
+        db = get_db()
+        rows = db.execute(
+            f"""
+            {Dog._base_query()}
+            ORDER BY Dog_ID DESC
+            """
+        ).fetchall()
+        return [Dog(row) for row in rows]
+
+    @staticmethod
     def get_by_id(dog_id):
-        '''
-        Return one dog by ID.
-        '''
-        for row in MOCK_DOGS:
-            if row['Dog_ID'] == dog_id:
-                return Dog(row)
-            
-        return None
-    
-    @staticmethod # Cannot directly access or modify object data = no self
+        """Return one dog by ID."""
+        db = get_db()
+        row = db.execute(
+            f"""
+            {Dog._base_query()}
+            WHERE Dog_ID = ?
+            """,
+            (dog_id,),
+        ).fetchone()
+        return Dog(row) if row else None
+
+    @staticmethod
     def search(q="", gender="", age_group="", size="", city="", sort="newest"):
-        '''
-        Used in dogs/list.html
-        Search dogs with URL parameters
-        '''
-        dogs = [Dog(row) for row in MOCK_DOGS]
-        
-        # 根據用戶輸入的搜尋欄
+        """Search dogs with URL filter parameters."""
+        dogs = Dog.get_all()
+
         if q:
-            q = q.lower()
+            query = q.lower()
             dogs = [
                 dog for dog in dogs
-                if q in dog.name.lower()
-                or q in dog.breed.lower()
+                if query in dog.name.lower() or query in dog.breed.lower()
             ]
-        
-        # 根據性別
-        if gender: 
+
+        if gender:
             dogs = [dog for dog in dogs if dog.gender == gender]
-        
-        # 根據4種年齡區間
+
         if age_group:
             if age_group == "puppy":
                 dogs = [dog for dog in dogs if dog.raw_age < 1]
@@ -268,23 +204,20 @@ class Dog:
                 dogs = [dog for dog in dogs if 3 <= dog.raw_age < 8]
             elif age_group == "senior":
                 dogs = [dog for dog in dogs if dog.raw_age >= 8]
-        
-        # 根據體型
+
         if size:
             dogs = [dog for dog in dogs if dog.size == size]
-        
-        # 根據城市
+
         if city:
             dogs = [dog for dog in dogs if dog.city == city]
-        
-        # 支持 狗狗新增時間 & 年齡大小
-        if sort == "newest": 
-            dogs = sorted(dogs, key=lambda dog: dog.id, reverse=True)
-        elif sort == "oldest":
+
+        if sort == "oldest":
             dogs = sorted(dogs, key=lambda dog: dog.id)
         elif sort == "age_asc":
             dogs = sorted(dogs, key=lambda dog: dog.raw_age)
         elif sort == "age_desc":
             dogs = sorted(dogs, key=lambda dog: dog.raw_age, reverse=True)
-            
+        else:
+            dogs = sorted(dogs, key=lambda dog: dog.id, reverse=True)
+
         return dogs

@@ -17,8 +17,8 @@ def login():
             if login_type == 'admin' and user.role == 'admin':
                 return redirect(url_for('admin.dashboard'))
             elif login_type == 'admin' and user.role != 'admin':
-                flash('This account does not have admin access.', 'error')
                 session.clear()
+                flash('This account does not have admin access.', 'error')
                 return render_template('auth/login.html', form=None, next=request.args.get('next', ''))
             next_url = request.form.get('next')
 
