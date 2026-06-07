@@ -22,8 +22,8 @@ def login():
                 return render_template('auth/login.html', form=None, next=request.args.get('next', ''))
             next_url = request.form.get('next')
 
-            if not next_url or not next_url.startswith('/'):
-                next_url = url_for('dogs.list_dogs')
+            if not next_url or not next_url.startswith('/') or next_url.startswith('//'):
+                next_url = url_for('main.index')
 
             return redirect(next_url)
 
