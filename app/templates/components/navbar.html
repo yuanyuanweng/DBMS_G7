@@ -9,14 +9,7 @@
       <li><a href="/#how">How It Works</a></li>
       <li><a href="/#ai-feature">AI Stories</a></li>
       {% if session.get('user_id') %}
-        <li>
-          <a href="{{ url_for('applications.my_applications') }}" style="position:relative;">
-            My Applications
-            {% if notif_count and notif_count > 0 %}
-              <span class="notif-badge">{{ notif_count }}</span>
-            {% endif %}
-          </a>
-        </li>
+        <li><a href="{{ url_for('applications.my_applications') }}">My Applications</a></li>
         {% if session.get('role') == 'admin' %}
           <li><a href="{{ url_for('admin.dashboard') }}" class="nav-btn" style="background:var(--dark-brown);">Admin</a></li>
         {% endif %}

@@ -53,7 +53,8 @@
 
     <div class="hero-content">
       <div class="hero-text">
-<h1 class="hero-title">
+        <span class="hero-eyebrow">🌸 AI-Powered Adoption Experience</span>
+        <h1 class="hero-title">
           Every dog has<br>
           <span class="accent">a story to tell</span><br>
           waiting for you
@@ -76,9 +77,77 @@
     <div class="floating-tag">✨ AI-Generated Stories</div>
     <div class="floating-tag">🏡 Waiting for a Home</div>
 
-    <!-- Dog Photo -->
-    <img src="{{ url_for('static', filename='img/狗狗.jpg') }}" alt="Dog"
-         style="width:100%;height:240px;object-fit:cover;border-radius:16px;display:block;"/>
+    <!-- Dog SVG Illustration -->
+    <svg class="hero-dog-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background wash -->
+      <rect width="320" height="240" fill="#F0E6D3" rx="16"/>
+      <!-- Ground -->
+      <ellipse cx="160" cy="215" rx="90" ry="14" fill="#D9C4A8" opacity="0.5"/>
+
+      <!-- Tail -->
+      <path d="M230 170 Q260 140 252 118 Q248 108 240 112 Q244 126 220 150Z" fill="{{ dog.spot_color }}"/>
+
+      <!-- Body -->
+      <ellipse cx="175" cy="175" rx="65" ry="45" fill="{{ dog.color }}"/>
+
+      <!-- Head -->
+      <circle cx="115" cy="148" r="42" fill="{{ dog.color }}"/>
+
+      <!-- Left Ear -->
+      <ellipse cx="90" cy="118" rx="18" ry="26" fill="{{ dog.spot_color }}" transform="rotate(-15 90 118)"/>
+
+      <!-- Right Ear -->
+      <ellipse cx="140" cy="115" rx="14" ry="22" fill="{{ dog.spot_color }}" transform="rotate(10 140 115)"/>
+
+      <!-- Snout -->
+      <ellipse cx="102" cy="162" rx="22" ry="16" fill="#E8B98A"/>
+      <!-- Nose -->
+      <ellipse cx="102" cy="155" rx="9" ry="6" fill="#4A3728"/>
+      <!-- Nose shine -->
+      <ellipse cx="99" cy="153" rx="3" ry="2" fill="white" opacity="0.6"/>
+
+      <!-- Left Eye -->
+      <circle cx="97" cy="138" r="8" fill="white"/>
+      <circle cx="98" cy="139" r="5" fill="#2C2416"/>
+      <circle cx="100" cy="137" r="2" fill="white"/>
+
+      <!-- Right Eye -->
+      <circle cx="127" cy="135" r="8" fill="white"/>
+      <circle cx="128" cy="136" r="5" fill="#2C2416"/>
+      <circle cx="130" cy="134" r="2" fill="white"/>
+
+      <!-- Mouth -->
+      <path d="M95 166 Q102 172 109 166" stroke="#8B6F52" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+      <!-- Tongue -->
+      <ellipse cx="102" cy="172" rx="7" ry="6" fill="#E07070"/>
+
+      <!-- Front Legs -->
+      <rect x="128" y="205" width="18" height="30" rx="9" fill="{{ dog.color }}"/>
+      <rect x="155" y="205" width="18" height="30" rx="9" fill="{{ dog.color }}"/>
+
+      <!-- Paw toes -->
+      <ellipse cx="132" cy="234" rx="4" ry="3" fill="{{ dog.spot_color }}"/>
+      <ellipse cx="140" cy="234" rx="4" ry="3" fill="{{ dog.spot_color }}"/>
+      <ellipse cx="159" cy="234" rx="4" ry="3" fill="{{ dog.spot_color }}"/>
+      <ellipse cx="167" cy="234" rx="4" ry="3" fill="{{ dog.spot_color }}"/>
+
+      <!-- Spots -->
+      <circle cx="185" cy="165" r="8" fill="{{ dog.spot_color }}" opacity="0.4"/>
+      <circle cx="200" cy="180" r="5" fill="{{ dog.spot_color }}" opacity="0.3"/>
+
+      <!-- Bandana -->
+      <path d="M85 172 Q102 182 119 172 L115 188 Q102 196 89 188Z" fill="{{ dog.spot_color }}" opacity="0.8"/>
+
+      <!-- Hearts floating -->
+      <text x="230" y="135" font-size="16" fill="{{ dog.spot_color }}" opacity="0.6">♥</text>
+      <text x="72" y="110" font-size="12" fill="#8A9E8C" opacity="0.5">♥</text>
+      <text x="250" y="100" font-size="10" fill="{{ dog.spot_color }}" opacity="0.4">♥</text>
+
+      <!-- Flower decorations -->
+      <text x="38" y="195" font-size="14" opacity="0.5">🌸</text>
+      <text x="268" y="200" font-size="14" opacity="0.5">🌿</text>
+    </svg>
 
     <p style="font-family:var(--font-serif);font-size:1rem;font-weight:700;color:var(--dark-brown);margin-bottom:4px;">
       {{ dog.name }}
@@ -88,15 +157,79 @@
       {{ dog.breed }} · {{ dog.age }} · {{ dog.city }}
     </p>
 
-    <p style="font-size:0.85rem;color:var(--brown);line-height:1.7;margin-top:0.8rem;text-align:left;">
-      A cheerful Golden Retriever who loves basking in the sun and sprawling across grassy fields.
-      Full of warmth and joy — he's always ready to brighten your day. 🌿
-    </p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">128</span>
+        <span class="lbl">Available</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">94%</span>
+        <span class="lbl">Match Rate</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">342</span>
+        <span class="lbl">Adopted</span>
+      </div>
+    </div>
   </div>
   {% endfor %}
 </div>
     </div>
 
+  </section>
+
+  <!-- ======== PAW DIVIDER ======== -->
+  <div class="paw-divider">
+    <div class="paw-divider-icons">🐾🐾🐾🐾🐾</div>
+  </div>
+
+  <!-- ======== SEARCH ======== -->
+  <section class="search-section" id="search">
+    <div class="search-box">
+      <p class="search-title">🔍 Filter Dogs</p>
+      <div class="search-row">
+        <div class="form-group">
+          <label class="form-label">Name / Breed</label>
+          <input class="form-input" type="text" placeholder="e.g. Shiba Inu, Golden Retriever…" id="searchName"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Size</label>
+          <select class="form-select" id="filterSize">
+            <option value="">All Sizes</option>
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <select class="form-select" id="filterCity">
+            <option value="">All Cities</option>
+            <option value="Taipei">Taipei</option>
+            <option value="New Taipei">New Taipei</option>
+            <option value="Taichung">Taichung</option>
+            <option value="Tainan">Tainan</option>
+            <option value="Kaohsiung">Kaohsiung</option>
+          </select>
+        </div>
+        <button class="search-btn" id="doSearch">
+          🔎 Search
+        </button>
+      </div>
+
+      <hr class="divider"/>
+
+      <div>
+        <div class="ai-label">✨ AI Smart Match — describe your lifestyle and we'll find the perfect dog</div>
+        <div class="ai-search-wrapper">
+          <input class="ai-input" type="text" id="aiSearchInput"
+            placeholder="e.g. I live in a small apartment, can walk 30 min/day, prefer a calm dog…"/>
+          <button class="ai-btn" id="aiSearchBtn">
+            🤖 AI Match
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ======== PAW DIVIDER ======== -->
@@ -155,11 +288,8 @@
               View Details
             </a>
 
-            <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
-                    type="button" aria-label="Like dog"
-                    data-heart="{{ dog.id }}"
-                    onclick="event.stopPropagation()">
-              {{ '❤️' if dog.id in liked_ids else '🤍' }}
+            <button class="heart-btn" type="button" aria-label="Like dog">
+              ♡
             </button>
           </div>
         </div>
@@ -209,336 +339,6 @@
     </div>
   </section>
 
-  <!-- ======== CARE GUIDE ======== -->
-  <section class="section" id="care-guide" style="background:var(--sand);">
-
-    <div class="section-inner">
-      <div class="section-header">
-        <span class="section-tag">🏠 After Adoption</span>
-        <h2 class="section-title">Bringing Your Dog Home</h2>
-        <p class="section-subtitle">Click each step — then interact to learn how to care for your new companion!</p>
-      </div>
-
-      <!-- Step cards -->
-      <div class="cg-steps-row">
-
-        <!-- Step 1: Bath -->
-        <button class="cg-step active" data-step="0">
-          <div class="cg-icon-wrap" style="background:#E8F4FB;">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <rect x="8" y="34" width="48" height="18" rx="8" fill="#6AAFD6"/>
-              <rect x="6" y="30" width="52" height="8" rx="4" fill="#5B9EC9"/>
-              <rect x="14" y="50" width="5" height="8" rx="2" fill="#5B9EC9"/>
-              <rect x="45" y="50" width="5" height="8" rx="2" fill="#5B9EC9"/>
-              <rect x="28" y="20" width="4" height="12" rx="2" fill="#A0C4D8"/>
-              <rect x="22" y="18" width="16" height="4" rx="2" fill="#A0C4D8"/>
-              <circle cx="20" cy="25" r="4" fill="white" opacity="0.8"/>
-              <circle cx="32" cy="20" r="5" fill="white" opacity="0.7"/>
-              <circle cx="44" cy="24" r="3" fill="white" opacity="0.8"/>
-              <rect x="38" y="31" width="10" height="6" rx="3" fill="#F8D7EA"/>
-              <line x1="41" y1="33" x2="45" y2="33" stroke="#F2A8B8" stroke-width="1.2" stroke-linecap="round"/>
-              <line x1="41" y1="35" x2="45" y2="35" stroke="#F2A8B8" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="cg-step-badge">Step 1</div>
-          <div class="cg-step-label">Bath Time</div>
-        </button>
-
-        <!-- Step 2: Dry -->
-        <button class="cg-step" data-step="1">
-          <div class="cg-icon-wrap" style="background:#FFF8E1;">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <rect x="8" y="20" width="28" height="20" rx="8" fill="#F5C842"/>
-              <rect x="34" y="26" width="8" height="8" rx="4" fill="#E8A820"/>
-              <rect x="4" y="27" width="8" height="10" rx="3" fill="#E8A820"/>
-              <path d="M44 20 Q54 20 58 16" stroke="#FFCC02" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M44 28 Q56 28 60 28" stroke="#FFCC02" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M44 36 Q54 36 58 40" stroke="#FFCC02" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <circle cx="22" cy="30" r="5" fill="white" opacity="0.5"/>
-              <circle cx="22" cy="30" r="2.5" fill="white" opacity="0.8"/>
-              <path d="M10 52 Q16 46 22 52 Q28 46 34 52 Q40 46 46 52 Q52 46 58 52" stroke="#D9A57A" stroke-width="3" fill="none" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="cg-step-badge">Step 2</div>
-          <div class="cg-step-label">Blow Dry</div>
-        </button>
-
-        <!-- Step 3: Feed -->
-        <button class="cg-step" data-step="2">
-          <div class="cg-icon-wrap" style="background:#FFF0E8;">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="32" cy="46" rx="22" ry="8" fill="#C4714A"/>
-              <path d="M10 40 Q10 54 32 54 Q54 54 54 40 Z" fill="#D9A57A"/>
-              <ellipse cx="32" cy="40" rx="22" ry="6" fill="#E8B98A"/>
-              <ellipse cx="24" cy="38" rx="7" ry="5" fill="#F5C842"/>
-              <rect x="21" y="33" width="4" height="6" rx="2" fill="#E8A820"/>
-              <ellipse cx="23" cy="33" rx="3" ry="2" fill="#F5C842"/>
-              <rect x="33" y="32" width="12" height="10" rx="3" fill="#6AAFD6"/>
-              <rect x="33" y="32" width="12" height="3" rx="1.5" fill="#5B9EC9"/>
-              <rect x="36" y="37" width="6" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
-              <rect x="46" y="14" width="12" height="10" rx="2" fill="#8B4513"/>
-              <line x1="44" y1="12" x2="60" y2="28" stroke="#E05050" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="52" cy="19" r="10" fill="none" stroke="#E05050" stroke-width="2.5"/>
-            </svg>
-          </div>
-          <div class="cg-step-badge">Step 3</div>
-          <div class="cg-step-label">First Meal</div>
-        </button>
-
-        <!-- Step 4: Play -->
-        <button class="cg-step" data-step="3">
-          <div class="cg-icon-wrap" style="background:#FDE8EE;">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="32" cy="42" rx="14" ry="16" fill="#D9A57A"/>
-              <circle cx="32" cy="24" r="13" fill="#D9A57A"/>
-              <circle cx="20" cy="14" r="7" fill="#D9A57A"/>
-              <circle cx="20" cy="14" r="4" fill="#E8B98A"/>
-              <circle cx="44" cy="14" r="7" fill="#D9A57A"/>
-              <circle cx="44" cy="14" r="4" fill="#E8B98A"/>
-              <ellipse cx="32" cy="26" rx="7" ry="5" fill="#E8B98A"/>
-              <circle cx="27" cy="21" r="2.5" fill="#4A3728"/>
-              <circle cx="37" cy="21" r="2.5" fill="#4A3728"/>
-              <circle cx="28" cy="20" r="1" fill="white"/>
-              <circle cx="38" cy="20" r="1" fill="white"/>
-              <ellipse cx="32" cy="25" rx="2.5" ry="1.5" fill="#8B6F52"/>
-              <path d="M28 28 Q32 31 36 28" stroke="#8B6F52" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <ellipse cx="16" cy="40" rx="5" ry="9" fill="#D9A57A" transform="rotate(-20 16 40)"/>
-              <ellipse cx="48" cy="40" rx="5" ry="9" fill="#D9A57A" transform="rotate(20 48 40)"/>
-              <ellipse cx="32" cy="44" rx="8" ry="9" fill="#E8B98A"/>
-              <path d="M26 35 L38 35" stroke="#F2A8B8" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="32" cy="35" r="2" fill="#F2A8B8"/>
-            </svg>
-          </div>
-          <div class="cg-step-badge">Step 4</div>
-          <div class="cg-step-label">Play Time</div>
-        </button>
-
-        <!-- Step 5: Walk -->
-        <button class="cg-step" data-step="4">
-          <div class="cg-icon-wrap" style="background:#F0F7F1;">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="52" cy="12" r="7" fill="#F5C842" opacity="0.9"/>
-              <line x1="52" y1="2" x2="52" y2="5" stroke="#F5C842" stroke-width="2" stroke-linecap="round"/>
-              <line x1="52" y1="19" x2="52" y2="22" stroke="#F5C842" stroke-width="2" stroke-linecap="round"/>
-              <line x1="42" y1="12" x2="45" y2="12" stroke="#F5C842" stroke-width="2" stroke-linecap="round"/>
-              <line x1="59" y1="12" x2="62" y2="12" stroke="#F5C842" stroke-width="2" stroke-linecap="round"/>
-              <rect x="6" y="38" width="5" height="14" rx="2" fill="#8B6F52"/>
-              <ellipse cx="8" cy="34" rx="10" ry="12" fill="#3D7A5C"/>
-              <ellipse cx="8" cy="28" rx="7" ry="9" fill="#4A9068"/>
-              <rect x="0" y="52" width="64" height="12" rx="4" fill="#A8CBB8"/>
-              <ellipse cx="38" cy="42" rx="12" ry="8" fill="#D9A57A"/>
-              <circle cx="50" cy="36" r="8" fill="#D9A57A"/>
-              <ellipse cx="56" cy="31" rx="4" ry="6" fill="#C4714A" transform="rotate(20 56 31)"/>
-              <circle cx="53" cy="34" r="2" fill="#4A3728"/>
-              <circle cx="54" cy="33" r="0.8" fill="white"/>
-              <ellipse cx="57" cy="37" rx="2" ry="1.5" fill="#4A3728"/>
-              <path d="M26 40 Q18 32 22 26" stroke="#C4714A" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <rect x="30" y="48" width="5" height="8" rx="2.5" fill="#C4714A"/>
-              <rect x="38" y="48" width="5" height="8" rx="2.5" fill="#D9A57A"/>
-              <rect x="44" y="48" width="5" height="8" rx="2.5" fill="#C4714A"/>
-              <path d="M50 40 Q44 46 36 44" stroke="#8B6F52" stroke-width="2" fill="none" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <div class="cg-step-badge">Step 5</div>
-          <div class="cg-step-label">First Walk</div>
-        </button>
-
-      </div>
-
-      <!-- Detail panels -->
-      <div class="cg-panels">
-
-        <!-- Panel 0: Bath -->
-        <div class="cg-panel active" id="cg-panel-0">
-          <div class="cg-panel-emoji">🛁</div>
-          <h3 class="cg-panel-title">Bath Time First!</h3>
-          <p class="cg-panel-desc">Give your new dog a gentle bath as soon as you get home. Use lukewarm water and dog-safe shampoo — rinse thoroughly and be gentle around the face and ears.</p>
-          <div class="cg-items-row">
-            <span class="cg-item good">🧼 Dog shampoo</span>
-            <span class="cg-item good">🚿 Lukewarm water</span>
-            <span class="cg-item good">🪣 Tub or shower</span>
-          </div>
-          <p class="cg-tip">💡 Talk softly to your dog throughout — it helps them stay calm during their very first bath!</p>
-        </div>
-
-        <!-- Panel 1: Dry -->
-        <div class="cg-panel" id="cg-panel-1">
-          <div class="cg-panel-emoji">💨</div>
-          <h3 class="cg-panel-title">Dry the Fur Completely</h3>
-          <p class="cg-panel-desc">After bathing, use a towel to pat dry first, then use a hair dryer on a low-heat setting. Keep the dryer moving and never hold it too close to avoid burns.</p>
-          <div class="cg-items-row">
-            <span class="cg-item good">🪮 Soft towel</span>
-            <span class="cg-item good">💨 Hair dryer (low heat)</span>
-          </div>
-          <p class="cg-tip">💡 A damp dog left overnight can catch a cold. Make sure the fur is completely dry before bedtime!</p>
-        </div>
-
-        <!-- Panel 2: Feed — flip card game -->
-        <div class="cg-panel" id="cg-panel-2">
-          <div class="cg-panel-emoji">🍖</div>
-          <h3 class="cg-panel-title">Can My Dog Eat This?</h3>
-          <p class="cg-panel-desc">Tap each food to find out if it's safe or dangerous for dogs!</p>
-          <div class="cg-food-grid">
-            <div class="food-card" data-safe="true"  data-reason="✅ Great source of lean protein! Cook it plain with no seasoning.">
-              <div class="food-front">🍗<span>Chicken</span></div>
-              <div class="food-back safe">✅<span>Safe!</span></div>
-            </div>
-            <div class="food-card" data-safe="true"  data-reason="✅ Formulated for dogs. Always a safe choice!">
-              <div class="food-front">🥫<span>Dog Food</span></div>
-              <div class="food-back safe">✅<span>Safe!</span></div>
-            </div>
-            <div class="food-card" data-safe="true"  data-reason="✅ Low calorie, great crunchy snack for dogs!">
-              <div class="food-front">🥕<span>Carrot</span></div>
-              <div class="food-back safe">✅<span>Safe!</span></div>
-            </div>
-            <div class="food-card" data-safe="true"  data-reason="✅ Plain cooked rice is easy on the stomach.">
-              <div class="food-front">🍚<span>Plain Rice</span></div>
-              <div class="food-back safe">✅<span>Safe!</span></div>
-            </div>
-            <div class="food-card" data-safe="false" data-reason="☠️ Theobromine in chocolate is toxic. Even a small amount can cause seizures or death!">
-              <div class="food-front">🍫<span>Chocolate</span></div>
-              <div class="food-back danger">❌<span>TOXIC!</span></div>
-            </div>
-            <div class="food-card" data-safe="false" data-reason="☠️ Grapes and raisins can cause sudden kidney failure in dogs!">
-              <div class="food-front">🍇<span>Grapes</span></div>
-              <div class="food-back danger">❌<span>TOXIC!</span></div>
-            </div>
-            <div class="food-card" data-safe="false" data-reason="☠️ Onions destroy red blood cells and can cause anaemia in dogs.">
-              <div class="food-front">🧅<span>Onion</span></div>
-              <div class="food-back danger">❌<span>TOXIC!</span></div>
-            </div>
-            <div class="food-card" data-safe="false" data-reason="☠️ Avocado contains persin which causes vomiting and diarrhoea in dogs.">
-              <div class="food-front">🥑<span>Avocado</span></div>
-              <div class="food-back danger">❌<span>TOXIC!</span></div>
-            </div>
-          </div>
-          <div class="food-reason-box" id="foodReasonBox">👆 Tap a food above to find out!</div>
-        </div>
-
-        <!-- Panel 3: Play -->
-        <div class="cg-panel" id="cg-panel-3">
-          <div class="cg-panel-emoji">🧸</div>
-          <h3 class="cg-panel-title">Play & Comfort</h3>
-          <p class="cg-panel-desc">Help your dog feel safe and at home with a soft stuffed toy. Playing together builds trust and helps your dog adjust to the new environment faster.</p>
-          <div class="cg-items-row">
-            <span class="cg-item good">🧸 Stuffed toy / plush</span>
-            <span class="cg-item good">🎾 Chew toy</span>
-            <span class="cg-item good">🪀 Interactive toy</span>
-          </div>
-          <p class="cg-tip">💡 A toy with a familiar scent from the shelter can help reduce separation anxiety on the first night.</p>
-        </div>
-
-        <!-- Panel 4: Walk -->
-        <div class="cg-panel" id="cg-panel-4">
-          <div class="cg-panel-emoji">🦮</div>
-          <h3 class="cg-panel-title">First Walk Together!</h3>
-          <p class="cg-panel-desc">Take your dog outside to explore the neighbourhood. The first walk should be short and relaxed — everything is new and exciting for them. Let your dog set the pace.</p>
-          <div class="cg-items-row">
-            <span class="cg-item good">🦮 Leash & collar</span>
-            <span class="cg-item good">🌳 Quiet outdoor space</span>
-            <span class="cg-item good">💧 Water bottle</span>
-          </div>
-          <p class="cg-tip">💡 Avoid busy roads for the first few walks. A calm environment helps your dog build confidence step by step.</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <style>
-    .cg-steps-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      justify-content: center;
-    }
-    .cg-step {
-      flex: 1;
-      max-width: 160px;
-      background: var(--warm-white);
-      border: 2px solid var(--light-gray);
-      border-radius: var(--radius-lg);
-      padding: 1.2rem 0.8rem;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.22s ease;
-    }
-    .cg-step:hover { border-color: var(--sage); transform: translateY(-4px); box-shadow: var(--shadow-md); }
-    .cg-step.active { border-color: var(--sage); background: white; box-shadow: var(--shadow-md); transform: translateY(-4px); }
-    .cg-icon-wrap { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 12px; }
-    .cg-icon-wrap svg { width: 100%; height: 100%; }
-    .cg-step-badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage); background: rgba(61,122,92,0.1); padding: 2px 10px; border-radius: 100px; }
-    .cg-step-label { font-size: 0.82rem; font-weight: 700; color: var(--dark-brown); font-family: var(--font-serif); text-align: center; }
-
-    .cg-panels { max-width: 700px; margin: 0 auto; }
-    .cg-panel { display: none; background: var(--warm-white); border-radius: var(--radius-lg); padding: 2rem 2.5rem; box-shadow: var(--shadow-sm); animation: cgIn 0.28s ease; }
-    .cg-panel.active { display: block; }
-    @keyframes cgIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-    .cg-panel-emoji { font-size: 2.8rem; margin-bottom: 0.6rem; }
-    .cg-panel-title { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--dark-brown); margin-bottom: 0.7rem; }
-    .cg-panel-desc { font-size: 0.9rem; color: var(--brown); line-height: 1.8; margin-bottom: 1rem; }
-    .cg-tip { font-size: 0.82rem; color: var(--gray); background: var(--pale-yellow); border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 1rem; line-height: 1.6; }
-
-    /* Item tags */
-    .cg-items-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0.6rem 0; }
-    .cg-item { display: inline-flex; align-items: center; gap: 4px; padding: 5px 13px; border-radius: 100px; font-size: 0.82rem; font-weight: 600; }
-    .cg-item.good { background: rgba(61,122,92,0.12); color: var(--sage); }
-
-    /* Food flip cards */
-    .cg-food-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1rem; }
-    .food-card { perspective: 600px; height: 90px; cursor: pointer; }
-    .food-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.45s ease; transform-style: preserve-3d; }
-    .food-card.flipped .food-card-inner { transform: rotateY(180deg); }
-    .food-front, .food-back { position: absolute; inset: 0; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; backface-visibility: hidden; font-size: 0.72rem; font-weight: 600; border: 2px solid var(--light-gray); }
-    .food-front { background: var(--cream); color: var(--brown); font-size: 1.8rem; flex-direction: column; }
-    .food-front span { font-size: 0.7rem; font-weight: 600; color: var(--gray); margin-top: 2px; }
-    .food-back { transform: rotateY(180deg); font-size: 1.6rem; flex-direction: column; }
-    .food-back span { font-size: 0.72rem; font-weight: 700; margin-top: 2px; }
-    .food-back.safe { background: #F0F7F1; border-color: var(--sage); color: var(--sage); }
-    .food-back.danger { background: #FEF0EC; border-color: #C04040; color: #C04040; }
-    .food-reason-box { background: var(--pale-yellow); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.85rem; color: var(--brown); line-height: 1.6; min-height: 52px; transition: all 0.2s; }
-
-    @media (max-width: 640px) {
-      .cg-steps-row { gap: 0.5rem; }
-      .cg-step { padding: 0.8rem 0.4rem; }
-      .cg-icon-wrap { width: 52px; height: 52px; }
-      .cg-panel { padding: 1.4rem 1.2rem; }
-      .cg-food-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-      .food-card { height: 76px; }
-    }
-  </style>
-
-  <script>
-    // Step switching
-    document.querySelectorAll('.cg-step').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.cg-step').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.cg-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('cg-panel-' + btn.dataset.step).classList.add('active');
-      });
-    });
-
-    // Food flip cards
-    document.querySelectorAll('.food-card').forEach(function(card) {
-      var inner = document.createElement('div');
-      inner.className = 'food-card-inner';
-      inner.appendChild(card.querySelector('.food-front'));
-      inner.appendChild(card.querySelector('.food-back'));
-      card.appendChild(inner);
-
-      card.addEventListener('click', function() {
-        card.classList.toggle('flipped');
-        var reason = card.dataset.reason;
-        var box = document.getElementById('foodReasonBox');
-        if (box) box.textContent = card.classList.contains('flipped') ? reason : '👆 Tap a food above to find out!';
-      });
-    });
-  </script>
-
   <!-- ======== AI FEATURE ======== -->
   <section class="section ai-section" id="ai-feature">
     <div class="section-inner">
@@ -587,24 +387,24 @@
               </div>
             </li>
             <li class="feature-point">
-              <div class="fp-icon">❤️</div>
+              <div class="fp-icon">🏷️</div>
               <div class="fp-text">
-                <strong>Favourites & Save</strong>
-                <span>Heart any dog to save them — view your full wishlist anytime from Find a Dog</span>
+                <strong>Smart Tag Analysis</strong>
+                <span>AI detects lifestyle tags: living space, exercise needs, family compatibility</span>
               </div>
             </li>
             <li class="feature-point">
               <div class="fp-icon">💬</div>
               <div class="fp-text">
-                <strong>Natural Language Match</strong>
-                <span>Describe your lifestyle in your own words and AI finds your best-matched dogs</span>
+                <strong>Natural Language Search</strong>
+                <span>Describe your daily life and the system finds your best match</span>
               </div>
             </li>
             <li class="feature-point">
-              <div class="fp-icon">📋</div>
+              <div class="fp-icon">📊</div>
               <div class="fp-text">
-                <strong>Application Tracking</strong>
-                <span>Submit adoption applications and get notified the moment a shelter approves or rejects</span>
+                <strong>Adoption Analytics</strong>
+                <span>Real-time dashboards help shelters track trends and optimize operations</span>
               </div>
             </li>
           </ul>
