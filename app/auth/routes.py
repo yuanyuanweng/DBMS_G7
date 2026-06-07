@@ -1,5 +1,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash, session
 from app.models.user import User
+from app.database import get_db
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,7 +24,12 @@ def login():
             next_url = request.form.get('next')
 
             if not next_url or not next_url.startswith('/'):
-                next_url = url_for('dogs.list_dogs')
+                db = get_db()
+                has_applied = db.execute(
+                    'SELECT 1 FROM Application WHERE User_ID = ? LIMIT 1',
+                    (user.id,)
+                ).fetchone()
+                next_url = url_for('main.index') if has_applied else url_for('dogs.list_dogs')
 
             return redirect(next_url)
 

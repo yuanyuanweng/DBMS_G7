@@ -29,6 +29,10 @@ def dashboard():
         'SELECT User_ID, Email, Role FROM Users ORDER BY User_ID DESC'
     ).fetchall()
 
+    dogs = db.execute(
+        'SELECT Dog_ID, Name, Breed, Availability FROM Dog_With_Status ORDER BY Dog_ID DESC'
+    ).fetchall()
+
     STATUS_MAP = {0: 'Pending', 1: 'Approved', 2: 'Rejected'}
 
     return render_template(
@@ -39,6 +43,7 @@ def dashboard():
         rejected_count=rejected_count,
         applications=applications,
         users=users,
+        dogs=dogs,
         STATUS_MAP=STATUS_MAP,
         admin_email=session.get('email', '')
     )
@@ -64,7 +69,7 @@ def update_status(app_id):
         return redirect(url_for('admin.dashboard'))
 
     db.execute(
-        'UPDATE Application SET Status = ? WHERE App_ID = ?',
+        'UPDATE Application SET Status = ?, Seen = 0 WHERE App_ID = ?',
         (int(new_status), app_id)
     )
     db.commit()
