@@ -1,9 +1,5 @@
 '''
 Landing page route.
-
-Current approach:
-- Show only 4 dogs on index.html.
-- Use mock data from Dog model. (Dog.get_featured())
 '''
 
 from flask import Blueprint, render_template 
