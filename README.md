@@ -14,6 +14,9 @@ cd DMBS_G7
 pip install -r requirements.txt
 ```
 
+1. Install Ollama from https://ollama.com/download
+2. Run: ollama pull llama3.2
+
 #### 4. Start Server  
 ```bash
 python run.py
