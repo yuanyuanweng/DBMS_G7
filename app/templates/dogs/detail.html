@@ -144,6 +144,7 @@
 
 {% block extra_js %}
 <script>
+  // Inject SVG illustration if no image
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById('detailDogSVG');
     if (el) {
@@ -155,6 +156,7 @@
       el.innerHTML = generateDogSVG(dog, 320);
     }
 
+    // AI Story generation (client-side via /ai/story endpoint)
     const storyBtn = document.getElementById('generateAIStoryBtn');
     if (storyBtn) {
       storyBtn.addEventListener('click', async () => {

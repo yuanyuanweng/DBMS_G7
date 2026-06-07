@@ -229,56 +229,19 @@ function setupHeartButtons() {
 
 // ── Scroll animation observer ────────────────────────────────────────────────
 function setupScrollAnimations() {
-  // Legacy: pause/resume animation-play-state for step/dog cards
-  const playStateObserver = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach(el => {
       if (el.isIntersecting) {
         el.target.style.animationPlayState = 'running';
-        playStateObserver.unobserve(el.target);
+        observer.unobserve(el.target);
       }
     });
   }, { threshold: 0.12 });
 
   document.querySelectorAll('.step-card, .dog-card').forEach(el => {
     el.style.animationPlayState = 'paused';
-    playStateObserver.observe(el);
+    observer.observe(el);
   });
-
-  // Reveal: fade-up on scroll for section headers, feature points, stat cards, etc.
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  const revealSelectors = [
-    '.section-header',
-    '.feature-point',
-    '.stat-card',
-    '.hero-stat',
-    '.admin-section-title',
-    '.cg-panel',
-  ];
-  document.querySelectorAll(revealSelectors.join(',')).forEach((el, i) => {
-    el.classList.add('reveal');
-    // Stagger siblings in the same parent
-    const siblings = Array.from(el.parentElement?.children || []);
-    const idx = siblings.indexOf(el);
-    if (idx > 0 && idx <= 4) el.classList.add(`reveal-delay-${idx}`);
-    revealObserver.observe(el);
-  });
-}
-
-// ── Navbar shadow on scroll ───────────────────────────────────────────────────
-function setupNavScroll() {
-  const header = document.querySelector('.site-header');
-  if (!header) return;
-  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 24);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll(); // run once on load
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -287,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inject SVG placeholders
   injectDogSVGs();
   setupScrollAnimations();
-  setupNavScroll();
   setupHeartButtons();
 
   // Demo story rotation (hero section)

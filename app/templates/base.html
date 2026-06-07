@@ -5,27 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}PICKPET — Stray Dog Adoption{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  <style>
-    .notif-badge {
-      position: absolute;
-      top: -7px;
-      right: -14px;
-      background: #E8614B;
-      color: #fff;
-      border-radius: 50%;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 4px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      box-shadow: 0 1px 4px rgba(232,97,75,0.35);
-      pointer-events: none;
-    }
-  </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -62,18 +41,6 @@
     (function () {
       var el = document.getElementById('loading-screen');
       if (!el) return;
-
-      var currentPath = window.location.pathname;
-      var lastPath = sessionStorage.getItem('pp_last_path');
-
-      // Skip animation if reloading the same page (e.g. filter submit)
-      if (lastPath === currentPath) {
-        el.style.display = 'none';
-        return;
-      }
-
-      sessionStorage.setItem('pp_last_path', currentPath);
-
       setTimeout(function () {
         el.classList.add('loading-hide');
         el.addEventListener('transitionend', function () {

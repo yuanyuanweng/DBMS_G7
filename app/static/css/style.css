@@ -2,7 +2,7 @@
    流浪狗認養平台 - 溫馨日式風格
    ======================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Nerko+One&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;700&display=swap');
 
 :root {
   /* ① 米白底色 */
@@ -35,8 +35,8 @@
 
   --pale-yellow: #FBF5CC;
 
-  --font-serif: 'Nerko One', cursive;
-  --font-sans: 'Nunito', sans-serif;
+  --font-serif: 'Shippori Mincho', 'Noto Serif JP', serif;
+  --font-sans: 'Noto Sans JP', sans-serif;
 
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -829,7 +829,7 @@ body {
 .dog-card-circle-wrap {
   display: flex;
   justify-content: center;
-  padding-top: 3.2rem;
+  padding-top: 1.6rem;
   padding-bottom: 0.4rem;
   position: relative;
 }
@@ -1363,8 +1363,6 @@ body {
   .modal-actions { flex-direction: column; }
 }
 
-.dog-card-img-circle { overflow: hidden; }
-
 /* ========================================
    UTILITY
    ======================================== */
@@ -1375,65 +1373,3 @@ body {
   border-top: 1px dashed var(--tan);
   margin: 1.5rem 0;
 }
-
-/* ========================================
-   SCROLL REVEAL
-   ======================================== */
-.reveal {
-  opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.reveal-delay-1 { transition-delay: 0.08s; }
-.reveal-delay-2 { transition-delay: 0.16s; }
-.reveal-delay-3 { transition-delay: 0.24s; }
-.reveal-delay-4 { transition-delay: 0.32s; }
-
-/* ========================================
-   NAVBAR SCROLL SHADOW
-   ======================================== */
-.site-header {
-  transition: box-shadow 0.3s ease;
-}
-.site-header.scrolled {
-  box-shadow: 0 2px 16px rgba(74,55,40,0.12);
-}
-
-/* ========================================
-   NAV LINK UNDERLINE SLIDE
-   ======================================== */
-.nav-links a:not(.nav-btn) {
-  position: relative;
-}
-.nav-links a:not(.nav-btn)::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 100%;
-  height: 2px;
-  background: var(--terracotta);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.22s ease;
-  border-radius: 2px;
-}
-.nav-links a:not(.nav-btn):hover::after {
-  transform: scaleX(1);
-}
-
-/* ========================================
-   BUTTON PRESS EFFECT
-   ======================================== */
-.btn-primary,
-.btn-secondary {
-  transition: background 0.18s, color 0.18s, border-color 0.18s,
-              transform 0.12s ease, box-shadow 0.18s;
-}
-.btn-primary:active  { transform: scale(0.96); }
-.btn-secondary:active { transform: scale(0.96); }
-
