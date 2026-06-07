@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from app.auth.utils import login_required
 from app.models.application import Application
 from app.models.dog import Dog
+from app.database import get_db
 
 applications_bp = Blueprint('applications', __name__)
 
