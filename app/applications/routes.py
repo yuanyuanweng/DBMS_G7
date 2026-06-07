@@ -1,4 +1,5 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash, session
+from app.auth.utils import login_required
 from app.models.application import Application
 from app.models.dog import Dog
 from app.database import get_db
@@ -6,10 +7,8 @@ from app.database import get_db
 applications_bp = Blueprint('applications', __name__)
 
 @applications_bp.route('/apply/<int:dog_id>', methods=['GET', 'POST'])
+@login_required
 def apply(dog_id):
-    if not session.get('user_id'):
-        return redirect(url_for('auth.login') + f'?next={request.url}')
-
     dog = Dog.get_by_id(dog_id)
     if not dog:
         return redirect(url_for('dogs.list_dogs'))
@@ -30,6 +29,7 @@ def apply(dog_id):
     return render_template('applications/apply.html', dog=dog)
 
 @applications_bp.route('/my-applications')
+@login_required
 def my_applications():
     if not session.get('user_id'):
         return redirect(url_for('auth.login'))
@@ -42,9 +42,8 @@ def my_applications():
     return render_template('applications/my_applications.html', applications=apps)
 
 @applications_bp.route('/applications/<int:app_id>/cancel', methods=['POST'])
+@login_required
 def cancel(app_id):
-    if not session.get('user_id'):
-        return redirect(url_for('auth.login'))
     Application.cancel(app_id, session['user_id'])
     flash('Application withdrawn.', 'info')
     return redirect(url_for('applications.my_applications'))

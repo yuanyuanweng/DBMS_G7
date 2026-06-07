@@ -182,6 +182,35 @@ class Dog:
         return Dog(row) if row else None
 
     @staticmethod
+    def create(shelter_id, name, gender, age, breed, image_url=None):
+        """Create a dog record and return the new dog ID."""
+        db = get_db()
+        cursor = db.execute(
+            """
+            INSERT INTO Dog (Shelter_ID, Name, Gender, Age, Breed, Image_URL)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (shelter_id, name, gender, age, breed, image_url),
+        )
+        db.commit()
+        return cursor.lastrowid
+
+    @staticmethod
+    def update(dog_id, shelter_id, name, gender, age, breed, image_url=None):
+        """Update one dog record and return whether a row was changed."""
+        db = get_db()
+        cursor = db.execute(
+            """
+            UPDATE Dog
+            SET Shelter_ID = ?, Name = ?, Gender = ?, Age = ?, Breed = ?, Image_URL = ?
+            WHERE Dog_ID = ?
+            """,
+            (shelter_id, name, gender, age, breed, image_url, dog_id),
+        )
+        db.commit()
+        return cursor.rowcount > 0
+
+    @staticmethod
     def search(q="", gender="", age_group="", size="", city="", sort="newest"):
         """Search dogs with URL filter parameters."""
         dogs = Dog.get_all()

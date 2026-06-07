@@ -68,6 +68,57 @@ class Application:
         return [Application(row) for row in rows]
 
     @staticmethod
+    def get_admin_counts():
+        """Return dashboard counts for admin application summary."""
+        db = get_db()
+        return {
+            "pending_count": db.execute(
+                "SELECT COUNT(*) FROM Application WHERE Status = ?",
+                (STATUS_PENDING,),
+            ).fetchone()[0],
+            "approved_count": db.execute(
+                "SELECT COUNT(*) FROM Application WHERE Status = ?",
+                (STATUS_APPROVED,),
+            ).fetchone()[0],
+            "rejected_count": db.execute(
+                "SELECT COUNT(*) FROM Application WHERE Status = ?",
+                (STATUS_REJECTED,),
+            ).fetchone()[0],
+        }
+
+    @staticmethod
+    def get_recent_for_admin(limit=20):
+        """Return recent application rows for the admin dashboard."""
+        db = get_db()
+        return db.execute(
+            """
+            SELECT a.App_ID, a.Status, a.Created_at,
+                   u.Email, u.User_ID,
+                   d.Name AS Dog_Name, d.Dog_ID
+            FROM Application a
+            JOIN Users u ON a.User_ID = u.User_ID
+            JOIN Dog d ON a.Dog_ID = d.Dog_ID
+            ORDER BY a.Created_at DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+    @staticmethod
+    def get_admin_users():
+        """Return user rows displayed on the admin dashboard."""
+        db = get_db()
+        return db.execute(
+            "SELECT User_ID, Email, Role FROM Users ORDER BY User_ID DESC"
+        ).fetchall()
+
+    @staticmethod
+    def count_users():
+        """Return total user count for the admin dashboard."""
+        db = get_db()
+        return db.execute("SELECT COUNT(*) FROM Users").fetchone()[0]
+
+    @staticmethod
     def already_applied(user_id, dog_id):
         """Return whether a user already applied for one dog."""
         db = get_db()
@@ -131,3 +182,17 @@ class Application:
         if cursor.rowcount == 0:
             return False, "Application not found."
         return True, Application.get_by_id(app_id)
+
+    @staticmethod
+    def delete_by_id(app_id):
+        """Delete one application by ID."""
+        db = get_db()
+        cursor = db.execute(
+            """
+            DELETE FROM Application
+            WHERE App_ID = ?
+            """,
+            (app_id,),
+        )
+        db.commit()
+        return cursor.rowcount > 0
