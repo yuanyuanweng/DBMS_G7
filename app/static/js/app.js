@@ -125,7 +125,7 @@ function renderAIResults(recs, query, error = false) {
       🤖 Based on <strong>"${escapeHtml(query)}"</strong>, AI recommends ${matched.length} dog(s) for you:
     </p>
     ${matched.map(({ dog, reason }) => `
-      <a href="/dogs/${dog.id}" style="display:flex;gap:1rem;padding:1rem;background:var(--cream);
+      <a href="/find-a-dog/${dog.id}" style="display:flex;gap:1rem;padding:1rem;background:var(--cream);
          border-radius:12px;margin-bottom:1rem;text-decoration:none;transition:box-shadow 0.2s;
          border:1px solid var(--light-gray);"
          onmouseover="this.style.boxShadow='0 4px 16px rgba(74,55,40,0.12)'"
@@ -229,19 +229,56 @@ function setupHeartButtons() {
 
 // ── Scroll animation observer ────────────────────────────────────────────────
 function setupScrollAnimations() {
-  const observer = new IntersectionObserver((entries) => {
+  // Legacy: pause/resume animation-play-state for step/dog cards
+  const playStateObserver = new IntersectionObserver((entries) => {
     entries.forEach(el => {
       if (el.isIntersecting) {
         el.target.style.animationPlayState = 'running';
-        observer.unobserve(el.target);
+        playStateObserver.unobserve(el.target);
       }
     });
   }, { threshold: 0.12 });
 
   document.querySelectorAll('.step-card, .dog-card').forEach(el => {
     el.style.animationPlayState = 'paused';
-    observer.observe(el);
+    playStateObserver.observe(el);
   });
+
+  // Reveal: fade-up on scroll for section headers, feature points, stat cards, etc.
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  const revealSelectors = [
+    '.section-header',
+    '.feature-point',
+    '.stat-card',
+    '.hero-stat',
+    '.admin-section-title',
+    '.cg-panel',
+  ];
+  document.querySelectorAll(revealSelectors.join(',')).forEach((el, i) => {
+    el.classList.add('reveal');
+    // Stagger siblings in the same parent
+    const siblings = Array.from(el.parentElement?.children || []);
+    const idx = siblings.indexOf(el);
+    if (idx > 0 && idx <= 4) el.classList.add(`reveal-delay-${idx}`);
+    revealObserver.observe(el);
+  });
+}
+
+// ── Navbar shadow on scroll ───────────────────────────────────────────────────
+function setupNavScroll() {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 24);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // run once on load
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
@@ -250,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inject SVG placeholders
   injectDogSVGs();
   setupScrollAnimations();
+  setupNavScroll();
   setupHeartButtons();
 
   // Demo story rotation (hero section)

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, request, redirect, url_for, flash
 from app.auth.utils import admin_required
 from app.models.application import Application, STATUS_MAP
+from app.models.dog import Dog
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -16,6 +17,7 @@ def dashboard():
         approved_count=counts["approved_count"],
         rejected_count=counts["rejected_count"],
         applications=Application.get_recent_for_admin(limit=20),
+        dogs=Dog.get_admin_rows(),
         users=Application.get_admin_users(),
         STATUS_MAP=STATUS_MAP,
         admin_email=session.get('email', '')

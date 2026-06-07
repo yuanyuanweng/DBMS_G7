@@ -7,8 +7,9 @@ Current progress:
 - Extra frontend fields are accepted for compatibility, but not persisted yet.
 """
 
-from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash
+from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify
 from app.auth.utils import admin_required
+from app.database import get_db
 from app.models.dog import Dog
 from app.models.application import Application
 from app.models.shelter import Shelter
@@ -144,13 +145,26 @@ def list_dogs():
         "urgent": len([dog for dog in dogs if dog.is_urgent]),
     }
 
+    user_id = session.get('user_id')
+    liked_ids = set()
+    favorite_dogs = []
+    if user_id:
+        db = get_db()
+        rows = db.execute(
+            'SELECT Dog_ID FROM Favorite WHERE User_ID = ? ORDER BY Created_at DESC', (user_id,)
+        ).fetchall()
+        liked_ids = {row['Dog_ID'] for row in rows}
+        favorite_dogs = [Dog.get_by_id(row['Dog_ID']) for row in rows]
+        favorite_dogs = [d for d in favorite_dogs if d]
+
     return render_template(
         "dogs/list.html",
         dogs=dogs,
         dogs_json=[dog.to_dict() for dog in dogs],
         filters=filters,
         stats=stats,
-        liked_ids=[],
+        liked_ids=liked_ids,
+        favorite_dogs=favorite_dogs,
     )
 
 
@@ -280,3 +294,24 @@ def edit(id):
         form=form,
         csrf_token=lambda: "",
     )
+
+
+@dogs_bp.route("/dogs/<int:dog_id>/like", methods=["POST"])
+def toggle_like(dog_id):
+    """Toggle favorite status for a dog. Returns JSON {liked: bool}."""
+    if not session.get('user_id'):
+        return jsonify({'error': 'login required'}), 401
+    user_id = session['user_id']
+    db = get_db()
+    existing = db.execute(
+        'SELECT 1 FROM Favorite WHERE User_ID = ? AND Dog_ID = ?',
+        (user_id, dog_id)
+    ).fetchone()
+    if existing:
+        db.execute('DELETE FROM Favorite WHERE User_ID = ? AND Dog_ID = ?', (user_id, dog_id))
+        liked = False
+    else:
+        db.execute('INSERT INTO Favorite (User_ID, Dog_ID) VALUES (?, ?)', (user_id, dog_id))
+        liked = True
+    db.commit()
+    return jsonify({'liked': liked})

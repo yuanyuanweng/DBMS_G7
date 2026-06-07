@@ -157,15 +157,27 @@ class Dog:
 
     @staticmethod
     def get_all():
-        """Return all dogs for the dog listing page."""
+        """Return all non-adopted dogs for the dog listing page."""
         db = get_db()
         rows = db.execute(
+            f"""
+            {Dog._base_query()}
+            WHERE Availability != 'Adopted'
+            ORDER BY Dog_ID DESC
+            """
+        ).fetchall()
+        return [Dog(row) for row in rows]
+
+    @staticmethod
+    def get_admin_rows():
+        """Return dog rows for the admin dashboard table."""
+        db = get_db()
+        return db.execute(
             f"""
             {Dog._base_query()}
             ORDER BY Dog_ID DESC
             """
         ).fetchall()
-        return [Dog(row) for row in rows]
 
     @staticmethod
     def get_by_id(dog_id):
