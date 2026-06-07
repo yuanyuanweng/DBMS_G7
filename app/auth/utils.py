@@ -1,12 +1,12 @@
 from functools import wraps
-from flask import session, redirect, url_for, flash
+from flask import session, redirect, url_for, flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('user_id'):
             flash("Please log in first.", "error")
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', next=request.full_path))
         return f(*args, **kwargs)
     return decorated_function
 
