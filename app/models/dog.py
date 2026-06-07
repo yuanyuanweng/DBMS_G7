@@ -157,11 +157,12 @@ class Dog:
 
     @staticmethod
     def get_all():
-        """Return all dogs for the dog listing page."""
+        """Return all non-adopted dogs for the dog listing page."""
         db = get_db()
         rows = db.execute(
             f"""
             {Dog._base_query()}
+            WHERE Availability != 'Adopted'
             ORDER BY Dog_ID DESC
             """
         ).fetchall()

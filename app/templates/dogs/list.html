@@ -2,172 +2,938 @@
 
 {% block title %}Find a Dog — PICKPET{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* ── Page layout ── */
+  .browse-page {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    background: var(--cream);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 272px;
+    flex-shrink: 0;
+    background: var(--warm-white);
+    border-right: 1px solid var(--light-gray);
+    padding: 2rem 1.5rem;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+    margin-bottom: 1.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .sidebar-section {
+    margin-bottom: 1.6rem;
+  }
+
+  .sidebar-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 0.7rem;
+    display: block;
+  }
+
+  /* Search input */
+  .sidebar-search {
+    position: relative;
+  }
+
+  .sidebar-search input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1.5px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    background: var(--cream);
+    color: var(--ink);
+    transition: border-color 0.2s;
+    font-family: var(--font-sans);
+  }
+
+  .sidebar-search input:focus {
+    outline: none;
+    border-color: var(--sage);
+    background: #fff;
+  }
+
+  .sidebar-search .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+
+  /* Chip-style filters */
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip-group input[type="radio"],
+  .chip-group input[type="checkbox"] {
+    display: none;
+  }
+
+  .chip-group label {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    border: 1.5px solid var(--light-gray);
+    color: var(--brown);
+    cursor: pointer;
+    transition: all 0.18s;
+    background: var(--cream);
+    user-select: none;
+  }
+
+  .chip-group input:checked + label {
+    background: var(--sage);
+    color: #fff;
+    border-color: var(--sage);
+  }
+
+  .chip-group label:hover {
+    border-color: var(--sage);
+    color: var(--sage);
+  }
+
+  .chip-group input:checked + label:hover {
+    color: #fff;
+  }
+
+  /* Select dropdown */
+  .sidebar-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .sidebar-select:focus {
+    outline: none;
+    border-color: var(--sage);
+  }
+
+  /* AI search in sidebar */
+  .ai-sidebar-wrap {
+    position: relative;
+  }
+
+  .ai-sidebar-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--muted-sage);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    background: #F4FAF7;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    resize: none;
+    transition: border-color 0.2s;
+  }
+
+  .ai-sidebar-input:focus {
+    outline: none;
+    border-color: var(--sage);
+    background: #fff;
+  }
+
+  .ai-sidebar-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    background: var(--sage);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+    font-family: var(--font-sans);
+  }
+
+  .ai-sidebar-btn:hover { background: #2D5E44; }
+
+  /* Apply / Reset buttons */
+  .sidebar-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 1.8rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--light-gray);
+  }
+
+  .btn-apply {
+    flex: 1;
+    padding: 10px;
+    background: var(--terracotta);
+    color: var(--dark-brown);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+    font-family: var(--font-sans);
+  }
+
+  .btn-apply:hover { background: #E8B820; }
+
+  .btn-reset {
+    padding: 10px 14px;
+    background: transparent;
+    color: var(--gray);
+    border: 1.5px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+  }
+
+  .btn-reset:hover { border-color: var(--brown); color: var(--brown); }
+
+  /* ── Main content ── */
+  .browse-main {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    min-width: 0;
+  }
+
+  .browse-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.6rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .browse-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+  }
+
+  .browse-meta {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  /* Active filter tags */
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.4rem;
+  }
+
+  .filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(61,122,92,0.1);
+    color: var(--sage);
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Dogs grid */
+  .dogs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.4rem;
+  }
+
+  /* ── Dog card ── */
+  .dog-card {
+    background: var(--warm-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--light-gray);
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .dog-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .dog-card-circle-wrap {
+    position: relative;
+    background: var(--sand);
+    padding: 1.2rem 1rem 0.8rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dog-status-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 100px;
+    background: rgba(61,122,92,0.15);
+    color: var(--sage);
+    letter-spacing: 0.05em;
+  }
+
+  .dog-status-badge.urgent {
+    background: rgba(245,200,66,0.25);
+    color: #8a6500;
+  }
+
+  .dog-status-badge.pending {
+    background: rgba(232,97,75,0.15);
+    color: #c0442a;
+  }
+
+  .dog-card-img-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--sand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dog-card-img-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .dog-card-body {
+    padding: 1rem 1.1rem 1.2rem;
+  }
+
+  .dog-card-name {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-brown);
+    margin-bottom: 3px;
+  }
+
+  .dog-card-meta {
+    font-size: 0.72rem;
+    color: var(--gray);
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+
+  .dog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 0.6rem;
+  }
+
+  .dog-tag {
+    font-size: 0.66rem;
+    padding: 2px 8px;
+    background: var(--sand);
+    color: var(--brown);
+    border-radius: 100px;
+    font-weight: 500;
+  }
+
+  .dog-story {
+    font-size: 0.75rem;
+    color: var(--brown);
+    line-height: 1.6;
+    margin-bottom: 0.9rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dog-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .adopt-btn {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    background: var(--terracotta);
+    color: var(--dark-brown);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    transition: background 0.18s, transform 0.18s;
+    box-shadow: 0 2px 8px rgba(245,200,66,0.3);
+  }
+
+  .adopt-btn:hover { background: #E8B820; transform: translateY(-1px); }
+
+  .heart-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.18s;
+    padding: 4px;
+  }
+
+  .heart-btn:hover { transform: scale(1.25); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 0;
+    color: var(--brown);
+  }
+
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  /* Sticky filter bar */
+  .filter-bar {
+    position: sticky;
+    top: 64px;
+    z-index: 50;
+    background: rgba(250,250,245,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--light-gray);
+    padding: 0.75rem 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin: 0 -2.5rem 1.6rem;
+  }
+
+  .filter-bar-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .filter-bar-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: var(--sage);
+    color: #fff;
+    border-radius: 100px;
+    font-size: 0.76rem;
+    font-weight: 600;
+  }
+
+  .filter-bar-chip a {
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 0.8rem;
+    line-height: 1;
+    margin-left: 2px;
+    transition: color 0.15s;
+  }
+
+  .filter-bar-chip a:hover { color: #fff; }
+
+  .filter-bar-clear {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--gray);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--light-gray);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .filter-bar-clear:hover { border-color: var(--brown); color: var(--brown); }
+
+  .filter-bar-count {
+    font-size: 0.78rem;
+    color: var(--brown);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 2.5rem;
+  }
+
+  /* Divider */
+  .sidebar-divider {
+    border: none;
+    border-top: 1px solid var(--light-gray);
+    margin: 1.4rem 0;
+  }
+
+  /* AI modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(45,62,40,0.45);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--warm-white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.4rem 1.6rem;
+    border-bottom: 1px solid var(--light-gray);
+    position: sticky;
+    top: 0;
+    background: var(--warm-white);
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    color: var(--dark-brown);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--gray);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+
+  .modal-close:hover { background: var(--sand); }
+
+  .modal-body { padding: 1.4rem 1.6rem; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Favourites button ── */
+  .fav-drawer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--warm-white);
+    border: 1.5px solid #E8614B;
+    color: #E8614B;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+    white-space: nowrap;
+  }
+  .fav-drawer-btn:hover { background: #FEF0EC; }
+  .fav-count-badge {
+    background: #E8614B;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+
+  /* ── Favourites slide-in drawer ── */
+  .fav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 600;
+  }
+  .fav-overlay.active { display: block; }
+  .fav-drawer {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 340px;
+    height: 100vh;
+    background: var(--warm-white);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+    z-index: 700;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+  }
+  .fav-drawer.open { right: 0; }
+  .fav-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.4rem;
+    border-bottom: 1px solid var(--light-gray);
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--dark-brown);
+    flex-shrink: 0;
+  }
+  .fav-drawer-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--gray);
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .fav-drawer-close:hover { background: var(--sand); }
+  .fav-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .fav-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--cream);
+    border-radius: var(--radius-md);
+    padding: 0.7rem 0.9rem;
+  }
+  .fav-row-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--sand);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+  }
+  .fav-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .fav-row-info { flex: 1; min-width: 0; }
+  .fav-row-name { font-weight: 700; font-size: 0.88rem; color: var(--dark-brown); }
+  .fav-row-breed { font-size: 0.74rem; color: var(--gray); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fav-row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .fav-row-view {
+    font-size: 0.72rem; padding: 4px 10px; border-radius: 100px;
+    background: var(--sage); color: white; text-decoration: none; font-weight: 600;
+  }
+  .fav-row-remove {
+    font-size: 0.8rem; padding: 4px 8px; border-radius: 100px;
+    background: var(--pale-sakura); color: #8C2A3E; border: none; cursor: pointer;
+  }
+  .fav-row-remove:hover { background: #f5c4d0; }
+  .fav-drawer-empty {
+    text-align: center; padding: 3rem 1rem; color: var(--gray); font-size: 0.88rem;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .browse-page { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    .browse-main { padding: 1.5rem 1rem; }
+    .dogs-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="browse-page">
 
-<!-- ======== HERO ======== -->
-<section class="hero">
-  <!-- Floating petals -->
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="hero-bg-pattern"></div>
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar">
 
-  <div class="hero-content">
-    <div class="hero-text">
-      <span class="hero-eyebrow">🌸 AI-Powered Adoption Experience</span>
-      <h1 class="hero-title">
-        Every dog has<br>
-        <span class="accent">a story to tell</span><br>
-        waiting for you
-      </h1>
-      <p class="hero-subtitle">
-        Through AI-powered matching, we go beyond appearances—
-        helping you feel each dog's personality and life story,
-        so you can find the one that truly belongs with you.
-      </p>
-      <div class="hero-actions">
-        <a href="#dogs" class="btn-primary">🐕 Find My Companion</a>
-        <a href="#how" class="btn-secondary">How It Works →</a>
-      </div>
+    <div class="sidebar-brand">
+      🐾 Find a Dog
     </div>
 
-    <div class="hero-illustration">
-      <div class="hero-dog-card">
-        <div class="floating-tag">✨ AI-Generated Stories</div>
-        <div class="floating-tag">🏡 Waiting for a Home</div>
+    <form method="GET" action="{{ url_for('dogs.list_dogs') }}" id="filterForm">
 
-        <!-- Hero Dog SVG Illustration -->
-        <svg class="hero-dog-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-          <rect width="320" height="240" fill="#F0E6D3" rx="16"/>
-          <ellipse cx="160" cy="215" rx="90" ry="14" fill="#D9C4A8" opacity="0.5"/>
-          <path d="M230 170 Q260 140 252 118 Q248 108 240 112 Q244 126 220 150Z" fill="#C4714A"/>
-          <ellipse cx="175" cy="175" rx="65" ry="45" fill="#D9A57A"/>
-          <circle cx="115" cy="148" r="42" fill="#D9A57A"/>
-          <ellipse cx="90" cy="118" rx="18" ry="26" fill="#C4714A" transform="rotate(-15 90 118)"/>
-          <ellipse cx="140" cy="115" rx="14" ry="22" fill="#C4714A" transform="rotate(10 140 115)"/>
-          <ellipse cx="102" cy="162" rx="22" ry="16" fill="#E8B98A"/>
-          <ellipse cx="102" cy="155" rx="9" ry="6" fill="#4A3728"/>
-          <ellipse cx="99" cy="153" rx="3" ry="2" fill="white" opacity="0.6"/>
-          <circle cx="97" cy="138" r="8" fill="white"/>
-          <circle cx="98" cy="139" r="5" fill="#2C2416"/>
-          <circle cx="100" cy="137" r="2" fill="white"/>
-          <circle cx="127" cy="135" r="8" fill="white"/>
-          <circle cx="128" cy="136" r="5" fill="#2C2416"/>
-          <circle cx="130" cy="134" r="2" fill="white"/>
-          <path d="M95 166 Q102 172 109 166" stroke="#8B6F52" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <ellipse cx="102" cy="172" rx="7" ry="6" fill="#E07070"/>
-          <rect x="128" y="205" width="18" height="30" rx="9" fill="#D9A57A"/>
-          <rect x="155" y="205" width="18" height="30" rx="9" fill="#D9A57A"/>
-          <ellipse cx="132" cy="234" rx="4" ry="3" fill="#C4714A"/>
-          <ellipse cx="140" cy="234" rx="4" ry="3" fill="#C4714A"/>
-          <ellipse cx="159" cy="234" rx="4" ry="3" fill="#C4714A"/>
-          <ellipse cx="167" cy="234" rx="4" ry="3" fill="#C4714A"/>
-          <circle cx="185" cy="165" r="8" fill="#C4714A" opacity="0.4"/>
-          <path d="M85 172 Q102 182 119 172 L115 188 Q102 196 89 188Z" fill="#C4714A" opacity="0.8"/>
-          <text x="230" y="135" font-size="16" fill="#C4714A" opacity="0.6">♥</text>
-          <text x="72" y="110" font-size="12" fill="#8A9E8C" opacity="0.5">♥</text>
-          <text x="38" y="195" font-size="14" opacity="0.5">🌸</text>
-          <text x="268" y="200" font-size="14" opacity="0.5">🌿</text>
-        </svg>
-
-        <p style="font-family:var(--font-serif);font-size:1rem;font-weight:700;color:var(--dark-brown);margin-bottom:4px;">Komame</p>
-        <p style="font-size:0.78rem;color:var(--gray);">Shiba Inu Mix · 2 yrs · Taipei</p>
-
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="num">{{ stats.available or 128 }}</span>
-            <span class="lbl">Available</span>
-          </div>
-          <div class="hero-stat">
-            <span class="num">94%</span>
-            <span class="lbl">Match Rate</span>
-          </div>
-          <div class="hero-stat">
-            <span class="num">{{ stats.adopted or 342 }}</span>
-            <span class="lbl">Adopted</span>
-          </div>
+      <!-- Keyword search -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">🔍 Keyword</span>
+        <div class="sidebar-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" name="q" value="{{ filters.q }}"
+                 placeholder="Name or breed…" autocomplete="off"/>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- ======== SEARCH ======== -->
-<section class="search-section" id="search">
-  <div class="search-box">
-    <p class="search-title">🔍 Filter Dogs</p>
+      <!-- Gender -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">⚥ Gender</span>
+        <div class="chip-group">
+          <input type="radio" name="gender" id="g-all" value=""
+                 {% if not filters.gender %}checked{% endif %}>
+          <label for="g-all">All</label>
 
-    {# Flask form: GET request to dogs.list with query params #}
-    <form method="GET" action="{{ url_for('dogs.list_dogs') }}">
-      <div class="search-row">
-        <div class="form-group">
-          <label class="form-label">Name / Breed</label>
-          <input class="form-input" type="text" name="q" value="{{ request.args.get('q', '') }}"
-            placeholder="e.g. Shiba Inu, Golden Retriever…"/>
+          <input type="radio" name="gender" id="g-male" value="Male"
+                 {% if filters.gender == 'Male' %}checked{% endif %}>
+          <label for="g-male">♂ Male</label>
+
+          <input type="radio" name="gender" id="g-female" value="Female"
+                 {% if filters.gender == 'Female' %}checked{% endif %}>
+          <label for="g-female">♀ Female</label>
         </div>
-        <div class="form-group">
-          <label class="form-label">Size</label>
-          <select class="form-select" name="size">
-            <option value="">All Sizes</option>
-            <option value="Small"  {% if request.args.get('size') == 'Small'  %}selected{% endif %}>Small</option>
-            <option value="Medium" {% if request.args.get('size') == 'Medium' %}selected{% endif %}>Medium</option>
-            <option value="Large"  {% if request.args.get('size') == 'Large'  %}selected{% endif %}>Large</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">City</label>
-          <select class="form-select" name="city">
-            <option value="">All Cities</option>
-            <option value="Taipei"   {% if request.args.get('city') == 'Taipei'   %}selected{% endif %}>Taipei</option>
-            <option value="New Taipei" {% if request.args.get('city') == 'New Taipei' %}selected{% endif %}>New Taipei</option>
-            <option value="Taichung" {% if request.args.get('city') == 'Taichung' %}selected{% endif %}>Taichung</option>
-            <option value="Tainan"   {% if request.args.get('city') == 'Tainan'   %}selected{% endif %}>Tainan</option>
-            <option value="Kaohsiung" {% if request.args.get('city') == 'Kaohsiung' %}selected{% endif %}>Kaohsiung</option>
-          </select>
-        </div>
-        <button type="submit" class="search-btn">🔎 Search</button>
       </div>
+
+      <!-- Age group -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">🎂 Age</span>
+        <div class="chip-group">
+          <input type="radio" name="age_group" id="a-all" value=""
+                 {% if not filters.age_group %}checked{% endif %}>
+          <label for="a-all">All</label>
+
+          <input type="radio" name="age_group" id="a-puppy" value="puppy"
+                 {% if filters.age_group == 'puppy' %}checked{% endif %}>
+          <label for="a-puppy">🐣 Puppy</label>
+
+          <input type="radio" name="age_group" id="a-young" value="young"
+                 {% if filters.age_group == 'young' %}checked{% endif %}>
+          <label for="a-young">Young</label>
+
+          <input type="radio" name="age_group" id="a-adult" value="adult"
+                 {% if filters.age_group == 'adult' %}checked{% endif %}>
+          <label for="a-adult">Adult</label>
+
+          <input type="radio" name="age_group" id="a-senior" value="senior"
+                 {% if filters.age_group == 'senior' %}checked{% endif %}>
+          <label for="a-senior">🌿 Senior</label>
+        </div>
+      </div>
+
+      <!-- Size -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">📏 Size</span>
+        <div class="chip-group">
+          <input type="radio" name="size" id="s-all" value=""
+                 {% if not filters.size %}checked{% endif %}>
+          <label for="s-all">All</label>
+
+          <input type="radio" name="size" id="s-small" value="Small"
+                 {% if filters.size == 'Small' %}checked{% endif %}>
+          <label for="s-small">Small</label>
+
+          <input type="radio" name="size" id="s-medium" value="Medium"
+                 {% if filters.size == 'Medium' %}checked{% endif %}>
+          <label for="s-medium">Medium</label>
+
+          <input type="radio" name="size" id="s-large" value="Large"
+                 {% if filters.size == 'Large' %}checked{% endif %}>
+          <label for="s-large">Large</label>
+        </div>
+      </div>
+
+      <!-- City -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">📍 City</span>
+        <select name="city" class="sidebar-select">
+          <option value="">All Cities</option>
+          {% for c in ['Taipei','New Taipei','Taichung','Tainan','Kaohsiung'] %}
+          <option value="{{ c }}" {% if filters.city == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sort -->
+      <div class="sidebar-section">
+        <span class="sidebar-label">↕ Sort By</span>
+        <select name="sort" class="sidebar-select">
+          <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+          <option value="oldest" {% if filters.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+          <option value="age_asc" {% if filters.sort == 'age_asc' %}selected{% endif %}>Age: Young → Old</option>
+          <option value="age_desc" {% if filters.sort == 'age_desc' %}selected{% endif %}>Age: Old → Young</option>
+        </select>
+      </div>
+
+      <div class="sidebar-actions">
+        <button type="submit" class="btn-apply">Apply Filters</button>
+        <a href="{{ url_for('dogs.list_dogs') }}" class="btn-reset">Reset</a>
+      </div>
+
     </form>
 
-    <hr class="divider"/>
+    <hr class="sidebar-divider">
 
-    <!-- AI Smart Match (JS-driven, calls backend /ai/match) -->
-    <div>
-      <div class="ai-label">✨ AI Smart Match — describe your lifestyle and we'll find the perfect dog</div>
-      <div class="ai-search-wrapper">
-        <input class="ai-input" type="text" id="aiSearchInput"
-          placeholder="e.g. I live in a small apartment, can walk 30 min/day, prefer a calm dog…"/>
-        <button class="ai-btn" id="aiSearchBtn">🤖 AI Match</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ======== DOGS GRID ======== -->
-<section class="section" id="dogs">
-  <div class="section-inner">
-    <div class="section-header">
-      <span class="section-tag">🐕 Waiting for a Home</span>
-      <h2 class="section-title">Meet Your Furry Soulmate</h2>
-      <p class="section-subtitle">Every life deserves to be loved. Every story deserves to continue.</p>
+    <!-- AI Smart Match -->
+    <div class="sidebar-section">
+      <span class="sidebar-label">✨ AI Smart Match</span>
+      <p style="font-size:0.75rem;color:var(--gray);margin-bottom:0.6rem;line-height:1.5;">
+        Describe your lifestyle and let AI find your perfect match.
+      </p>
+      <textarea class="ai-sidebar-input" id="aiSearchInput" rows="3"
+        placeholder="e.g. I live in a small apartment, work from home, prefer a calm dog…"></textarea>
+      <button class="ai-sidebar-btn" id="aiSearchBtn">🤖 AI Match</button>
     </div>
 
+  </aside>
+
+  <!-- ══════════ MAIN CONTENT ══════════ -->
+  <main class="browse-main">
+
+    <!-- Page title -->
+    <div class="browse-header">
+      <h1 class="browse-title">Meet Your Furry Soulmate 🐶</h1>
+    </div>
+
+    <!-- Sticky filter status bar -->
+    {% set has_filters = filters.q or filters.gender or filters.age_group or filters.size or filters.city %}
+    <div class="filter-bar">
+      <span class="filter-bar-count">
+        🐕 {{ stats.total }} result{{ 's' if stats.total != 1 else '' }}
+      </span>
+
+      {% if has_filters %}
+        <span class="filter-bar-label">Filters:</span>
+
+        {% if filters.q %}
+        <span class="filter-bar-chip">
+          🔍 "{{ filters.q }}"
+          <a href="{{ url_for('dogs.list_dogs', gender=filters.gender, age_group=filters.age_group, size=filters.size, city=filters.city, sort=filters.sort) }}" title="Remove">✕</a>
+        </span>
+        {% endif %}
+
+        {% if filters.gender %}
+        <span class="filter-bar-chip">
+          ⚥ {{ filters.gender }}
+          <a href="{{ url_for('dogs.list_dogs', q=filters.q, age_group=filters.age_group, size=filters.size, city=filters.city, sort=filters.sort) }}" title="Remove">✕</a>
+        </span>
+        {% endif %}
+
+        {% if filters.age_group %}
+        <span class="filter-bar-chip">
+          🎂 {{ filters.age_group|capitalize }}
+          <a href="{{ url_for('dogs.list_dogs', q=filters.q, gender=filters.gender, size=filters.size, city=filters.city, sort=filters.sort) }}" title="Remove">✕</a>
+        </span>
+        {% endif %}
+
+        {% if filters.size %}
+        <span class="filter-bar-chip">
+          📏 {{ filters.size }}
+          <a href="{{ url_for('dogs.list_dogs', q=filters.q, gender=filters.gender, age_group=filters.age_group, city=filters.city, sort=filters.sort) }}" title="Remove">✕</a>
+        </span>
+        {% endif %}
+
+        {% if filters.city %}
+        <span class="filter-bar-chip">
+          📍 {{ filters.city }}
+          <a href="{{ url_for('dogs.list_dogs', q=filters.q, gender=filters.gender, age_group=filters.age_group, size=filters.size, sort=filters.sort) }}" title="Remove">✕</a>
+        </span>
+        {% endif %}
+
+        <a href="{{ url_for('dogs.list_dogs') }}" class="filter-bar-clear">✕ Clear all</a>
+      {% else %}
+        <span style="font-size:0.78rem;color:var(--gray);">No filters applied</span>
+      {% endif %}
+
+      {% if session.get('user_id') %}
+      <button class="fav-drawer-btn" id="favDrawerBtn" style="margin-left:auto;">
+        ❤️ My Favourites
+        {% if favorite_dogs %}
+          <span class="fav-count-badge">{{ favorite_dogs|length }}</span>
+        {% endif %}
+      </button>
+      {% endif %}
+    </div>
+
+    <!-- Dog grid -->
     {% if dogs %}
-      <div class="dogs-grid">
+      <div class="dogs-grid" id="dogs">
         {% for dog in dogs %}
         <div class="dog-card" onclick="window.location='{{ url_for('dogs.dog_detail', dog_id=dog.id) }}'">
           <div class="dog-card-circle-wrap">
-            <span class="dog-status-badge {% if dog.is_urgent %}urgent{% endif %}">
-              {{ 'Urgent' if dog.is_urgent else 'Available' }}
+            <span class="dog-status-badge {% if dog.is_urgent %}urgent{% elif dog.availability == 'Pending' %}pending{% endif %}">
+              {% if dog.is_urgent %}Urgent
+              {% elif dog.availability == 'Pending' %}Pending
+              {% else %}Available{% endif %}
             </span>
             <div class="dog-card-img-circle">
               {% if dog.image_url %}
                 <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
               {% else %}
-                <div class="dog-card-img-placeholder" data-color="{{ dog.color or '#D9A57A' }}" data-spot="{{ dog.spot_color or '#C4714A' }}" data-id="{{ dog.id }}">
-                  <!-- SVG injected by app.js -->
+                <div class="dog-card-img-placeholder"
+                     data-color="{{ dog.color or '#D9A57A' }}"
+                     data-spot="{{ dog.spot_color or '#C4714A' }}"
+                     data-id="{{ dog.id }}">
                 </div>
               {% endif %}
             </div>
@@ -180,9 +946,10 @@
                 <span class="dog-tag">{{ tag }}</span>
               {% endfor %}
             </div>
-            <p class="dog-story">{{ dog.ai_story or dog.description or 'No story yet — click to generate one with AI!' }}</p>
+            <p class="dog-story">{{ dog.ai_story or dog.description or 'Click to generate an AI story!' }}</p>
             <div class="dog-card-footer">
-              <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
+              <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}"
+                 class="adopt-btn" onclick="event.stopPropagation()">Adopt Me 🐾</a>
               <button class="heart-btn {% if dog.id in liked_ids %}liked{% endif %}"
                 data-heart="{{ dog.id }}" onclick="event.stopPropagation()">
                 {{ '❤️' if dog.id in liked_ids else '🤍' }}
@@ -195,137 +962,80 @@
 
       <!-- Pagination -->
       {% if pagination %}
-      <div class="text-center mt-2" style="display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap;">
+      <div class="pagination">
         {% if pagination.has_prev %}
-          <a href="{{ url_for('dogs.list_dogs', page=pagination.prev_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
+          <a href="{{ url_for('dogs.list_dogs', page=pagination.prev_num,
+                     q=filters.q, size=filters.size, city=filters.city,
+                     gender=filters.gender, age_group=filters.age_group, sort=filters.sort) }}"
              class="btn-secondary" style="padding:8px 18px;font-size:0.85rem;">← Prev</a>
         {% endif %}
         <span style="padding:8px 14px;font-size:0.85rem;color:var(--gray);">
           Page {{ pagination.page }} of {{ pagination.pages }}
         </span>
         {% if pagination.has_next %}
-          <a href="{{ url_for('dogs.list_dogs', page=pagination.next_num, q=request.args.get('q',''), size=request.args.get('size',''), city=request.args.get('city','')) }}"
+          <a href="{{ url_for('dogs.list_dogs', page=pagination.next_num,
+                     q=filters.q, size=filters.size, city=filters.city,
+                     gender=filters.gender, age_group=filters.age_group, sort=filters.sort) }}"
              class="btn-secondary" style="padding:8px 18px;font-size:0.85rem;">Next →</a>
         {% endif %}
       </div>
       {% endif %}
 
     {% else %}
-      <div style="text-align:center;padding:4rem 0;color:var(--brown);">
-        <div style="font-size:3rem;margin-bottom:1rem;">🐾</div>
-        <p style="font-family:var(--font-serif);font-size:1.1rem;">No dogs found matching your criteria</p>
-        <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--gray);">Try adjusting your filters or use AI Match</p>
-        <a href="{{ url_for('dogs.list_dogs') }}" class="btn-secondary" style="margin-top:1.5rem;display:inline-flex;">Clear Filters</a>
+      <div class="empty-state">
+        <div class="empty-icon">🐾</div>
+        <p style="font-family:var(--font-serif);font-size:1.1rem;color:var(--dark-brown);margin-bottom:0.5rem;">
+          No dogs found
+        </p>
+        <p style="font-size:0.85rem;color:var(--gray);margin-bottom:1.5rem;">
+          Try adjusting your filters or use AI Match on the left.
+        </p>
+        <a href="{{ url_for('dogs.list_dogs') }}" class="btn-secondary">Clear All Filters</a>
+      </div>
+    {% endif %}
+
+  </main>
+</div>
+
+<!-- ══════════ MY FAVOURITES DRAWER ══════════ -->
+{% if session.get('user_id') %}
+<div class="fav-overlay" id="favOverlay"></div>
+<div class="fav-drawer" id="favDrawer">
+  <div class="fav-drawer-header">
+    <span>❤️ My Favourites</span>
+    <button class="fav-drawer-close" id="favDrawerClose">✕</button>
+  </div>
+  <div class="fav-drawer-body">
+    {% if favorite_dogs %}
+      {% for dog in favorite_dogs %}
+      <div class="fav-row" id="fav-row-{{ dog.id }}">
+        <div class="fav-row-avatar">
+          {% if dog.image_url %}
+            <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
+          {% else %}🐶{% endif %}
+        </div>
+        <div class="fav-row-info">
+          <div class="fav-row-name">{{ dog.name }}</div>
+          <div class="fav-row-breed">{{ dog.breed }} · {{ dog.age }}</div>
+        </div>
+        <div class="fav-row-actions">
+          <a href="{{ url_for('dogs.dog_detail', dog_id=dog.id) }}" class="fav-row-view">View</a>
+          <button class="fav-row-remove" onclick="removeFavDrawer({{ dog.id }})">💔</button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="fav-drawer-empty">
+        <div style="font-size:2.5rem;margin-bottom:0.8rem;">🤍</div>
+        <p>No favourites yet.</p>
+        <p style="font-size:0.8rem;margin-top:4px;">Press ❤️ on any dog card!</p>
       </div>
     {% endif %}
   </div>
-</section>
+</div>
+{% endif %}
 
-<!-- ======== HOW IT WORKS ======== -->
-<section class="section how-section" id="how">
-  <div class="section-inner">
-    <div class="section-header">
-      <span class="section-tag">🗺 Adoption Process</span>
-      <h2 class="section-title">Four Steps to Bring Them Home</h2>
-    </div>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-icon-wrap">🔍<span class="step-num">1</span></div>
-        <p class="step-title">Browse & Match</p>
-        <p class="step-desc">Use AI to describe your lifestyle and get personalized recommendations, or browse and filter directly.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon-wrap">📝<span class="step-num">2</span></div>
-        <p class="step-title">Submit Application</p>
-        <p class="step-desc">Fill in your details and living environment so the shelter can understand your situation. Transparency first.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon-wrap">📞<span class="step-num">3</span></div>
-        <p class="step-title">Review & Contact</p>
-        <p class="step-desc">The shelter admin reviews your application and reaches out to arrange a meet-and-greet.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon-wrap">🏠<span class="step-num">4</span></div>
-        <p class="step-title">Take Them Home 🎉</p>
-        <p class="step-desc">Complete the paperwork and welcome your new companion. A brand new chapter begins.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ======== AI FEATURE ======== -->
-<section class="section ai-section" id="ai-feature">
-  <div class="section-inner">
-    <div class="ai-feature-grid">
-      <div class="ai-story-demo">
-        <div class="ai-story-header">
-          <div class="ai-avatar">🐶</div>
-          <div>
-            <p class="ai-story-name">Komame's Story</p>
-            <p class="ai-story-sub">✨ AI-Generated Personality Story</p>
-          </div>
-        </div>
-        <p class="ai-story-content" id="demoStoryText">
-          "My name is Komame, and I love napping in sunny spots.
-          I don't need a big space — just a short daily walk
-          and a warm lap to curl up on. If you enjoy a slow,
-          peaceful life, maybe we're each other's destiny."
-        </p>
-        <div class="ai-tags-row">
-          <span class="ai-tag">🏠 Apartment-Friendly</span>
-          <span class="ai-tag">🧘 Gentle Temperament</span>
-          <span class="ai-tag">🚶 Low Exercise Needs</span>
-          <span class="ai-tag">👶 Child-Friendly</span>
-          <span class="ai-tag">🐱 Cat-Compatible</span>
-        </div>
-      </div>
-
-      <div class="ai-feature-text">
-        <span class="section-tag">🤖 AI Features</span>
-        <h2 class="section-title" style="text-align:left;margin-top:0.5rem;">
-          More than data —<br>a story that connects
-        </h2>
-        <p class="section-subtitle" style="text-align:left;margin:0;">
-          Traditional adoption profiles are cold and impersonal.
-          We let AI write each dog's unique personality story,
-          helping you find a companion you truly click with.
-        </p>
-        <ul class="feature-points">
-          <li class="feature-point">
-            <div class="fp-icon">📖</div>
-            <div class="fp-text">
-              <strong>AI Personality Story</strong>
-              <span>Auto-generates a warm first-person narrative based on each dog's profile</span>
-            </div>
-          </li>
-          <li class="feature-point">
-            <div class="fp-icon">🏷️</div>
-            <div class="fp-text">
-              <strong>Smart Tag Analysis</strong>
-              <span>AI detects lifestyle tags: living space, exercise needs, family compatibility</span>
-            </div>
-          </li>
-          <li class="feature-point">
-            <div class="fp-icon">💬</div>
-            <div class="fp-text">
-              <strong>Natural Language Search</strong>
-              <span>Describe your daily life and the system finds your best match</span>
-            </div>
-          </li>
-          <li class="feature-point">
-            <div class="fp-icon">📊</div>
-            <div class="fp-text">
-              <strong>Adoption Analytics</strong>
-              <span>Real-time dashboards help shelters track trends and optimize operations</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ======== AI MATCH RESULT MODAL ======== -->
+<!-- ══════════ AI MATCH MODAL ══════════ -->
 <div class="modal-overlay" id="aiResultModal">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
@@ -337,12 +1047,59 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // Pass dog data from Flask to JS for AI match rendering
   const DOGS_FROM_SERVER = {{ dogs_json | tojson | safe }};
+
+  // Keyword → submit on Enter
+  (function () {
+    const form = document.getElementById('filterForm');
+    if (!form) return;
+    var q = form.querySelector('input[name="q"]');
+    if (q) {
+      q.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); form.submit(); }
+      });
+    }
+  }());
+
+  // ── Favourites drawer ──
+  const favBtn     = document.getElementById('favDrawerBtn');
+  const favDrawer  = document.getElementById('favDrawer');
+  const favOverlay = document.getElementById('favOverlay');
+  const favClose   = document.getElementById('favDrawerClose');
+
+  function openDrawer()  { favDrawer?.classList.add('open');  favOverlay?.classList.add('active'); }
+  function closeDrawer() { favDrawer?.classList.remove('open'); favOverlay?.classList.remove('active'); }
+
+  favBtn?.addEventListener('click', openDrawer);
+  favClose?.addEventListener('click', closeDrawer);
+  favOverlay?.addEventListener('click', closeDrawer);
+
+  async function removeFavDrawer(dogId) {
+    try {
+      const res  = await fetch(`/dogs/${dogId}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      const data = await res.json();
+      if (!data.liked) {
+        document.getElementById('fav-row-' + dogId)?.remove();
+        // Update count badge
+        const badge = document.querySelector('.fav-count-badge');
+        if (badge) {
+          const n = parseInt(badge.textContent) - 1;
+          if (n <= 0) { badge.remove(); } else { badge.textContent = n; }
+        }
+        // Update heart on card
+        const heartBtn = document.querySelector(`.heart-btn[data-heart="${dogId}"]`);
+        if (heartBtn) { heartBtn.classList.remove('liked'); heartBtn.textContent = '🤍'; }
+        // Show empty state if no rows left
+        const body = document.querySelector('.fav-drawer-body');
+        if (body && !body.querySelector('.fav-row')) {
+          body.innerHTML = `<div class="fav-drawer-empty"><div style="font-size:2.5rem;margin-bottom:0.8rem;">🤍</div><p>No favourites yet.</p><p style="font-size:0.8rem;margin-top:4px;">Press ❤️ on any dog card!</p></div>`;
+        }
+      }
+    } catch(e) { console.error(e); }
+  }
 </script>
 {% endblock %}

@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from app.auth.utils import login_required
 from app.models.application import Application
 from app.models.dog import Dog
+from app.database import get_db
 
 applications_bp = Blueprint('applications', __name__)
 
@@ -30,7 +31,14 @@ def apply(dog_id):
 @applications_bp.route('/my-applications')
 @login_required
 def my_applications():
-    apps = Application.get_by_user(session['user_id'])
+    if not session.get('user_id'):
+        return redirect(url_for('auth.login'))
+    user_id = session['user_id']
+    apps = Application.get_by_user(user_id)
+    db = get_db()
+    db.execute('UPDATE Application SET Seen = 1 WHERE User_ID = ? AND Seen = 0', (user_id,))
+    db.commit()
+
     return render_template('applications/my_applications.html', applications=apps)
 
 @applications_bp.route('/applications/<int:app_id>/cancel', methods=['POST'])
