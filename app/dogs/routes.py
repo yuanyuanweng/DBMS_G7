@@ -229,7 +229,7 @@ def create():
                 image_url=image_url,
             )
             flash("Dog profile created.", "success")
-            return redirect(url_for("dogs.dog_detail", dog_id=dog_id))
+            return redirect(url_for("admin.dashboard"))
 
         form = DogFormView(request.form, errors)
 
@@ -281,7 +281,7 @@ def edit(id):
                 image_url=image_url,
             )
             flash("Dog profile updated.", "success")
-            return redirect(url_for("dogs.dog_detail", dog_id=id))
+            return redirect(url_for("admin.dashboard"))
 
         form = DogFormView(request.form, errors)
 
