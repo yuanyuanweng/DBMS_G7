@@ -165,12 +165,29 @@ class Application:
 
     @staticmethod
     def update_status(app_id, status):
-        """Update an application's status and return the updated object."""
+        """Update an application's status.If one application is approved, reject all other applications
+        for the same dog to prevent multiple adopters from being approved.
+        """
         if status not in VALID_STATUSES:
             return False, "Invalid status."
 
         db = get_db()
-        cursor = db.execute(
+
+        application = db.execute(
+            """
+            SELECT App_ID, Dog_ID
+            FROM Application
+            WHERE App_ID = ?
+            """,
+            (app_id,),
+        ).fetchone()
+
+        if application is None:
+            return False, "Application not found."
+
+        dog_id = application["Dog_ID"]
+
+        db.execute(
             """
             UPDATE Application
             SET Status = ?
@@ -178,11 +195,21 @@ class Application:
             """,
             (status, app_id),
         )
-        db.commit()
-        if cursor.rowcount == 0:
-            return False, "Application not found."
-        return True, Application.get_by_id(app_id)
 
+        if status == 1:
+            db.execute(
+                """
+                UPDATE Application
+                SET Status = 2
+                WHERE Dog_ID = ?
+                  AND App_ID != ?
+                  AND Status IN (0, 1)
+                """,
+                (dog_id, app_id),
+            )
+        db.commit()
+        return True, Application.get_by_id(app_id)
+    
     @staticmethod
     def delete_by_id(app_id):
         """Delete one application by ID."""
