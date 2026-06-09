@@ -6,9 +6,6 @@ __pycache__/
 venv/
 .env/
 
-# Database (local)
-*.db
-*.sqlite3
 
 # Flask instance folder
 instance/
