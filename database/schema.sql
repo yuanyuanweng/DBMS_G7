@@ -23,6 +23,7 @@ CREATE TABLE Dog (
     Age INTEGER CHECK (Age >= 0),
     Breed TEXT,
     Image_URL TEXT,
+    Description TEXT,
     FOREIGN KEY (Shelter_ID) REFERENCES Shelter(Shelter_ID)
 );
 
@@ -74,6 +75,7 @@ SELECT
     d.Age,
     d.Breed,
     d.Image_URL,
+    d.Description,
     CASE
         WHEN COUNT(CASE WHEN a.Status = 1 THEN 1 END) > 0 THEN 'Adopted'
         WHEN COUNT(CASE WHEN a.Status = 0 THEN 1 END) > 0 THEN 'Pending'

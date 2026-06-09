@@ -3,15 +3,22 @@ Dog-related routes.
 
 Current progress:
 - Dog list/detail use real database data through the Dog model.
-- Dog create/edit are admin-only and save current Dog table fields.
-- Extra frontend fields are accepted for compatibility, but not persisted yet.
+- Dog create/edit are admin-only and save uploaded images, short descriptions,
+  and health status records.
+- Availability is derived from application status through Dog_With_Status.
 """
 
-from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify
+import os
+from datetime import date
+from uuid import uuid4
+
+from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify, current_app
+from werkzeug.utils import secure_filename
 from app.auth.utils import admin_required
 from app.database import get_db
 from app.models.dog import Dog
 from app.models.application import Application
+from app.models.health_record import HealthRecord
 from app.models.shelter import Shelter
 
 dogs_bp = Blueprint("dogs", __name__)
@@ -56,6 +63,8 @@ SORT_MAP = {
     "age_desc": "age_desc",
 }
 
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
 
 class FormField:
     """Template helper for form.field.data."""
@@ -68,8 +77,8 @@ class DogFormView:
     """Template helper for create/edit form state."""
 
     FIELD_NAMES = (
-        "name", "breed", "age", "gender", "size", "city", "health_status",
-        "is_urgent", "shelter_id", "description",
+        "name", "breed", "age", "gender", "health_status",
+        "shelter_id", "description",
     )
 
     def __init__(self, form_data=None, errors=None):
@@ -104,6 +113,24 @@ def _parse_age(value):
     value = (value or "").strip()
     digits = "".join(char for char in value if char.isdigit())
     return int(digits) if digits else 0
+
+
+def _save_uploaded_image(file_storage):
+    """Save an uploaded dog image and return its static URL path."""
+    if not file_storage or not file_storage.filename:
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        return None
+
+    upload_dir = os.path.join(current_app.root_path, "static", "img", "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    saved_name = f"{uuid4().hex}.{extension}"
+    file_storage.save(os.path.join(upload_dir, saved_name))
+    return f"/static/img/uploads/{saved_name}"
 
 
 @dogs_bp.route("/find-a-dog/", methods=["GET"])
@@ -209,7 +236,9 @@ def create():
         gender = request.form.get("gender", "").strip() or "Unknown"
         shelter_id = request.form.get("shelter_id", "").strip()
         age = _parse_age(request.form.get("age", ""))
-        image_url = request.form.get("image_url", "").strip() or None
+        description = request.form.get("description", "").strip() or None
+        health_status = request.form.get("health_status", "").strip()
+        image_url = _save_uploaded_image(request.files.get("image"))
 
         errors = {}
         if not name:
@@ -227,7 +256,10 @@ def create():
                 age=age,
                 breed=breed,
                 image_url=image_url,
+                description=description,
             )
+            if health_status:
+                HealthRecord.create(dog_id, date.today().isoformat(), health_status)
             flash("Dog profile created.", "success")
             return redirect(url_for("admin.dashboard"))
 
@@ -260,7 +292,9 @@ def edit(id):
         gender = request.form.get("gender", "").strip() or "Unknown"
         shelter_id = request.form.get("shelter_id", "").strip()
         age = _parse_age(request.form.get("age", ""))
-        image_url = request.form.get("image_url", "").strip() or dog.image_url
+        description = request.form.get("description", "").strip() or None
+        health_status = request.form.get("health_status", "").strip()
+        image_url = _save_uploaded_image(request.files.get("image")) or dog.image_url
 
         errors = {}
         if not name:
@@ -279,7 +313,10 @@ def edit(id):
                 age=age,
                 breed=breed,
                 image_url=image_url,
+                description=description,
             )
+            if health_status and health_status != dog.health_status:
+                HealthRecord.create(id, date.today().isoformat(), health_status)
             flash("Dog profile updated.", "success")
             return redirect(url_for("admin.dashboard"))
 
