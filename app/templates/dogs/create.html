@@ -67,27 +67,6 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Size *</label>
-            <select class="form-select" name="size" required>
-              <option value="">Select size</option>
-              <option value="Small"  {% if form.size.data == 'Small'  %}selected{% endif %}>Small</option>
-              <option value="Medium" {% if form.size.data == 'Medium' %}selected{% endif %}>Medium</option>
-              <option value="Large"  {% if form.size.data == 'Large'  %}selected{% endif %}>Large</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">City *</label>
-            <select class="form-select" name="city" required>
-              <option value="">Select city</option>
-              {% for city in ['Taipei','New Taipei','Taichung','Tainan','Kaohsiung','Other'] %}
-                <option value="{{ city }}" {% if form.city.data == city %}selected{% endif %}>{{ city }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
         <!-- Health -->
         <p class="form-section-title">🏥 Health Status</p>
         <div class="form-full">
@@ -98,17 +77,6 @@
                    placeholder="e.g. Neutered, vaccinated, microchipped"/>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group" style="flex-direction:row;align-items:center;gap:10px;">
-            <input type="checkbox" name="is_urgent" id="isUrgent"
-                   {% if form.is_urgent.data %}checked{% endif %}
-                   style="width:18px;height:18px;accent-color:var(--terracotta);"/>
-            <label for="isUrgent" class="form-label" style="margin:0;cursor:pointer;">
-              Mark as Urgent Adoption
-            </label>
-          </div>
-        </div>
-
         <!-- Shelter -->
         <p class="form-section-title">🏠 Shelter Assignment</p>
         <div class="form-full">

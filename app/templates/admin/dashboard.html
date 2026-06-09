@@ -245,6 +245,11 @@
           </td>
           <td>
             <div class="action-form">
+              <a href="{{ url_for('admin.application_detail', app_id=app['App_ID']) }}"
+                 class="btn-approve"
+                 style="text-decoration:none;background:var(--pale-blue);color:#1A4F6E;">
+                View
+              </a>
               {% if app['Status'] != 1 %}
               <form method="POST" action="{{ url_for('admin.update_status', app_id=app['App_ID']) }}">
                 <input type="hidden" name="status" value="1">

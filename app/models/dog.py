@@ -39,9 +39,9 @@ class Dog:
         self.city = self._derive_city()
         self.size = self._derive_size()
         self.health_status = self._latest_health_status()
-        self.description = self._derive_description()
+        self.description = data.get("Description") or self._derive_description()
+        self.desc = self.description
         self.ai_story = ""
-        self.is_urgent = False
 
         self.color = COLORS[(self.id - 1) % len(COLORS)]
         self.spot_color = SPOT_COLORS[(self.id - 1) % len(SPOT_COLORS)]
@@ -128,7 +128,6 @@ class Dog:
             "ai_story": self.ai_story,
             "description": self.description,
             "health_status": self.health_status,
-            "is_urgent": self.is_urgent,
             "color": self.color,
             "spot_color": self.spot_color,
             "tags": self.tags,
@@ -137,7 +136,8 @@ class Dog:
     @staticmethod
     def _base_query():
         return """
-            SELECT Dog_ID, Shelter_ID, Name, Gender, Age, Breed, Image_URL, Availability
+            SELECT Dog_ID, Shelter_ID, Name, Gender, Age, Breed, Image_URL,
+                   Description, Availability
             FROM Dog_With_Status
         """
 
@@ -193,30 +193,31 @@ class Dog:
         return Dog(row) if row else None
 
     @staticmethod
-    def create(shelter_id, name, gender, age, breed, image_url=None):
+    def create(shelter_id, name, gender, age, breed, image_url=None, description=None):
         """Create a dog record and return the new dog ID."""
         db = get_db()
         cursor = db.execute(
             """
-            INSERT INTO Dog (Shelter_ID, Name, Gender, Age, Breed, Image_URL)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO Dog (Shelter_ID, Name, Gender, Age, Breed, Image_URL, Description)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (shelter_id, name, gender, age, breed, image_url),
+            (shelter_id, name, gender, age, breed, image_url, description),
         )
         db.commit()
         return cursor.lastrowid
 
     @staticmethod
-    def update(dog_id, shelter_id, name, gender, age, breed, image_url=None):
+    def update(dog_id, shelter_id, name, gender, age, breed, image_url=None, description=None):
         """Update one dog record and return whether a row was changed."""
         db = get_db()
         cursor = db.execute(
             """
             UPDATE Dog
-            SET Shelter_ID = ?, Name = ?, Gender = ?, Age = ?, Breed = ?, Image_URL = ?
+            SET Shelter_ID = ?, Name = ?, Gender = ?, Age = ?, Breed = ?,
+                Image_URL = ?, Description = ?
             WHERE Dog_ID = ?
             """,
-            (shelter_id, name, gender, age, breed, image_url, dog_id),
+            (shelter_id, name, gender, age, breed, image_url, description, dog_id),
         )
         db.commit()
         return cursor.rowcount > 0

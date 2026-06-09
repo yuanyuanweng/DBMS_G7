@@ -22,21 +22,8 @@ class Application:
         self.dog_id = row["Dog_ID"]
         self.status_code = row["Status"]
         self.status = STATUS_MAP.get(self.status_code, "Pending")
-        self.match_score = row["Match_Score"]
         self.created_at = row["Created_at"] or ""
         self.dog = Dog.get_by_id(self.dog_id)
-
-    def to_dict(self):
-        """Convert the application object into a dictionary."""
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "dog_id": self.dog_id,
-            "status_code": self.status_code,
-            "status": self.status,
-            "match_score": self.match_score,
-            "created_at": self.created_at,
-        }
 
     @staticmethod
     def get_by_id(app_id):
@@ -44,7 +31,7 @@ class Application:
         db = get_db()
         row = db.execute(
             """
-            SELECT App_ID, User_ID, Dog_ID, Status, Match_Score, Created_at
+            SELECT App_ID, User_ID, Dog_ID, Status, Created_at
             FROM Application
             WHERE App_ID = ?
             """,
@@ -58,7 +45,7 @@ class Application:
         db = get_db()
         rows = db.execute(
             """
-            SELECT App_ID, User_ID, Dog_ID, Status, Match_Score, Created_at
+            SELECT App_ID, User_ID, Dog_ID, Status, Created_at
             FROM Application
             WHERE User_ID = ?
             ORDER BY Created_at DESC
@@ -66,6 +53,33 @@ class Application:
             (user_id,),
         ).fetchall()
         return [Application(row) for row in rows]
+
+    @staticmethod
+    def count_unseen_updates(user_id):
+        """Return approved/rejected application updates not yet seen by a user."""
+        db = get_db()
+        return db.execute(
+            """
+            SELECT COUNT(*)
+            FROM Application
+            WHERE User_ID = ? AND Seen = 0 AND Status != ?
+            """,
+            (user_id, STATUS_PENDING),
+        ).fetchone()[0]
+
+    @staticmethod
+    def mark_updates_seen(user_id):
+        """Mark all unseen application updates for a user as seen."""
+        db = get_db()
+        db.execute(
+            """
+            UPDATE Application
+            SET Seen = 1
+            WHERE User_ID = ? AND Seen = 0
+            """,
+            (user_id,),
+        )
+        db.commit()
 
     @staticmethod
     def get_admin_counts():
@@ -105,6 +119,41 @@ class Application:
         ).fetchall()
 
     @staticmethod
+    def get_admin_detail(app_id):
+        """Return one application with user, dog, and form details for admin."""
+        db = get_db()
+        app_columns = {
+            row["name"]
+            for row in db.execute("PRAGMA table_info(Application)").fetchall()
+        }
+        form_fields = (
+            "Full_Name",
+            "Phone",
+            "City",
+            "Housing_Type",
+            "Reason",
+            "Lifestyle",
+        )
+        form_select = [
+            f"a.{field}" if field in app_columns else f"NULL AS {field}"
+            for field in form_fields
+        ]
+
+        return db.execute(
+            f"""
+            SELECT a.App_ID, a.User_ID, a.Dog_ID, a.Status, a.Created_at,
+                   {", ".join(form_select)},
+                   u.Email,
+                   d.Name AS Dog_Name, d.Breed, d.Age, d.Gender, d.Image_URL
+            FROM Application a
+            JOIN Users u ON a.User_ID = u.User_ID
+            JOIN Dog d ON a.Dog_ID = d.Dog_ID
+            WHERE a.App_ID = ?
+            """,
+            (app_id,),
+        ).fetchone()
+
+    @staticmethod
     def get_admin_users():
         """Return user rows displayed on the admin dashboard."""
         db = get_db()
@@ -133,16 +182,38 @@ class Application:
         return row is not None
 
     @staticmethod
-    def create(user_id, dog_id, match_score=None):
+    def create(
+        user_id,
+        dog_id,
+        full_name=None,
+        phone=None,
+        city=None,
+        housing_type=None,
+        reason=None,
+        lifestyle=None,
+    ):
         """Create a pending application for one user and dog."""
         db = get_db()
         try:
             cursor = db.execute(
                 """
-                INSERT INTO Application (User_ID, Dog_ID, Status, Match_Score)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Application (
+                    User_ID, Dog_ID, Status,
+                    Full_Name, Phone, City, Housing_Type, Reason, Lifestyle
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (user_id, dog_id, STATUS_PENDING, match_score),
+                (
+                    user_id,
+                    dog_id,
+                    STATUS_PENDING,
+                    full_name,
+                    phone,
+                    city,
+                    housing_type,
+                    reason,
+                    lifestyle,
+                ),
             )
             db.commit()
             return True, cursor.lastrowid

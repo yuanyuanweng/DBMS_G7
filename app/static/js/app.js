@@ -16,7 +16,7 @@ function generateDogSVG(dog, size = 200) {
   const snoutC = light ? '#E8B98A' : '#8B6F52';
 
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-    <rect width="200" height="200" fill="${dog.urgent || dog.is_urgent ? '#FFF0EB' : '#F0E6D3'}"/>
+    <rect width="200" height="200" fill="#F0E6D3"/>
     <ellipse cx="100" cy="185" rx="55" ry="10" fill="#D9C4A8" opacity="0.4"/>
     <path d="M148 118 Q168 98 162 82 Q158 72 152 76 Q155 87 138 106Z" fill="${s}"/>
     <ellipse cx="108" cy="138" rx="48" ry="34" fill="${c}"/>
@@ -39,7 +39,7 @@ function generateDogSVG(dog, size = 200) {
     <circle cx="118" cy="132" r="6" fill="${s}" opacity="0.35"/>
     <text x="148" y="82" font-size="12" fill="#C4714A" opacity="0.55">♥</text>
     <text x="28" y="82" font-size="10" fill="#8A9E8C" opacity="0.5">✿</text>
-    ${(dog.urgent || dog.is_urgent) ? '<text x="150" y="165" font-size="11" opacity="0.6">⚡</text>' : '<text x="148" y="168" font-size="11" opacity="0.5">🌸</text>'}
+    <text x="148" y="168" font-size="11" opacity="0.5">🌸</text>
   </svg>`;
 }
 
@@ -57,88 +57,11 @@ function injectDogSVGs() {
   document.querySelectorAll('.dog-card-img-placeholder').forEach(el => {
     const dog = {
       color:     el.dataset.color || '#D9A57A',
-      spotColor: el.dataset.spot  || '#C4714A',
-      urgent:    el.dataset.urgent === 'true'
+      spotColor: el.dataset.spot  || '#C4714A'
     };
     el.innerHTML = generateDogSVG(dog, 160);
     el.style.cssText = 'width:100%;height:100%;';
   });
-}
-
-// ── AI Smart Match (calls Flask /ai/match POST) ──────────────────────────────
-async function doAIMatch() {
-  const input = document.getElementById('aiSearchInput');
-  if (!input || !input.value.trim()) {
-    showToast('💬', 'Please describe your lifestyle first');
-    return;
-  }
-
-  const btn = document.getElementById('aiSearchBtn');
-  btn.textContent = '⏳ Analysing…';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/ai/match', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: input.value.trim() })
-    });
-
-    const data = await res.json();
-    renderAIResults(data.recommendations || [], input.value.trim(), !res.ok);
-  } catch (err) {
-    console.error(err);
-    renderAIResults([], input.value.trim(), true);
-  } finally {
-    btn.textContent = '🤖 AI Match';
-    btn.disabled = false;
-  }
-}
-
-// ── Render AI results modal ──────────────────────────────────────────────────
-function renderAIResults(recs, query, error = false) {
-  const content = document.getElementById('aiResultContent');
-  const modal   = document.getElementById('aiResultModal');
-  if (!content || !modal) return;
-
-  // Use server-injected dog list if available, else empty
-  const dogs = (typeof DOGS_FROM_SERVER !== 'undefined') ? DOGS_FROM_SERVER : [];
-
-  if (error || recs.length === 0) {
-    content.innerHTML = `
-      <div style="text-align:center;padding:2rem;color:var(--brown);">
-        <div style="font-size:2.5rem;margin-bottom:1rem;">🐾</div>
-        <p>${error ? 'AI matching is temporarily unavailable. Please try again later.' : 'No perfect match found for your description. Try rephrasing!'}</p>
-      </div>`;
-    openModal(modal);
-    return;
-  }
-
-  const matched = recs.map(r => ({
-    dog:    dogs.find(d => d.id === r.id),
-    reason: r.reason
-  })).filter(r => r.dog);
-
-  content.innerHTML = `
-    <p style="font-size:0.85rem;color:var(--brown);margin-bottom:1.5rem;padding:10px;
-              background:var(--pale-yellow);border-radius:8px;">
-      🤖 Based on <strong>"${escapeHtml(query)}"</strong>, AI recommends ${matched.length} dog(s) for you:
-    </p>
-    ${matched.map(({ dog, reason }) => `
-      <a href="/find-a-dog/${dog.id}" style="display:flex;gap:1rem;padding:1rem;background:var(--cream);
-         border-radius:12px;margin-bottom:1rem;text-decoration:none;transition:box-shadow 0.2s;
-         border:1px solid var(--light-gray);"
-         onmouseover="this.style.boxShadow='0 4px 16px rgba(74,55,40,0.12)'"
-         onmouseout="this.style.boxShadow='none'">
-        <div style="flex-shrink:0;">${generateDogSVG(dog, 80)}</div>
-        <div>
-          <p style="font-family:var(--font-serif);font-weight:700;color:var(--dark-brown);margin-bottom:3px;">${escapeHtml(dog.name)}</p>
-          <p style="font-size:0.75rem;color:var(--gray);margin-bottom:6px;">${escapeHtml(dog.breed)} · ${escapeHtml(dog.age)} · ${escapeHtml(dog.city)}</p>
-          <p style="font-size:0.82rem;color:var(--brown);line-height:1.6;">${escapeHtml(reason)}</p>
-        </div>
-      </a>`).join('')}`;
-
-  openModal(modal);
 }
 
 // ── Typewriter effect ────────────────────────────────────────────────────────
@@ -293,22 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Demo story rotation (hero section)
   if (document.getElementById('demoStoryText')) {
     setInterval(rotateDemoStory, 5000);
-  }
-
-  // AI Match button
-  const aiBtn = document.getElementById('aiSearchBtn');
-  if (aiBtn) {
-    aiBtn.addEventListener('click', doAIMatch);
-    document.getElementById('aiSearchInput')?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') doAIMatch();
-    });
-  }
-
-  // AI Result modal close
-  const aiModal = document.getElementById('aiResultModal');
-  if (aiModal) {
-    document.getElementById('closeAiModal')?.addEventListener('click', () => closeModal(aiModal));
-    aiModal.addEventListener('click', e => { if (e.target === aiModal) closeModal(aiModal); });
   }
 
   // ESC closes any open modal

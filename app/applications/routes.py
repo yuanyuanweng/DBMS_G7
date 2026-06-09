@@ -2,7 +2,6 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from app.auth.utils import login_required
 from app.models.application import Application
 from app.models.dog import Dog
-from app.database import get_db
 
 applications_bp = Blueprint('applications', __name__)
 
@@ -20,7 +19,16 @@ def apply(dog_id):
         return redirect(url_for('applications.my_applications'))
 
     if request.method == 'POST':
-        success, _ = Application.create(user_id, dog_id)
+        form_data = {
+            'full_name': request.form.get('full_name', '').strip(),
+            'phone': request.form.get('phone', '').strip(),
+            'city': request.form.get('city', '').strip(),
+            'housing_type': request.form.get('house_type', '').strip(),
+            'reason': request.form.get('reason', '').strip(),
+            'lifestyle': request.form.get('lifestyle', '').strip(),
+        }
+
+        success, _ = Application.create(user_id, dog_id, **form_data)
         if success:
             flash(f'Application for {dog.name} submitted successfully!', 'success')
             return redirect(url_for('applications.my_applications'))
@@ -32,9 +40,7 @@ def apply(dog_id):
 @login_required
 def my_applications():
     user_id = session['user_id']
-    db = get_db()
-    db.execute('UPDATE Application SET Seen = 1 WHERE User_ID = ? AND Seen = 0', (user_id,))
-    db.commit()
+    Application.mark_updates_seen(user_id)
     apps = Application.get_by_user(user_id)
     return render_template('applications/my_applications.html', applications=apps)
 

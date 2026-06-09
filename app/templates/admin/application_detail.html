@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Application #{{ application['App_ID'] }} - PICKPET{% endblock %}
+
+{% block extra_css %}
+<style>
+  .detail-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .detail-title {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    color: var(--dark-brown);
+    margin-bottom: 0.4rem;
+  }
+
+  .detail-sub {
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+
+  .detail-panel {
+    background: var(--warm-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 1.4rem 1.6rem;
+  }
+
+  .detail-panel.full {
+    grid-column: 1 / -1;
+  }
+
+  .panel-title {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    color: var(--dark-brown);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--sand);
+  }
+
+  .info-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid rgba(61, 122, 92, 0.1);
+  }
+
+  .info-row:last-child {
+    border-bottom: 0;
+  }
+
+  .info-label {
+    color: var(--gray);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .info-value {
+    color: var(--ink);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% macro value(text) -%}
+  {{ text if text not in [none, ''] else '-' }}
+{%- endmacro %}
+
+<div class="detail-wrap">
+  <div class="detail-header">
+    <div>
+      <h1 class="detail-title">Application #{{ application['App_ID'] }}</h1>
+      <p class="detail-sub">
+        Submitted on {{ (application['Created_at'] or '')[:10] }}
+      </p>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="btn-secondary"
+       style="display:inline-flex;text-decoration:none;">
+      Back to Dashboard
+    </a>
+  </div>
+
+  <div class="detail-grid">
+    <section class="detail-panel">
+      <h2 class="panel-title">Application Status</h2>
+      <div class="info-row">
+        <div class="info-label">Status</div>
+        <div class="info-value">
+          {% if application['Status'] == 0 %}
+            <span class="badge badge-pending">Pending</span>
+          {% elif application['Status'] == 1 %}
+            <span class="badge badge-approved">Approved</span>
+          {% else %}
+            <span class="badge badge-rejected">Rejected</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Created At</div>
+        <div class="info-value">{{ value(application['Created_at']) }}</div>
+      </div>
+    </section>
+
+    <section class="detail-panel">
+      <h2 class="panel-title">Dog</h2>
+      <div class="info-row">
+        <div class="info-label">Name</div>
+        <div class="info-value">{{ value(application['Dog_Name']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Breed</div>
+        <div class="info-value">{{ value(application['Breed']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Age</div>
+        <div class="info-value">{{ value(application['Age']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Gender</div>
+        <div class="info-value">{{ value(application['Gender']) }}</div>
+      </div>
+    </section>
+
+    <section class="detail-panel">
+      <h2 class="panel-title">User Account</h2>
+      <div class="info-row">
+        <div class="info-label">User ID</div>
+        <div class="info-value">#{{ application['User_ID'] }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Email</div>
+        <div class="info-value">{{ value(application['Email']) }}</div>
+      </div>
+    </section>
+
+    <section class="detail-panel">
+      <h2 class="panel-title">Applicant Form</h2>
+      <div class="info-row">
+        <div class="info-label">Full Name</div>
+        <div class="info-value">{{ value(application['Full_Name']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Phone</div>
+        <div class="info-value">{{ value(application['Phone']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">City</div>
+        <div class="info-value">{{ value(application['City']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Housing Type</div>
+        <div class="info-value">{{ value(application['Housing_Type']) }}</div>
+      </div>
+    </section>
+
+    <section class="detail-panel full">
+      <h2 class="panel-title">Application Notes</h2>
+      <div class="info-row">
+        <div class="info-label">Reason</div>
+        <div class="info-value">{{ value(application['Reason']) }}</div>
+      </div>
+      <div class="info-row">
+        <div class="info-label">Lifestyle</div>
+        <div class="info-value">{{ value(application['Lifestyle']) }}</div>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

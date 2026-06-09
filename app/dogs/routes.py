@@ -1,17 +1,18 @@
 """
 Dog-related routes.
-
-Current progress:
-- Dog list/detail use real database data through the Dog model.
-- Dog create/edit are admin-only and save current Dog table fields.
-- Extra frontend fields are accepted for compatibility, but not persisted yet.
 """
 
-from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify
+import os
+from datetime import date
+from uuid import uuid4
+
+from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify, current_app
+from werkzeug.utils import secure_filename
 from app.auth.utils import admin_required
-from app.database import get_db
 from app.models.dog import Dog
 from app.models.application import Application
+from app.models.favorite import Favorite
+from app.models.health_record import HealthRecord
 from app.models.shelter import Shelter
 
 dogs_bp = Blueprint("dogs", __name__)
@@ -56,6 +57,8 @@ SORT_MAP = {
     "age_desc": "age_desc",
 }
 
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
 
 class FormField:
     """Template helper for form.field.data."""
@@ -68,8 +71,8 @@ class DogFormView:
     """Template helper for create/edit form state."""
 
     FIELD_NAMES = (
-        "name", "breed", "age", "gender", "size", "city", "health_status",
-        "is_urgent", "shelter_id", "description",
+        "name", "breed", "age", "gender", "health_status",
+        "shelter_id", "description",
     )
 
     def __init__(self, form_data=None, errors=None):
@@ -78,8 +81,6 @@ class DogFormView:
 
         for field_name in self.FIELD_NAMES:
             value = form_data.get(field_name, "")
-            if field_name == "is_urgent":
-                value = bool(value)
             setattr(self, field_name, FormField(value))
 
 
@@ -104,6 +105,24 @@ def _parse_age(value):
     value = (value or "").strip()
     digits = "".join(char for char in value if char.isdigit())
     return int(digits) if digits else 0
+
+
+def _save_uploaded_image(file_storage):
+    """Save an uploaded dog image and return its static URL path."""
+    if not file_storage or not file_storage.filename:
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        return None
+
+    upload_dir = os.path.join(current_app.root_path, "static", "img", "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    saved_name = f"{uuid4().hex}.{extension}"
+    file_storage.save(os.path.join(upload_dir, saved_name))
+    return f"/static/img/uploads/{saved_name}"
 
 
 @dogs_bp.route("/find-a-dog/", methods=["GET"])
@@ -142,20 +161,14 @@ def list_dogs():
         "available": len([dog for dog in dogs if dog.availability == "Available"]),
         "pending": len([dog for dog in dogs if dog.availability == "Pending"]),
         "adopted": len([dog for dog in dogs if dog.availability == "Adopted"]),
-        "urgent": len([dog for dog in dogs if dog.is_urgent]),
     }
 
     user_id = session.get('user_id')
     liked_ids = set()
     favorite_dogs = []
     if user_id:
-        db = get_db()
-        rows = db.execute(
-            'SELECT Dog_ID FROM Favorite WHERE User_ID = ? ORDER BY Created_at DESC', (user_id,)
-        ).fetchall()
-        liked_ids = {row['Dog_ID'] for row in rows}
-        favorite_dogs = [Dog.get_by_id(row['Dog_ID']) for row in rows]
-        favorite_dogs = [d for d in favorite_dogs if d]
+        liked_ids = set(Favorite.get_user_favorite_ids(user_id))
+        favorite_dogs = Favorite.get_user_favorite_dogs(user_id)
 
     return render_template(
         "dogs/list.html",
@@ -209,7 +222,9 @@ def create():
         gender = request.form.get("gender", "").strip() or "Unknown"
         shelter_id = request.form.get("shelter_id", "").strip()
         age = _parse_age(request.form.get("age", ""))
-        image_url = request.form.get("image_url", "").strip() or None
+        description = request.form.get("description", "").strip() or None
+        health_status = request.form.get("health_status", "").strip()
+        image_url = _save_uploaded_image(request.files.get("image"))
 
         errors = {}
         if not name:
@@ -227,7 +242,10 @@ def create():
                 age=age,
                 breed=breed,
                 image_url=image_url,
+                description=description,
             )
+            if health_status:
+                HealthRecord.create(dog_id, date.today().isoformat(), health_status)
             flash("Dog profile created.", "success")
             return redirect(url_for("admin.dashboard"))
 
@@ -260,7 +278,9 @@ def edit(id):
         gender = request.form.get("gender", "").strip() or "Unknown"
         shelter_id = request.form.get("shelter_id", "").strip()
         age = _parse_age(request.form.get("age", ""))
-        image_url = request.form.get("image_url", "").strip() or dog.image_url
+        description = request.form.get("description", "").strip() or None
+        health_status = request.form.get("health_status", "").strip()
+        image_url = _save_uploaded_image(request.files.get("image")) or dog.image_url
 
         errors = {}
         if not name:
@@ -279,7 +299,10 @@ def edit(id):
                 age=age,
                 breed=breed,
                 image_url=image_url,
+                description=description,
             )
+            if health_status and health_status != dog.health_status:
+                HealthRecord.create(id, date.today().isoformat(), health_status)
             flash("Dog profile updated.", "success")
             return redirect(url_for("admin.dashboard"))
 
@@ -301,17 +324,5 @@ def toggle_like(dog_id):
     """Toggle favorite status for a dog. Returns JSON {liked: bool}."""
     if not session.get('user_id'):
         return jsonify({'error': 'login required'}), 401
-    user_id = session['user_id']
-    db = get_db()
-    existing = db.execute(
-        'SELECT 1 FROM Favorite WHERE User_ID = ? AND Dog_ID = ?',
-        (user_id, dog_id)
-    ).fetchone()
-    if existing:
-        db.execute('DELETE FROM Favorite WHERE User_ID = ? AND Dog_ID = ?', (user_id, dog_id))
-        liked = False
-    else:
-        db.execute('INSERT INTO Favorite (User_ID, Dog_ID) VALUES (?, ?)', (user_id, dog_id))
-        liked = True
-    db.commit()
+    liked = Favorite.toggle(session['user_id'], dog_id)
     return jsonify({'liked': liked})

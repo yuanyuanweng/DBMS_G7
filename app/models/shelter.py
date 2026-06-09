@@ -6,16 +6,6 @@ class Shelter:
         self.id = row["Shelter_ID"]
         self.name = row["Name"]
         self.location = row["Location"]
-        self.contact = row["Contact"]
-
-    def to_dict(self):
-        """Convert the shelter object into a dictionary."""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "location": self.location,
-            "contact": self.contact,
-        }
 
     @staticmethod
     def get_all():
@@ -23,7 +13,7 @@ class Shelter:
         db = get_db()
         rows = db.execute(
             """
-            SELECT Shelter_ID, Name, Location, Contact
+            SELECT Shelter_ID, Name, Location
             FROM Shelter
             ORDER BY Name
             """
@@ -36,26 +26,10 @@ class Shelter:
         db = get_db()
         row = db.execute(
             """
-            SELECT Shelter_ID, Name, Location, Contact
+            SELECT Shelter_ID, Name, Location
             FROM Shelter
             WHERE Shelter_ID = ?
             """,
             (shelter_id,),
         ).fetchone()
         return Shelter(row) if row else None
-
-    @staticmethod
-    def get_by_user_id(user_id):
-        """Return shelters assigned to one staff/admin user."""
-        db = get_db()
-        rows = db.execute(
-            """
-            SELECT s.Shelter_ID, s.Name, s.Location, s.Contact
-            FROM Shelter s
-            JOIN User_Shelter us ON s.Shelter_ID = us.Shelter_ID
-            WHERE us.User_ID = ?
-            ORDER BY s.Name
-            """,
-            (user_id,),
-        ).fetchall()
-        return [Shelter(row) for row in rows]
