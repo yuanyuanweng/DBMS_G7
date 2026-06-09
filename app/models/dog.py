@@ -40,6 +40,7 @@ class Dog:
         self.size = self._derive_size()
         self.health_status = self._latest_health_status()
         self.description = data.get("Description") or self._derive_description()
+        self.desc = self.description
         self.ai_story = ""
         self.is_urgent = False
 

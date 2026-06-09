@@ -10,6 +10,7 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 def _build_prompt(dog):
     shelter_name = dog.shelter.name if dog.shelter else "Unknown shelter"
     health_status = dog.health_status or "Ask the shelter for details"
+    description = dog.desc or "No extra description provided"
 
     return f"""
 Write a warm adoption story for this dog.
@@ -22,6 +23,7 @@ Dog profile:
 - Size: {dog.size}
 - Shelter: {shelter_name}
 - Health: {health_status}
+- Description: {description}
 
 Requirements:
 - Around 80 words.
