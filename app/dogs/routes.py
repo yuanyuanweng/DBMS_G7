@@ -1,11 +1,5 @@
 """
 Dog-related routes.
-
-Current progress:
-- Dog list/detail use real database data through the Dog model.
-- Dog create/edit are admin-only and save uploaded images, short descriptions,
-  and health status records.
-- Availability is derived from application status through Dog_With_Status.
 """
 
 import os
@@ -15,9 +9,9 @@ from uuid import uuid4
 from flask import Blueprint, render_template, request, abort, redirect, session, url_for, flash, jsonify, current_app
 from werkzeug.utils import secure_filename
 from app.auth.utils import admin_required
-from app.database import get_db
 from app.models.dog import Dog
 from app.models.application import Application
+from app.models.favorite import Favorite
 from app.models.health_record import HealthRecord
 from app.models.shelter import Shelter
 
@@ -87,8 +81,6 @@ class DogFormView:
 
         for field_name in self.FIELD_NAMES:
             value = form_data.get(field_name, "")
-            if field_name == "is_urgent":
-                value = bool(value)
             setattr(self, field_name, FormField(value))
 
 
@@ -176,13 +168,8 @@ def list_dogs():
     liked_ids = set()
     favorite_dogs = []
     if user_id:
-        db = get_db()
-        rows = db.execute(
-            'SELECT Dog_ID FROM Favorite WHERE User_ID = ? ORDER BY Created_at DESC', (user_id,)
-        ).fetchall()
-        liked_ids = {row['Dog_ID'] for row in rows}
-        favorite_dogs = [Dog.get_by_id(row['Dog_ID']) for row in rows]
-        favorite_dogs = [d for d in favorite_dogs if d]
+        liked_ids = set(Favorite.get_user_favorite_ids(user_id))
+        favorite_dogs = Favorite.get_user_favorite_dogs(user_id)
 
     return render_template(
         "dogs/list.html",
@@ -338,17 +325,5 @@ def toggle_like(dog_id):
     """Toggle favorite status for a dog. Returns JSON {liked: bool}."""
     if not session.get('user_id'):
         return jsonify({'error': 'login required'}), 401
-    user_id = session['user_id']
-    db = get_db()
-    existing = db.execute(
-        'SELECT 1 FROM Favorite WHERE User_ID = ? AND Dog_ID = ?',
-        (user_id, dog_id)
-    ).fetchone()
-    if existing:
-        db.execute('DELETE FROM Favorite WHERE User_ID = ? AND Dog_ID = ?', (user_id, dog_id))
-        liked = False
-    else:
-        db.execute('INSERT INTO Favorite (User_ID, Dog_ID) VALUES (?, ?)', (user_id, dog_id))
-        liked = True
-    db.commit()
+    liked = Favorite.toggle(session['user_id'], dog_id)
     return jsonify({'liked': liked})
