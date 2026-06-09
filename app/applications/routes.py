@@ -31,7 +31,11 @@ def apply(dog_id):
 @applications_bp.route('/my-applications')
 @login_required
 def my_applications():
-    apps = Application.get_by_user(session['user_id'])
+    user_id = session['user_id']
+    db = get_db()
+    db.execute('UPDATE Application SET Seen = 1 WHERE User_ID = ? AND Seen = 0', (user_id,))
+    db.commit()
+    apps = Application.get_by_user(user_id)
     return render_template('applications/my_applications.html', applications=apps)
 
 @applications_bp.route('/applications/<int:app_id>/cancel', methods=['POST'])

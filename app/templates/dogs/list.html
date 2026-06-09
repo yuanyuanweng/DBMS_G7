@@ -17,12 +17,12 @@
     flex-shrink: 0;
     background: var(--warm-white);
     border-right: 1px solid var(--light-gray);
-    padding: 2rem 1.5rem;
+    padding: 1rem 1.2rem;
     position: sticky;
     top: 64px;
     height: calc(100vh - 64px);
     overflow-y: auto;
-    scrollbar-width: thin;
+    scrollbar-width: none;
   }
 
   .sidebar-brand {
@@ -33,13 +33,13 @@
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--dark-brown);
-    margin-bottom: 1.8rem;
-    padding-bottom: 1.2rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.7rem;
     border-bottom: 1px solid var(--light-gray);
   }
 
   .sidebar-section {
-    margin-bottom: 1.6rem;
+    margin-bottom: 0.8rem;
   }
 
   .sidebar-label {
@@ -48,7 +48,7 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gray);
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.4rem;
     display: block;
   }
 
@@ -59,7 +59,7 @@
 
   .sidebar-search input {
     width: 100%;
-    padding: 9px 12px 9px 34px;
+    padding: 6px 12px 6px 34px;
     border: 1.5px solid var(--light-gray);
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
@@ -98,7 +98,7 @@
 
   .chip-group label {
     display: inline-block;
-    padding: 5px 12px;
+    padding: 3px 10px;
     border-radius: 100px;
     font-size: 0.78rem;
     font-weight: 500;
@@ -128,7 +128,7 @@
   /* Select dropdown */
   .sidebar-select {
     width: 100%;
-    padding: 8px 12px;
+    padding: 5px 12px;
     border: 1.5px solid var(--light-gray);
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
@@ -293,6 +293,7 @@
     cursor: pointer;
     transition: transform 0.22s ease, box-shadow 0.22s ease;
     animation: fadeUp 0.5s ease both;
+    position: relative;
   }
 
   .dog-card:hover {
@@ -310,25 +311,27 @@
 
   .dog-status-badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 0.65rem;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    font-size: 0.62rem;
     font-weight: 700;
-    padding: 3px 9px;
+    padding: 2px 7px;
     border-radius: 100px;
-    background: rgba(61,122,92,0.15);
-    color: var(--sage);
-    letter-spacing: 0.05em;
+    background: rgba(61,122,92,0.85);
+    color: #fff;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
   }
 
   .dog-status-badge.urgent {
-    background: rgba(245,200,66,0.25);
-    color: #8a6500;
+    background: rgba(200,100,50,0.85);
+    color: #fff;
   }
 
   .dog-status-badge.pending {
-    background: rgba(232,97,75,0.15);
-    color: #c0442a;
+    background: rgba(192,68,42,0.85);
+    color: #fff;
   }
 
   .dog-card-img-circle {
@@ -354,7 +357,7 @@
 
   .dog-card-name {
     font-family: var(--font-serif);
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--dark-brown);
     margin-bottom: 3px;
@@ -832,18 +835,6 @@
 
     </form>
 
-    <hr class="sidebar-divider">
-
-    <!-- AI Smart Match -->
-    <div class="sidebar-section">
-      <span class="sidebar-label">✨ AI Smart Match</span>
-      <p style="font-size:0.75rem;color:var(--gray);margin-bottom:0.6rem;line-height:1.5;">
-        Describe your lifestyle and let AI find your perfect match.
-      </p>
-      <textarea class="ai-sidebar-input" id="aiSearchInput" rows="3"
-        placeholder="e.g. I live in a small apartment, work from home, prefer a calm dog…"></textarea>
-      <button class="ai-sidebar-btn" id="aiSearchBtn">🤖 AI Match</button>
-    </div>
 
   </aside>
 
@@ -920,12 +911,12 @@
       <div class="dogs-grid" id="dogs">
         {% for dog in dogs %}
         <div class="dog-card" onclick="window.location='{{ url_for('dogs.dog_detail', dog_id=dog.id) }}'">
+          <span class="dog-status-badge {% if dog.is_urgent %}urgent{% elif dog.availability == 'Pending' %}pending{% endif %}">
+            {% if dog.is_urgent %}Urgent
+            {% elif dog.availability == 'Pending' %}Pending
+            {% else %}Available{% endif %}
+          </span>
           <div class="dog-card-circle-wrap">
-            <span class="dog-status-badge {% if dog.is_urgent %}urgent{% elif dog.availability == 'Pending' %}pending{% endif %}">
-              {% if dog.is_urgent %}Urgent
-              {% elif dog.availability == 'Pending' %}Pending
-              {% else %}Available{% endif %}
-            </span>
             <div class="dog-card-img-circle">
               {% if dog.image_url %}
                 <img src="{{ dog.image_url }}" alt="{{ dog.name }}"/>
@@ -1078,22 +1069,56 @@
   favClose?.addEventListener('click', closeDrawer);
   favOverlay?.addEventListener('click', closeDrawer);
 
+  // ── Badge helper ──
+  function updateBadge(delta) {
+    const btn = document.getElementById('favDrawerBtn');
+    if (!btn) return;
+    let badge = btn.querySelector('.fav-count-badge');
+    const current = badge ? parseInt(badge.textContent) : 0;
+    const next = current + delta;
+    if (next <= 0) {
+      badge?.remove();
+    } else if (badge) {
+      badge.textContent = next;
+    } else {
+      badge = document.createElement('span');
+      badge.className = 'fav-count-badge';
+      badge.textContent = next;
+      btn.appendChild(badge);
+    }
+  }
+
+  // ── Add dog row to drawer ──
+  function addFavRow(dog) {
+    const body = document.querySelector('.fav-drawer-body');
+    if (!body) return;
+    body.querySelector('.fav-drawer-empty')?.remove();
+    const row = document.createElement('div');
+    row.className = 'fav-row';
+    row.id = 'fav-row-' + dog.id;
+    row.innerHTML = `
+      <div class="fav-row-avatar">${dog.image_url ? `<img src="${dog.image_url}" alt="${dog.name}"/>` : '🐶'}</div>
+      <div class="fav-row-info">
+        <div class="fav-row-name">${dog.name}</div>
+        <div class="fav-row-breed">${dog.breed} · ${dog.age}</div>
+      </div>
+      <div class="fav-row-actions">
+        <a href="/dogs/${dog.id}" class="fav-row-view">View</a>
+        <button class="fav-row-remove" onclick="removeFavDrawer(${dog.id})">💔</button>
+      </div>`;
+    body.appendChild(row);
+  }
+
+  // ── Remove dog row from drawer ──
   async function removeFavDrawer(dogId) {
     try {
       const res  = await fetch(`/dogs/${dogId}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
       const data = await res.json();
       if (!data.liked) {
         document.getElementById('fav-row-' + dogId)?.remove();
-        // Update count badge
-        const badge = document.querySelector('.fav-count-badge');
-        if (badge) {
-          const n = parseInt(badge.textContent) - 1;
-          if (n <= 0) { badge.remove(); } else { badge.textContent = n; }
-        }
-        // Update heart on card
+        updateBadge(-1);
         const heartBtn = document.querySelector(`.heart-btn[data-heart="${dogId}"]`);
         if (heartBtn) { heartBtn.classList.remove('liked'); heartBtn.textContent = '🤍'; }
-        // Show empty state if no rows left
         const body = document.querySelector('.fav-drawer-body');
         if (body && !body.querySelector('.fav-row')) {
           body.innerHTML = `<div class="fav-drawer-empty"><div style="font-size:2.5rem;margin-bottom:0.8rem;">🤍</div><p>No favourites yet.</p><p style="font-size:0.8rem;margin-top:4px;">Press ❤️ on any dog card!</p></div>`;
@@ -1101,5 +1126,47 @@
       }
     } catch(e) { console.error(e); }
   }
+
+  // ── Override heart buttons with drawer-aware handler ──
+  // Runs inside DOMContentLoaded so it fires AFTER app.js's setupHeartButtons(),
+  // then cloneNode strips that generic listener before we add our own.
+  document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.heart-btn').forEach(btn => {
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const dogId = parseInt(newBtn.dataset.heart);
+      const wasLiked = newBtn.classList.contains('liked');
+
+      // Optimistic UI
+      newBtn.classList.toggle('liked');
+      newBtn.textContent = wasLiked ? '🤍' : '❤️';
+
+      try {
+        const res  = await fetch(`/dogs/${dogId}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const data = await res.json();
+        if (data.liked) {
+          updateBadge(+1);
+          const dog = DOGS_FROM_SERVER.find(d => d.id === dogId);
+          if (dog) addFavRow(dog);
+          showToast('❤️', 'Added to favourites!');
+        } else {
+          document.getElementById('fav-row-' + dogId)?.remove();
+          updateBadge(-1);
+          const body = document.querySelector('.fav-drawer-body');
+          if (body && !body.querySelector('.fav-row')) {
+            body.innerHTML = `<div class="fav-drawer-empty"><div style="font-size:2.5rem;margin-bottom:0.8rem;">🤍</div><p>No favourites yet.</p><p style="font-size:0.8rem;margin-top:4px;">Press ❤️ on any dog card!</p></div>`;
+          }
+          showToast('💔', 'Removed from favourites');
+        }
+      } catch {
+        // Revert on failure
+        newBtn.classList.toggle('liked');
+        newBtn.textContent = wasLiked ? '❤️' : '🤍';
+      }
+    });
+  });
+  }); // end DOMContentLoaded
 </script>
 {% endblock %}

@@ -190,7 +190,7 @@ class Application:
         db.execute(
             """
             UPDATE Application
-            SET Status = ?
+            SET Status = ?, Seen = 0
             WHERE App_ID = ?
             """,
             (status, app_id),
@@ -200,7 +200,7 @@ class Application:
             db.execute(
                 """
                 UPDATE Application
-                SET Status = 2
+                SET Status = 2, Seen = 0
                 WHERE Dog_ID = ?
                   AND App_ID != ?
                   AND Status IN (0, 1)

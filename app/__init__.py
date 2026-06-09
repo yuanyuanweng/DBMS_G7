@@ -1,5 +1,5 @@
-from flask import Flask
-from app.database import close_db
+from flask import Flask, session
+from app.database import close_db, get_db
 import sqlite3
 
 def _add_seen_column(app):
@@ -54,5 +54,20 @@ def create_app():
     app.register_blueprint(applications_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(ai_bp)
+
+    @app.context_processor
+    def inject_notif_count():
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'notif_count': 0}
+        try:
+            db = get_db()
+            count = db.execute(
+                'SELECT COUNT(*) FROM Application WHERE User_ID = ? AND Seen = 0 AND Status != 0',
+                (user_id,)
+            ).fetchone()[0]
+        except Exception:
+            count = 0
+        return {'notif_count': count}
 
     return app
