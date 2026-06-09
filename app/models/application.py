@@ -105,6 +105,42 @@ class Application:
         ).fetchall()
 
     @staticmethod
+    def get_admin_detail(app_id):
+        """Return one application with user, dog, and form details for admin."""
+        db = get_db()
+        app_columns = {
+            row["name"]
+            for row in db.execute("PRAGMA table_info(Application)").fetchall()
+        }
+        form_fields = (
+            "Full_Name",
+            "Phone",
+            "City",
+            "Housing_Type",
+            "Reason",
+            "Lifestyle",
+        )
+        form_select = [
+            f"a.{field}" if field in app_columns else f"NULL AS {field}"
+            for field in form_fields
+        ]
+
+        return db.execute(
+            f"""
+            SELECT a.App_ID, a.User_ID, a.Dog_ID, a.Status, a.Match_Score,
+                   a.Created_at,
+                   {", ".join(form_select)},
+                   u.Email,
+                   d.Name AS Dog_Name, d.Breed, d.Age, d.Gender, d.Image_URL
+            FROM Application a
+            JOIN Users u ON a.User_ID = u.User_ID
+            JOIN Dog d ON a.Dog_ID = d.Dog_ID
+            WHERE a.App_ID = ?
+            """,
+            (app_id,),
+        ).fetchone()
+
+    @staticmethod
     def get_admin_users():
         """Return user rows displayed on the admin dashboard."""
         db = get_db()
@@ -133,16 +169,40 @@ class Application:
         return row is not None
 
     @staticmethod
-    def create(user_id, dog_id, match_score=None):
+    def create(
+        user_id,
+        dog_id,
+        match_score=None,
+        full_name=None,
+        phone=None,
+        city=None,
+        housing_type=None,
+        reason=None,
+        lifestyle=None,
+    ):
         """Create a pending application for one user and dog."""
         db = get_db()
         try:
             cursor = db.execute(
                 """
-                INSERT INTO Application (User_ID, Dog_ID, Status, Match_Score)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Application (
+                    User_ID, Dog_ID, Status, Match_Score,
+                    Full_Name, Phone, City, Housing_Type, Reason, Lifestyle
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (user_id, dog_id, STATUS_PENDING, match_score),
+                (
+                    user_id,
+                    dog_id,
+                    STATUS_PENDING,
+                    match_score,
+                    full_name,
+                    phone,
+                    city,
+                    housing_type,
+                    reason,
+                    lifestyle,
+                ),
             )
             db.commit()
             return True, cursor.lastrowid

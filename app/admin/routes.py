@@ -23,6 +23,23 @@ def dashboard():
         admin_email=session.get('email', '')
     )
 
+
+@admin_bp.route('/applications/<int:app_id>')
+@admin_required
+def application_detail(app_id):
+    application = Application.get_admin_detail(app_id)
+    if application is None:
+        flash('Application not found.', 'error')
+        return redirect(url_for('admin.dashboard'))
+
+    return render_template(
+        'admin/application_detail.html',
+        application=application,
+        STATUS_MAP=STATUS_MAP,
+        admin_email=session.get('email', '')
+    )
+
+
 @admin_bp.route('/applications/<int:app_id>/status', methods=['POST'])
 @admin_required
 def update_status(app_id):

@@ -20,7 +20,16 @@ def apply(dog_id):
         return redirect(url_for('applications.my_applications'))
 
     if request.method == 'POST':
-        success, _ = Application.create(user_id, dog_id)
+        form_data = {
+            'full_name': request.form.get('full_name', '').strip(),
+            'phone': request.form.get('phone', '').strip(),
+            'city': request.form.get('city', '').strip(),
+            'housing_type': request.form.get('house_type', '').strip(),
+            'reason': request.form.get('reason', '').strip(),
+            'lifestyle': request.form.get('lifestyle', '').strip(),
+        }
+
+        success, _ = Application.create(user_id, dog_id, **form_data)
         if success:
             flash(f'Application for {dog.name} submitted successfully!', 'success')
             return redirect(url_for('applications.my_applications'))
