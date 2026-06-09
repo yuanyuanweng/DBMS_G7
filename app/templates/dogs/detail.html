@@ -24,7 +24,6 @@
             <div id="detailDogSVG"
                  data-color="{{ dog.color or '#D9A57A' }}"
                  data-spot="{{ dog.spot_color or '#C4714A' }}"
-                 data-urgent="{{ 'true' if dog.is_urgent else 'false' }}"
                  style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--sand);">
               <!-- SVG injected by app.js -->
             </div>
@@ -33,9 +32,8 @@
 
         <!-- Status badge -->
         <div style="margin-bottom:1.2rem;">
-          <span class="dog-status-badge {% if dog.is_urgent %}urgent{% endif %}"
-                style="font-size:0.8rem;padding:6px 16px;">
-            {{ 'Urgent Adoption Needed' if dog.is_urgent else 'Available for Adoption' }}
+          <span class="dog-status-badge" style="font-size:0.8rem;padding:6px 16px;">
+            {{ dog.availability }}
           </span>
         </div>
 
@@ -149,8 +147,7 @@
     if (el) {
       const dog = {
         color: el.dataset.color,
-        spotColor: el.dataset.spot,
-        urgent: el.dataset.urgent === 'true'
+        spotColor: el.dataset.spot
       };
       el.innerHTML = generateDogSVG(dog, 320);
     }

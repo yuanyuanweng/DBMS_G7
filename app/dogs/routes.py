@@ -161,7 +161,6 @@ def list_dogs():
         "available": len([dog for dog in dogs if dog.availability == "Available"]),
         "pending": len([dog for dog in dogs if dog.availability == "Pending"]),
         "adopted": len([dog for dog in dogs if dog.availability == "Adopted"]),
-        "urgent": len([dog for dog in dogs if dog.is_urgent]),
     }
 
     user_id = session.get('user_id')

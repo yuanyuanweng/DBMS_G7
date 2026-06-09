@@ -719,8 +719,6 @@ body {
   white-space: nowrap;
 }
 
-.dog-status-badge.urgent { background: var(--sakura); color: #7A1A30; }
-
 .dog-card-body {
   padding: 1.4rem;
 }

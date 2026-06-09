@@ -16,7 +16,7 @@ function generateDogSVG(dog, size = 200) {
   const snoutC = light ? '#E8B98A' : '#8B6F52';
 
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-    <rect width="200" height="200" fill="${dog.urgent || dog.is_urgent ? '#FFF0EB' : '#F0E6D3'}"/>
+    <rect width="200" height="200" fill="#F0E6D3"/>
     <ellipse cx="100" cy="185" rx="55" ry="10" fill="#D9C4A8" opacity="0.4"/>
     <path d="M148 118 Q168 98 162 82 Q158 72 152 76 Q155 87 138 106Z" fill="${s}"/>
     <ellipse cx="108" cy="138" rx="48" ry="34" fill="${c}"/>
@@ -39,7 +39,7 @@ function generateDogSVG(dog, size = 200) {
     <circle cx="118" cy="132" r="6" fill="${s}" opacity="0.35"/>
     <text x="148" y="82" font-size="12" fill="#C4714A" opacity="0.55">♥</text>
     <text x="28" y="82" font-size="10" fill="#8A9E8C" opacity="0.5">✿</text>
-    ${(dog.urgent || dog.is_urgent) ? '<text x="150" y="165" font-size="11" opacity="0.6">⚡</text>' : '<text x="148" y="168" font-size="11" opacity="0.5">🌸</text>'}
+    <text x="148" y="168" font-size="11" opacity="0.5">🌸</text>
   </svg>`;
 }
 
@@ -57,8 +57,7 @@ function injectDogSVGs() {
   document.querySelectorAll('.dog-card-img-placeholder').forEach(el => {
     const dog = {
       color:     el.dataset.color || '#D9A57A',
-      spotColor: el.dataset.spot  || '#C4714A',
-      urgent:    el.dataset.urgent === 'true'
+      spotColor: el.dataset.spot  || '#C4714A'
     };
     el.innerHTML = generateDogSVG(dog, 160);
     el.style.cssText = 'width:100%;height:100%;';

@@ -324,11 +324,6 @@
     white-space: nowrap;
   }
 
-  .dog-status-badge.urgent {
-    background: rgba(200,100,50,0.85);
-    color: #fff;
-  }
-
   .dog-status-badge.pending {
     background: rgba(192,68,42,0.85);
     color: #fff;
@@ -911,9 +906,8 @@
       <div class="dogs-grid" id="dogs">
         {% for dog in dogs %}
         <div class="dog-card" onclick="window.location='{{ url_for('dogs.dog_detail', dog_id=dog.id) }}'">
-          <span class="dog-status-badge {% if dog.is_urgent %}urgent{% elif dog.availability == 'Pending' %}pending{% endif %}">
-            {% if dog.is_urgent %}Urgent
-            {% elif dog.availability == 'Pending' %}Pending
+          <span class="dog-status-badge {% if dog.availability == 'Pending' %}pending{% endif %}">
+            {% if dog.availability == 'Pending' %}Pending
             {% else %}Available{% endif %}
           </span>
           <div class="dog-card-circle-wrap">

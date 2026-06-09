@@ -25,17 +25,6 @@ class Application:
         self.created_at = row["Created_at"] or ""
         self.dog = Dog.get_by_id(self.dog_id)
 
-    def to_dict(self):
-        """Convert the application object into a dictionary."""
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "dog_id": self.dog_id,
-            "status_code": self.status_code,
-            "status": self.status,
-            "created_at": self.created_at,
-        }
-
     @staticmethod
     def get_by_id(app_id):
         """Return one application by its application ID."""

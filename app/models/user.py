@@ -8,12 +8,6 @@ class User:
         self.role = 'admin' if row['Role'] == 1 else 'user'
 
     @staticmethod
-    def get_by_id(user_id):
-        db = get_db()
-        row = db.execute('SELECT * FROM Users WHERE User_ID = ?', (user_id,)).fetchone()
-        return User(row) if row else None
-
-    @staticmethod
     def verify_password(email, password):
         db = get_db()
         row = db.execute('SELECT * FROM Users WHERE Email = ?', (email,)).fetchone()

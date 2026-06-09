@@ -112,11 +112,7 @@
     <div class="dogs-grid">
       {% for dog in dogs %}
       <article class="dog-card">
-          {% if dog.is_urgent %}
-          <span class="dog-status-badge urgent">Urgent</span>
-          {% else %}
           <span class="dog-status-badge">{{ dog.availability }}</span>
-          {% endif %}
         <div class="dog-card-circle-wrap">
           <div class="dog-card-img-circle">
             {% if dog.image_url %}

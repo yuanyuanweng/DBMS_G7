@@ -42,7 +42,6 @@ class Dog:
         self.description = data.get("Description") or self._derive_description()
         self.desc = self.description
         self.ai_story = ""
-        self.is_urgent = False
 
         self.color = COLORS[(self.id - 1) % len(COLORS)]
         self.spot_color = SPOT_COLORS[(self.id - 1) % len(SPOT_COLORS)]
@@ -129,7 +128,6 @@ class Dog:
             "ai_story": self.ai_story,
             "description": self.description,
             "health_status": self.health_status,
-            "is_urgent": self.is_urgent,
             "color": self.color,
             "spot_color": self.spot_color,
             "tags": self.tags,
