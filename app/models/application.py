@@ -66,6 +66,33 @@ class Application:
         return [Application(row) for row in rows]
 
     @staticmethod
+    def count_unseen_updates(user_id):
+        """Return approved/rejected application updates not yet seen by a user."""
+        db = get_db()
+        return db.execute(
+            """
+            SELECT COUNT(*)
+            FROM Application
+            WHERE User_ID = ? AND Seen = 0 AND Status != ?
+            """,
+            (user_id, STATUS_PENDING),
+        ).fetchone()[0]
+
+    @staticmethod
+    def mark_updates_seen(user_id):
+        """Mark all unseen application updates for a user as seen."""
+        db = get_db()
+        db.execute(
+            """
+            UPDATE Application
+            SET Seen = 1
+            WHERE User_ID = ? AND Seen = 0
+            """,
+            (user_id,),
+        )
+        db.commit()
+
+    @staticmethod
     def get_admin_counts():
         """Return dashboard counts for admin application summary."""
         db = get_db()
