@@ -65,9 +65,9 @@ INSERT INTO User_Shelter (User_ID, Shelter_ID) VALUES (1, 1), (2, 2), (3, 3);
 
 -- Application
 INSERT INTO Application 
-(App_ID, User_ID, Dog_ID, Status, Match_Score, Full_Name, Phone, City, Housing_Type, Reason, Lifestyle) 
+(App_ID, User_ID, Dog_ID, Status, Full_Name, Phone, City, Housing_Type, Reason, Lifestyle) 
 VALUES
-(1, 6, 1, 0, 88, 
+(1, 6, 1, 0, 
  'David Chen', 
  '0912-345-678', 
  'Taipei', 
@@ -75,7 +75,7 @@ VALUES
  'I want to adopt Alex because I like active dogs and can take him for walks every day.', 
  'I work from 9 to 5 and usually spend weekends outdoors.'),
 
-(2, 7, 2, 1, 95, 
+(2, 7, 2, 1, 
  'Emily Wang', 
  '0922-111-222', 
  'Taichung', 
@@ -83,7 +83,7 @@ VALUES
  'I have always loved dogs and Rachel seems suitable for my family.', 
  'My family is usually at home in the evening and we have enough space.'),
 
-(3, 8, 3, 2, 45, 
+(3, 8, 3, 2, 
  'Kevin Lin', 
  '0933-222-333', 
  'Kaohsiung', 
@@ -91,7 +91,7 @@ VALUES
  'I want to adopt Vacok because I like small mixed-breed dogs.', 
  'I am a student and my schedule is flexible.'),
 
-(4, 9, 8, 0, 72, 
+(4, 9, 8, 0, 
  'Sophia Liu', 
  '0944-333-444', 
  'Tainan', 
@@ -99,7 +99,7 @@ VALUES
  'Max looks friendly and I think he would be a good companion.', 
  'I usually stay at home after work and can walk the dog daily.'),
 
-(5, 10, 11, 1, 80, 
+(5, 10, 11, 1, 
  'Jason Huang', 
  '0955-444-555', 
  'Taipei', 

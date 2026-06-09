@@ -22,7 +22,6 @@ class Application:
         self.dog_id = row["Dog_ID"]
         self.status_code = row["Status"]
         self.status = STATUS_MAP.get(self.status_code, "Pending")
-        self.match_score = row["Match_Score"]
         self.created_at = row["Created_at"] or ""
         self.dog = Dog.get_by_id(self.dog_id)
 
@@ -34,7 +33,6 @@ class Application:
             "dog_id": self.dog_id,
             "status_code": self.status_code,
             "status": self.status,
-            "match_score": self.match_score,
             "created_at": self.created_at,
         }
 
@@ -44,7 +42,7 @@ class Application:
         db = get_db()
         row = db.execute(
             """
-            SELECT App_ID, User_ID, Dog_ID, Status, Match_Score, Created_at
+            SELECT App_ID, User_ID, Dog_ID, Status, Created_at
             FROM Application
             WHERE App_ID = ?
             """,
@@ -58,7 +56,7 @@ class Application:
         db = get_db()
         rows = db.execute(
             """
-            SELECT App_ID, User_ID, Dog_ID, Status, Match_Score, Created_at
+            SELECT App_ID, User_ID, Dog_ID, Status, Created_at
             FROM Application
             WHERE User_ID = ?
             ORDER BY Created_at DESC
@@ -127,8 +125,7 @@ class Application:
 
         return db.execute(
             f"""
-            SELECT a.App_ID, a.User_ID, a.Dog_ID, a.Status, a.Match_Score,
-                   a.Created_at,
+            SELECT a.App_ID, a.User_ID, a.Dog_ID, a.Status, a.Created_at,
                    {", ".join(form_select)},
                    u.Email,
                    d.Name AS Dog_Name, d.Breed, d.Age, d.Gender, d.Image_URL
@@ -172,7 +169,6 @@ class Application:
     def create(
         user_id,
         dog_id,
-        match_score=None,
         full_name=None,
         phone=None,
         city=None,
@@ -186,16 +182,15 @@ class Application:
             cursor = db.execute(
                 """
                 INSERT INTO Application (
-                    User_ID, Dog_ID, Status, Match_Score,
+                    User_ID, Dog_ID, Status,
                     Full_Name, Phone, City, Housing_Type, Reason, Lifestyle
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     user_id,
                     dog_id,
                     STATUS_PENDING,
-                    match_score,
                     full_name,
                     phone,
                     city,

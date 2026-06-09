@@ -33,7 +33,6 @@ CREATE TABLE Application (
     User_ID INTEGER NOT NULL,
     Dog_ID INTEGER NOT NULL,
     Status INTEGER NOT NULL DEFAULT 0 CHECK (Status IN (0, 1, 2)), -- 0:待審(pending), 1:核准(approved), 2:拒絕(rejected) (管理員層面)
-    Match_Score INTEGER CHECK (Match_Score BETWEEN 0 AND 100),
     Created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     Full_Name TEXT,
     Phone TEXT,
